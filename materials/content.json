@@ -10,6 +10,10 @@
     "mainPage": {
       "label": "Return to GitHub main page",
       "url": "https://github.com/youminghu0930-public"
+    },
+    "personalPage": {
+      "label": "More about me →",
+      "url": "https://youminghu0930.github.io/"
     }
   },
   "sections": [

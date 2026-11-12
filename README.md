@@ -42,3 +42,7 @@ GitHub Actions builds and deploys `dist/` on pushes to `main` or `master`. Set *
 ## Navigation
 
 The parent is https://github.com/youminghu0930-public. Its profile README links to this portfolio, and the portfolio's left navigator links back. The two major project pages link back to this site's `#projects` section. Public project repositories contain presentation frontends; confidential implementation code is not published.
+
+## Parallel landing pages
+
+The personal and public GitHub landing READMEs link to each other and to their own polished pages. The polished personal page and portfolio link to each other in the main content; each left navigator returns to its own GitHub parent.

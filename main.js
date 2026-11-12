@@ -41,6 +41,7 @@ async function renderPage() {
   const main = element('main');
   main.id = sections[0].id;
   main.append(element('p', page.eyebrow, 'eyebrow'), element('h1', page.heading), element('p', page.intro, 'intro'));
+  main.append(link(page.personalPage.label, page.personalPage.url));
   const section = element('section');
   section.id = sections[1].id;
   section.setAttribute('aria-labelledby', 'projects-heading');
