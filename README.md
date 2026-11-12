@@ -31,3 +31,13 @@ If the remote already contains commits, fetch and reconcile them before pushing.
 ## Git workflow
 
 Create feature branches from the current default branch, commit focused changes, and open a pull request. Merge into the default branch to deploy. Keep site files inside `public/`; the Node server is for local preview only, since GitHub Pages hosts static files.
+
+## Project hierarchy
+
+Local checkout: `/Users/youming/Documents/Personal/Public/main.github.io`. Its folder name is independent of the remote repository name. Keep the remote `youminghu0930-public.github.io` to publish at the account root.
+
+- Main page: https://youminghu0930-public.github.io/
+- 2D analysis: https://youminghu0930-public.github.io/golf-swing-analysis-poc/
+- True 3D: https://youminghu0930-public.github.io/golf-true-3d-product/
+
+The main page links to both independently deployed project repositories. Their “Return to main page” links point to the root site's `#projects` section. Commit and push each of the three repositories to publish these changes. Local preview on port 8100 uses the production project links.
