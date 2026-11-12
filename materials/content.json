@@ -1,0 +1,43 @@
+{
+  "page": {
+    "title": "Youming Hu | Portfolio",
+    "description": "Youming Hu's portfolio and projects.",
+    "eyebrow": "Portfolio & projects",
+    "heading": "Hi, I'm Youming.",
+    "intro": "I build computer-vision systems that turn ordinary video into useful movement insights. Explore my golf swing analysis projects below.",
+    "navigationLabel": "Portfolio sections",
+    "navigationToggle": "Toggle section navigation",
+    "mainPage": {
+      "label": "Return to GitHub main page",
+      "url": "https://github.com/youminghu0930-public"
+    }
+  },
+  "sections": [
+    {
+      "id": "about",
+      "title": "About"
+    },
+    {
+      "id": "projects",
+      "title": "Selected projects"
+    }
+  ],
+  "projects": [
+    {
+      "id": "golf-2d",
+      "navigationTitle": "Golf Swing Analysis",
+      "title": "Golf Swing Analysis with RGB Video",
+      "summary": "Explore 2D pose estimation, golfer and club detection, data augmentation, and trajectory reconstruction.",
+      "url": "https://youminghu0930-public.github.io/golf-swing-analysis-poc/",
+      "linkLabel": "Explore 2D analysis →"
+    },
+    {
+      "id": "golf-3d",
+      "navigationTitle": "Golf True 3D",
+      "title": "Golf True 3D",
+      "summary": "Explore 3D reconstruction, synchronization across camera views, and movement information extracted from golf swings.",
+      "url": "https://youminghu0930-public.github.io/golf-true-3d-product/",
+      "linkLabel": "Explore True 3D →"
+    }
+  ]
+}

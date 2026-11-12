@@ -3,7 +3,9 @@ import { readFile, stat } from 'node:fs/promises';
 import { fileURLToPath } from 'node:url';
 import path from 'node:path';
 
-const root = fileURLToPath(new URL('../public/', import.meta.url));
+const built = process.argv.includes('--dist');
+const root = fileURLToPath(new URL(built ? '../dist/' : '../', import.meta.url));
+const allowed = new Set(['index.html', 'styles.css', 'main.js', 'navigation.js']);
 const types = { '.html': 'text/html; charset=utf-8', '.css': 'text/css', '.js': 'text/javascript', '.json': 'application/json', '.svg': 'image/svg+xml', '.png': 'image/png', '.jpg': 'image/jpeg', '.ico': 'image/x-icon', '.pdf': 'application/pdf' };
 
 const server = createServer(async (req, res) => {
@@ -19,6 +21,11 @@ const server = createServer(async (req, res) => {
       return;
     }
     if ((await stat(file)).isDirectory()) file = path.join(file, 'index.html');
+    const relative = path.relative(root, file).split(path.sep).join('/');
+    if (!allowed.has(relative) && !(relative.startsWith('materials/') && !relative.split('/').some(part => part.startsWith('.')))) {
+      res.writeHead(404).end('Not found');
+      return;
+    }
     const content = await readFile(file);
     res.writeHead(200, { 'Content-Type': types[path.extname(file)] ?? 'application/octet-stream', 'Cache-Control': 'no-cache' });
     res.end(req.method === 'HEAD' ? undefined : content);
