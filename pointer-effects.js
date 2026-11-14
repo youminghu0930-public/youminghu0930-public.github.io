@@ -18,6 +18,23 @@ export function installPointerEffects(hero) {
   let target = null;
   let touchId = null;
   let releaseTimer;
+  let touchStrength = 0;
+  let touchFrame;
+  function fadeTouch(to) {
+    cancelAnimationFrame(touchFrame);
+    const from = touchStrength;
+    const start = performance.now();
+    const duration = to ? options.touchFadeInMs : options.touchFadeOutMs;
+    function step(now) {
+      const progress = Math.min(1, (now - start) / duration);
+      const eased = progress * progress * (3 - 2 * progress);
+      touchStrength = from + (to - from) * eased;
+      if (progress === 1 && to === 0 && pointer?.touch) pointer = null;
+      draw();
+      if (progress < 1) touchFrame = requestAnimationFrame(step);
+    }
+    touchFrame = requestAnimationFrame(step);
+  }
   const frame = cursor.firstElementChild;
   const corners = Array.from(frame.querySelectorAll('i'));
   const actionGroup = hero?.querySelector('.landing-actions');
@@ -86,13 +103,21 @@ export function installPointerEffects(hero) {
         const distance = Math.hypot(dx, dy);
         const t = inside ? Math.max(0, 1 - distance / influenceRadius) : 0;
         // Smoothstep gives a soft boundary and avoids a sharp central pinch.
-        const influence = t * t * (3 - 2 * t);
-        const offset = influence * options.dotDisplacement * Math.min(1, distance / influenceRadius);
-        ctx.globalAlpha = options.dotBaseOpacity + influence * (options.dotHighlightOpacity - options.dotBaseOpacity);
-        ctx.fillStyle = influence > 0 ? accent : muted;
-        ctx.beginPath();
-        ctx.arc(x + (distance ? dx / distance * offset : 0), y + (distance ? dy / distance * offset : 0), options.dotRadius * (1 + influence * options.dotEnlargement), 0, Math.PI * 2);
-        ctx.fill();
+        const influence = t * t * (3 - 2 * t) * (pointer?.touch ? touchStrength : 1);
+        const displacement = pointer?.touch ? options.touchDotDisplacement : options.dotDisplacement;
+        const offset = influence * displacement * Math.min(1, distance / influenceRadius);
+        const px = x + (distance ? dx / distance * offset : 0);
+        const py = y + (distance ? dy / distance * offset : 0);
+        const radius = options.dotRadius * (1 + influence * options.dotEnlargement);
+        // Crossfade dot colors too; switching to accent at first contact would pop.
+        ctx.globalAlpha = options.dotBaseOpacity * (1 - influence);
+        ctx.fillStyle = muted;
+        ctx.beginPath(); ctx.arc(px, py, radius, 0, Math.PI * 2); ctx.fill();
+        if (influence > 0) {
+          ctx.globalAlpha = options.dotHighlightOpacity * influence;
+          ctx.fillStyle = accent;
+          ctx.beginPath(); ctx.arc(px, py, radius, 0, Math.PI * 2); ctx.fill();
+        }
       }
     }
     ctx.globalAlpha = 1;
@@ -108,7 +133,7 @@ export function installPointerEffects(hero) {
     frame.style.transform = 'translate(-50%, -50%)';
     cursor.dataset.link = String(Boolean(rect));
   }
-  function hide() { resetMagnets(); clearTimeout(releaseTimer); touchId = null; stopFlights(); cursor.hidden = true; pointer = null; target = null; draw(); }
+  function hide() { cancelAnimationFrame(touchFrame); touchStrength = 0; resetMagnets(); clearTimeout(releaseTimer); touchId = null; stopFlights(); cursor.hidden = true; pointer = null; target = null; draw(); }
   function move(event) {
     // Native touch events continue during scrolling after pointercancel.
     if (event.pointerType === 'touch') return;
@@ -131,6 +156,7 @@ export function installPointerEffects(hero) {
   }
   function updateTouch(event) {
     if (reduced.matches) return;
+    const beginning = touchId === null;
     const touches = Array.from(event.touches);
     if (touchId === null) touchId = touches[0]?.identifier ?? null;
     const touch = touches.find(item => item.identifier === touchId);
@@ -140,21 +166,19 @@ export function installPointerEffects(hero) {
     cursor.hidden = true;
     target = null;
     pointer = {x:touch.clientX, y:touch.clientY, touch:true};
+    if (beginning) fadeTouch(1);
     draw();
   }
   function endTouch(event) {
     if (Array.from(event.touches).some(item => item.identifier === touchId)) return;
     touchId = null;
     clearTimeout(releaseTimer);
-    // Briefly retain a tap's highlight so it remains visible after release.
-    releaseTimer = setTimeout(() => {
-      if (pointer?.touch) { pointer = null; draw(); }
-    }, options.touchHighlightReleaseMs);
+    fadeTouch(0);
   }
   window.addEventListener('touchstart', updateTouch, {passive:true, signal});
   window.addEventListener('touchmove', updateTouch, {passive:true, signal});
   window.addEventListener('touchend', endTouch, {passive:true, signal});
-  window.addEventListener('touchcancel', hide, {passive:true, signal});
+  window.addEventListener('touchcancel', () => { touchId = null; fadeTouch(0); }, {passive:true, signal});
   window.addEventListener('pointermove', move, {passive:true, signal});
   window.addEventListener('scroll', () => { resetMagnets(); stopFlights(); target = null; position(); draw(); }, {passive:true, signal});
   window.addEventListener('blur', hide, {signal});
@@ -164,5 +188,5 @@ export function installPointerEffects(hero) {
   const observer = new ResizeObserver(() => { position(); draw(); });
   if (hero) observer.observe(hero);
   hide();
-  return () => { resetMagnets(); clearTimeout(releaseTimer); stopFlights(); controller.abort(); observer.disconnect(); cursor.remove(); };
+  return () => { cancelAnimationFrame(touchFrame); resetMagnets(); clearTimeout(releaseTimer); stopFlights(); controller.abort(); observer.disconnect(); cursor.remove(); };
 }

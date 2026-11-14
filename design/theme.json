@@ -286,13 +286,14 @@
     "LandingGlowWidth": "120%",
     "LandingGlowHeight": "115%",
     "LandingGlowFadeStop": "90%",
-    "LandingGlowPosition": "60% -30%"
+    "LandingGlowPosition": "60% -30%",
+    "MobileStableLandingHeight": "100svh"
   },
   "layoutReference": "https://aaftab.is-a.dev/",
   "effects": {
     "dotSpacing": 35,
     "dotRadius": 1,
-    "dotInfluenceRadius": 340,
+    "dotInfluenceRadius": 200,
     "dotDisplacement": 9,
     "dotEnlargement": 0.8,
     "dotBaseOpacity": 0.2,
@@ -310,9 +311,11 @@
     "cursorFlightStagger": 25,
     "cursorGatherOffset": 0.32,
     "cursorButtonPadding": 4,
-    "touchHighlightReleaseMs": 450,
     "buttonMagnetRange": 70,
     "buttonMagnetStrength": 7,
-    "touchDotInfluenceRadius": 145
+    "touchDotInfluenceRadius": 145,
+    "touchDotDisplacement": 0,
+    "touchFadeInMs": 180,
+    "touchFadeOutMs": 350
   }
 }

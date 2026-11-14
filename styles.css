@@ -376,3 +376,11 @@ body:has(.portfolio-shell) { overflow-x:clip; }
 
 /* Shared ambient green glow, clipped to the landing area above the stripe. */
 .portfolio-shell .landing .hero::before { content:''; position:absolute; inset:0 calc(50% - 50vw); pointer-events:none; z-index:-1; background:radial-gradient(ellipse 120% 115% at 60% -30%, hsl(140 100% 47% / 7%), transparent 90%); }
+
+/* Freeze the final measured lines while revealing their characters concurrently. */
+.type-visible .type-line { display:block; min-height:1lh; white-space:pre; }
+/* Native document scrolling owns the whole landing, including its dot canvas. */
+.portfolio-shell > main { touch-action:pan-y pinch-zoom; }
+@media (hover:none) and (pointer:coarse) {
+ .portfolio-shell .landing { min-height:100svh; }
+}

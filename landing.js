@@ -11,6 +11,29 @@ function link(label, url, className) {
   node.href = url;
   return node;
 }
+export function measureRenderedLines(reserved, text) {
+  const range = document.createRange();
+  const source = reserved.firstChild;
+  const lines = [];
+  let line = '', top = null, offset = 0;
+  for (const character of Array.from(text)) {
+    if (character === '\n') {
+      lines.push(line); line = ''; top = null; offset++;
+      continue;
+    }
+    range.setStart(source, offset);
+    offset += character.length;
+    range.setEnd(source, offset);
+    const rect = range.getBoundingClientRect();
+    if (rect.height && top !== null && Math.abs(rect.top - top) > 1) {
+      lines.push(line); line = '';
+    }
+    if (rect.height) top = rect.top;
+    line += character;
+  }
+  lines.push(line);
+  return lines;
+}
 function installPageEntrance(hero, header, stripe = null, {animateHeader = true} = {}) {
   const motion = matchMedia('(prefers-reduced-motion: reduce)');
   const settings = design.effects;
@@ -30,6 +53,7 @@ function installPageEntrance(hero, header, stripe = null, {animateHeader = true}
   const stopTicker = () => { disposed = true; tickerObserver.disconnect(); controller.abort(); };
   if (motion.matches) return stopTicker;
   const jobs = [];
+  const lineObservers = [];
   function prepare(node, delay, maxDuration = Infinity, fixedDuration = null, parallelLines = false) {
     if (!node) return;
     const text = node.textContent;
@@ -45,8 +69,20 @@ function installPageEntrance(hero, header, stripe = null, {animateHeader = true}
     node.classList.add('typing-active');
     const chars = Array.from(text);
     const duration = fixedDuration ?? Math.min(chars.length * settings.typeCharacterMs, maxDuration);
-    const lines = parallelLines ? text.split('\n').map(line => Array.from(line)) : null;
-    jobs.push({node, visible, text, chars, lines, delay, duration, done:false});
+    const lines = parallelLines ? measureRenderedLines(reserved, text).map(line => Array.from(line)) : null;
+    const lineNodes = lines?.map(() => element('span', '', 'type-line'));
+    if (lineNodes) visible.replaceChildren(...lineNodes);
+    const job = {node, visible, text, chars, lines, lineNodes, delay, duration, done:false};
+    jobs.push(job);
+    if (parallelLines) {
+      const width = node.getBoundingClientRect().width;
+      const observer = new ResizeObserver(() => {
+        // A genuine width change restores normal text rather than keeping stale wraps.
+        if (!job.done && Math.abs(node.getBoundingClientRect().width - width) > 1) finish(job);
+      });
+      observer.observe(node);
+      lineObservers.push(observer);
+    }
   }
   prepare(hero.querySelector('.current-work'), settings.typeStatusDelay);
   prepare(hero.querySelector('.local-status > span'), settings.typeLocationDelay);
@@ -71,9 +107,11 @@ function installPageEntrance(hero, header, stripe = null, {animateHeader = true}
       const progress = Math.max(0, (now - start - job.delay) / Math.max(1, job.duration));
       if (progress >= 1) finish(job);
       else {
-        job.visible.textContent = job.lines
-          ? job.lines.map(line => line.slice(0, Math.floor(progress * line.length)).join('')).join('\n')
-          : job.chars.slice(0, Math.floor(progress * job.chars.length)).join('');
+        if (job.lines) {
+          job.lines.forEach((line, index) => {
+            job.lineNodes[index].textContent = line.slice(0, Math.floor(progress * line.length)).join('');
+          });
+        } else job.visible.textContent = job.chars.slice(0, Math.floor(progress * job.chars.length)).join('');
         pending = true;
       }
     }
@@ -93,7 +131,7 @@ function installPageEntrance(hero, header, stripe = null, {animateHeader = true}
   hero.querySelector('.landing-actions')?.classList.add('actions-entrance');
   const breadcrumb = hero.querySelector('.breadcrumbs');
   breadcrumb?.classList.add('identity-entrance');
-  return () => { complete(); stopTicker(); };
+  return () => { complete(); lineObservers.forEach(observer => observer.disconnect()); stopTicker(); };
 }
 
 function createTitle(config) {
