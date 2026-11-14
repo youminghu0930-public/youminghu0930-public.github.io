@@ -3,8 +3,6 @@
     "title": "You-Ming Hu’s Portfolio",
     "description": "Youming Hu's portfolio and projects.",
     "eyebrow": "Portfolio & projects",
-    "heading": "You-Ming Hu",
-    "intro": "A short introduction about my background and interests will go here.\nThis space will describe the problems I enjoy working on.\nMore details about my approach and direction will follow.",
     "navigationLabel": "Portfolio sections",
     "navigationToggle": "Toggle section navigation",
     "mainPage": {
@@ -15,22 +13,12 @@
       "label": "More about me →",
       "url": "https://youminghu0930.github.io/"
     },
-    "nameLines": [
-      "You-Ming Hu"
-    ],
-    "role": "Artificial Intelligence Engineer",
     "workLinkLabel": "View selected work ↗",
     "identityLabel": "Youming Hu / Portfolio",
     "sectionNumber": "01",
     "scrollLabel": "Scroll to explore ↓",
     "footerLabel": "From video to movement insights.",
     "footerLinkLabel": "Back to top ↑",
-    "focusAreas": [
-      "Pose estimation",
-      "Object detection",
-      "3D reconstruction",
-      "Motion analysis"
-    ],
     "brandLabel": "You-Ming Hu",
     "brandMonogram": "YM",
     "currentWork": {
@@ -43,20 +31,9 @@
       "timeZoneLabel": "UTC+8",
       "clockLabel": "Current time in Taipei"
     },
-    "breadcrumbLabel": "Breadcrumb"
+    "breadcrumbLabel": "Breadcrumb",
+    "mobileMenuLabel": "Menu"
   },
-  "sections": [
-    {
-      "id": "about",
-      "title": "Intro"
-    },
-    {
-      "id": "projects",
-      "title": "Selected projects",
-      "number": "02",
-      "intro": "Two connected projects exploring how ordinary video becomes reliable, interpretable movement information."
-    }
-  ],
   "projects": [
     {
       "id": "golf-2d",
@@ -111,18 +88,78 @@
       "url": "/contact/"
     }
   ],
-  "placeholders": [
-    {
-      "id": "skills",
-      "title": "Skills",
-      "number": "03",
-      "description": "Skills and areas of expertise will be added here."
+  "landings": {
+    "home": {
+      "label": "Home",
+      "title": "You-Ming Hu",
+      "role": "Artificial Intelligence Engineer",
+      "description": "A short introduction about my background and interests will go here.\nThis space will describe the problems I enjoy working on.\nMore details about my approach and direction will follow.",
+      "stripeItems": [
+        "Pose estimation",
+        "Object detection",
+        "3D reconstruction",
+        "Motion analysis"
+      ],
+      "accentLastWord": false,
+      "terminalDot": false,
+      "showBreadcrumb": false,
+      "showCurrentWork": true,
+      "actions": [
+        {
+          "label": "View my work",
+          "url": "/works/",
+          "style": "primary",
+          "arrow": "→"
+        },
+        {
+          "label": "Contact me",
+          "url": "/contact/",
+          "style": "outline"
+        },
+        {
+          "label": "Resume",
+          "style": "text"
+        }
+      ]
     },
-    {
-      "id": "contact",
+    "works": {
+      "label": "Works",
+      "title": "Selected projects",
+      "role": "",
+      "description": "Two connected projects exploring how ordinary video becomes reliable, interpretable movement information.",
+      "stripeItems": [
+        "Works"
+      ],
+      "accentLastWord": true,
+      "terminalDot": true,
+      "showBreadcrumb": true,
+      "showCurrentWork": false
+    },
+    "skills": {
+      "label": "Skills",
+      "title": "Skills",
+      "role": "",
+      "description": "Skills and areas of expertise will be added here.",
+      "stripeItems": [
+        "Skills"
+      ],
+      "accentLastWord": true,
+      "terminalDot": true,
+      "showBreadcrumb": true,
+      "showCurrentWork": false
+    },
+    "contact": {
+      "label": "Contact",
       "title": "Contact",
-      "number": "04",
-      "description": "Contact information will be added here."
+      "role": "",
+      "description": "Contact information will be added here.",
+      "stripeItems": [
+        "Contact"
+      ],
+      "accentLastWord": true,
+      "terminalDot": true,
+      "showBreadcrumb": true,
+      "showCurrentWork": false
     }
-  ]
+  }
 }

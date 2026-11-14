@@ -28,4 +28,6 @@ document.addEventListener('keydown', event => {
   }
 });
 
+return {close: () => { if (mobile.matches) setNavigation(false); }};
+
 }

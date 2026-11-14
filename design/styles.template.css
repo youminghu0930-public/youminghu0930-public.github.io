@@ -265,3 +265,80 @@ body:has(.portfolio-shell) { overflow-x:clip; }
 .portfolio-shell .inner-page h1 .title-word { display:inline-block; white-space:nowrap; }
 .section-intro .type-shell { display:grid; width:100%; }
 .section-intro .type-visible, .section-intro .type-reserved { white-space:pre-line; }
+
+/* Shared landing contract for every route: one viewport, content, bottom stripe. */
+.portfolio-shell .landing { min-height:{{LandingMinHeight}}; display:grid; grid-template-rows:1fr auto; }
+.portfolio-shell .landing .hero { min-height:0; margin:0; padding-top:{{LandingHeroTopPadding}}; padding-bottom:{{LandingHeroBottomPadding}}; }
+.portfolio-shell .landing h1, .portfolio-shell .inner-page .landing h1 { font-size:{{HeroSingleLineSize}}; margin:0; line-height:{{H1LineHeight}}; letter-spacing:{{H1LetterSpacing}}; }
+.portfolio-shell .landing h1 .title-word { display:inline-block; white-space:nowrap; }
+.portfolio-shell .landing h1 .title-accent { color:var(--accent); }
+.portfolio-shell .landing .breadcrumbs { position:absolute; top:{{StatusRowTop}}; left:0; right:0; margin:0; }
+.landing .section-number { display:flex; align-items:center; gap:{{BreadcrumbGap}}; margin:0 0 {{InnerHeadingGap}}; color:var(--muted); text-transform:uppercase; letter-spacing:{{SectionLabelTracking}}; }
+
+/* Shared narrow-screen contract applies to all routes. */
+@media (max-width:{{narrowBreakpoint}}) {
+ .portfolio-shell > main, .portfolio-shell > header[data-expanded=false] ~ main { width:{{MobileCanvasWidth}}; }
+ .portfolio-shell .landing .hero { padding-top:{{MobileLandingTopSpace}}; padding-bottom:{{MobileLandingBottomSpace}}; }
+ .portfolio-shell .landing h1, .portfolio-shell .inner-page .landing h1 { font-size:{{MobileTitleSize}}; }
+ .portfolio-shell .eyebrow { font-size:{{MobileRoleSize}}; }
+ .portfolio-shell .intro { font-size:{{MobileIntroSize}}; }
+ .portfolio-shell .hero > .hero-status, .portfolio-shell .landing .breadcrumbs { top:{{MobileStatusTop}}; }
+ .hero-status { flex-direction:column; align-items:flex-start; gap:{{MobileStatusGap}}; }
+ .brand-name { font-size:{{MobileBrandSize}}; }
+}
+
+/* Shared green stripe and lightweight independent cursor-corner flights. */
+.portfolio-shell .landing-stripe { background:{{StripeBackground}}; color:{{StripeForeground}}; border-top:{{StripeBorder}}; border-bottom:{{StripeBorder}}; }
+.cursor-frame i { transform-origin:center; }
+
+/* Viewport-driven landing: keep the entire text group immediately above the stripe. */
+.portfolio-shell .landing { min-height:100svh; min-height:{{LandingViewportHeight}}; grid-template-rows:minmax(min-content, 1fr) auto; }
+.portfolio-shell .landing .hero { display:flex; flex-direction:column; justify-content:flex-end; padding-top:{{LandingStatusReserve}}; padding-bottom:{{LandingContentBottomGap}}; }
+.landing-content { flex:none; width:100%; }
+@media (max-width:{{mobileBreakpoint}}) {
+ .portfolio-shell .local-status { display:none; }
+}
+@media (max-width:{{narrowBreakpoint}}) {
+ .portfolio-shell .landing .hero { padding-top:{{MobileLandingStatusReserve}}; padding-bottom:{{MobileLandingContentBottomGap}}; }
+}
+
+/* Home-only action slot: solid, outlined, and text treatments. */
+.landing-actions { display:flex; align-items:center; flex-wrap:wrap; gap:{{ActionGap}}; margin:{{ActionMargin}}; }
+.portfolio-shell .landing-actions .landing-action { display:inline-flex; align-items:center; justify-content:center; gap:{{ActionArrowGap}}; min-height:{{ActionMinHeight}}; margin:0; padding:{{ActionPadding}}; border:1px solid transparent; border-radius:{{ActionRadius}}; font-family:inherit; font-size:{{ActionFontSize}}; font-weight:{{MainAFontWeight}}; line-height:{{BodyLineHeight}}; text-decoration:none; cursor:pointer; transition:{{NavHoverTransition}}; }
+.portfolio-shell .landing-actions .action-primary { background:var(--accent); color:var(--button-text); }
+.portfolio-shell .landing-actions .action-primary:hover { background:{{PrimaryActionHoverBackground}}; }
+.portfolio-shell .landing-actions .action-outline { background:transparent; border:{{ProjectBorder}}; color:{{ActionOutlineColor}}; }
+.portfolio-shell .landing-actions .action-outline:hover { border-color:var(--accent); color:var(--accent); }
+.portfolio-shell .landing-actions .action-text { background:transparent; color:var(--muted); }
+.portfolio-shell .landing-actions .action-text:hover { color:var(--accent); }
+.mobile-menu-label { display:none; }
+.actions-entrance { animation:nav-arrive {{NavEntranceDuration}} ease-out {{ActionEntranceDelay}} both; }
+@media (max-width:{{narrowBreakpoint}}) {
+ /* Home can grow beyond one viewport when its extra actions need the space. */
+ .portfolio-shell .home-page .landing .hero { padding-top:{{HomeMobileHeroTop}}; }
+ .portfolio-shell .home-page .landing .hero > .hero-status { position:relative; top:auto; left:auto; right:auto; margin:0 0 {{HomeMobileStatusGap}}; }
+ .home-page .hero-status .current-work { width:100%; }
+ .portfolio-shell .home-page .intro { font-size:{{HomeMobileIntroSize}}; }
+ .home-page .landing-actions { display:grid; grid-template-columns:{{HomeMobileActionColumns}}; }
+ .portfolio-shell .home-page .landing-actions .landing-action { padding:{{HomeMobileActionPadding}}; font-size:{{HomeMobileActionFontSize}}; }
+ .home-page .landing-actions .action-text { grid-column:1 / -1; justify-self:start; }
+ .portfolio-shell .brand-name { display:none; }
+ .portfolio-shell .brand-monogram { width:{{MobileHeaderMarkSize}}; height:{{MobileHeaderMarkSize}}; }
+ .portfolio-shell > .navigation-toggle { width:auto; display:flex; align-items:center; gap:{{MobileMenuGap}}; }
+ .portfolio-shell .mobile-menu-label { display:inline; font-size:{{MobileMenuLabelSize}}; }
+ .portfolio-shell .navigation-toggle .menu-icon { position:relative; display:block; height:{{MenuIconWidth}}; }
+ .portfolio-shell .navigation-toggle .menu-icon span { display:none; }
+ .portfolio-shell .navigation-toggle .menu-icon::before, .portfolio-shell .navigation-toggle .menu-icon::after { content:''; position:absolute; top:50%; left:0; width:100%; height:{{MenuIconSpanHeight}}; background:currentColor; }
+ .portfolio-shell .navigation-toggle .menu-icon::after { transform:rotate(90deg); }
+ .portfolio-shell .navigation-toggle[aria-expanded=true] .menu-icon { transform:rotate(45deg); }
+}
+@media (prefers-reduced-motion:reduce) { .actions-entrance { animation:none; } }
+
+/* Small magnetic offset for the optional Home actions. */
+.landing-actions { position:relative; }
+@media (hover:hover) and (pointer:fine) {
+ .portfolio-shell .landing-actions .landing-action { translate:var(--magnet-x, 0px) var(--magnet-y, 0px); transition:{{NavHoverTransition}}, {{ButtonMagnetTransition}}; }
+}
+@media (prefers-reduced-motion:reduce) {
+ .portfolio-shell .landing-actions .landing-action { translate:none; }
+}

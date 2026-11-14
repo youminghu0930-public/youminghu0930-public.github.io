@@ -5,7 +5,7 @@ import path from 'node:path';
 
 const built = process.argv.includes('--dist');
 const root = fileURLToPath(new URL(built ? '../dist/' : '../', import.meta.url));
-const allowed = new Set(['index.html', 'works/index.html', 'skills/index.html', 'contact/index.html', 'styles.css', 'main.js', 'navigation.js', 'pointer-effects.js', 'design-settings.js', 'materials/content.json']);
+const allowed = new Set(['index.html', 'works/index.html', 'skills/index.html', 'contact/index.html', 'styles.css', 'main.js', 'landing.js', 'navigation.js', 'pointer-effects.js', 'design-settings.js', 'materials/content.json']);
 const types = { '.html': 'text/html; charset=utf-8', '.css': 'text/css', '.js': 'text/javascript', '.json': 'application/json', '.svg': 'image/svg+xml', '.png': 'image/png', '.jpg': 'image/jpeg', '.ico': 'image/x-icon', '.pdf': 'application/pdf' };
 
 const server = createServer(async (req, res) => {

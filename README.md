@@ -65,3 +65,11 @@ Use `materials/draft.md` for rough thoughts and background. Rewritten presentati
 - `/contact/`: Contact placeholder.
 
 Each route has its own static `index.html`, so direct links and refreshes work on GitHub Pages. All share `main.js` and `materials/content.json`. Restart the local server after this routing change.
+
+## Shared landing component
+
+`landing.js` owns the viewport-height landing, animated title, typing entrance, optional status/breadcrumbs, and bottom scrolling stripe for every route. `main.js` composes the shared header, landing, and page body. Edit `landings.home`, `landings.works`, `landings.skills`, or `landings.contact` in `materials/content.json` for each page's copy and stripe labels. Appearance and timing remain in `design/theme.json`. All pages share the landing dot and cursor effects.
+
+## Persistent navigation and mobile
+
+Internal navigation replaces only the main page content; the YM identity and navigation keep their DOM state and animate only on initial load. Browser Back/Forward, direct page URLs, modified clicks, and mobile menu closing remain supported. Landing clock, pointer listeners, and observers are cleaned up when leaving each route. Mobile typography and spacing share the controls in `design/theme.json`.
