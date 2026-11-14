@@ -413,3 +413,8 @@ body:has(.portfolio-shell) { overflow-x:clip; }
 @media (prefers-reduced-motion:reduce) {
  .portfolio-shell header nav > a { translate:none; scale:none; }
 }
+
+/* Frosted Contact action across desktop and touch layouts. */
+.portfolio-shell .landing-actions .action-outline { background:{{NavPillBackground}}; -webkit-backdrop-filter:blur({{NavBackdropBlur}}); backdrop-filter:blur({{NavBackdropBlur}}); transition:{{NavHoverTransition}}, {{NavBackdropTransition}}, {{ButtonMagnetTransition}}; }
+.portfolio-shell .landing-actions .action-outline:hover, .portfolio-shell .landing-actions .action-outline:focus-visible, .portfolio-shell .landing-actions .action-outline:active { -webkit-backdrop-filter:blur({{NavHoverBackdropBlur}}); backdrop-filter:blur({{NavHoverBackdropBlur}}); }
+@media (prefers-reduced-motion:reduce) { .portfolio-shell .landing-actions .action-outline { transition:none; } }

@@ -267,7 +267,7 @@
     "HomeMobileStatusGap": "56px",
     "HomeMobileHeroTop": "120px",
     "HomeMobileIntroSize": "1.05rem",
-    "HomeMobileActionFontSize": ".85rem",
+    "HomeMobileActionFontSize": "1rem",
     "HomeMobileActionPadding": "12px",
     "HomeMobileActionColumns": "minmax(0, 1.2fr) minmax(0, 1fr)",
     "MobileHeaderMarkSize": "40px",
@@ -294,7 +294,9 @@
     "MenuItemRevealStagger": "90ms",
     "MenuIconTransition": "transform 200ms ease",
     "MenuRevealTotalDuration": "1500ms",
-    "MenuElasticReturn": "translate 450ms cubic-bezier(.2,.8,.2,1), scale 450ms cubic-bezier(.2,.8,.2,1)"
+    "MenuElasticReturn": "translate 450ms cubic-bezier(.2,.8,.2,1), scale 450ms cubic-bezier(.2,.8,.2,1)",
+    "ContactActionBackdropBlur": "6px",
+    "ContactActionBackground": "rgb(12 12 12 / 25%)"
   },
   "layoutReference": "https://aaftab.is-a.dev/",
   "effects": {
