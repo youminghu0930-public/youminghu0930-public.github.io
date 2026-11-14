@@ -274,7 +274,19 @@
     "MobileMenuLabelSize": "1rem",
     "MobileMenuGap": "8px",
     "PrimaryActionHoverBackground": "hsl(140 100% 38%)",
-    "ButtonMagnetTransition": "translate 160ms ease-out"
+    "ButtonMagnetTransition": "translate 160ms ease-out",
+    "MobileMenuIconSize": "14px",
+    "MobileMenuPanelPadding": "104px 24px 40px",
+    "MobileMenuLinkSize": "clamp(2.5rem, 12vw, 5rem)",
+    "MobileMenuLinkGap": "12px",
+    "MobileMenuNumberSize": "1rem",
+    "MobileMenuSlideDuration": "350ms",
+    "MobileActionEqualColumns": "repeat(2, minmax(0, 1fr))",
+    "LandingGlowColor": "hsl(140 100% 47% / 7%)",
+    "LandingGlowWidth": "120%",
+    "LandingGlowHeight": "115%",
+    "LandingGlowFadeStop": "90%",
+    "LandingGlowPosition": "60% -30%"
   },
   "layoutReference": "https://aaftab.is-a.dev/",
   "effects": {
@@ -283,7 +295,7 @@
     "dotInfluenceRadius": 340,
     "dotDisplacement": 9,
     "dotEnlargement": 0.8,
-    "dotBaseOpacity": 0.12,
+    "dotBaseOpacity": 0.2,
     "dotHighlightOpacity": 0.4,
     "cursorRotation": 45,
     "breadcrumbCursorPadding": 8,
@@ -300,6 +312,7 @@
     "cursorButtonPadding": 4,
     "touchHighlightReleaseMs": 450,
     "buttonMagnetRange": 70,
-    "buttonMagnetStrength": 7
+    "buttonMagnetStrength": 7,
+    "touchDotInfluenceRadius": 145
   }
 }

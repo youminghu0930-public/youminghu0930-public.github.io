@@ -342,3 +342,36 @@ body:has(.portfolio-shell) { overflow-x:clip; }
 @media (prefers-reduced-motion:reduce) {
  .portfolio-shell .landing-actions .landing-action { translate:none; }
 }
+
+/* Prevent ticker and text intrinsic widths from widening the page grid. */
+.portfolio-shell, .portfolio-shell > main, .landing, .landing .hero, .landing-content, .hero-details, .type-shell { min-width:0; }
+.portfolio-shell .landing { grid-template-columns:minmax(0, 1fr); }
+.portfolio-shell .landing > * { min-width:0; }
+.portfolio-shell .intro { overflow-wrap:anywhere; }
+@media (max-width:{{mobileBreakpoint}}) {
+ /* Full viewport panel enters from the right behind the persistent identity. */
+ .portfolio-shell header nav, .portfolio-shell header[data-expanded=false] nav { position:fixed; inset:0; width:100%; height:100dvh; max-height:none; padding:{{MobileMenuPanelPadding}}; margin:0; display:flex; flex-direction:column; align-items:flex-start; justify-content:flex-start; gap:{{MobileMenuLinkGap}}; background:var(--surface); border:0; border-radius:0; overflow-x:hidden; overflow-y:auto; overscroll-behavior:contain; transform:translateX(0); opacity:1; visibility:visible; transition:transform {{MobileMenuSlideDuration}} ease, visibility 0s; -webkit-backdrop-filter:none; backdrop-filter:none; }
+ .portfolio-shell header[data-expanded=false] nav { transform:translateX(100%); opacity:1; visibility:hidden; transition:transform {{MobileMenuSlideDuration}} ease, visibility 0s {{MobileMenuSlideDuration}}; }
+ .portfolio-shell header .header-identity { position:relative; z-index:1; }
+ .portfolio-shell header nav > a { flex:none; padding:0; border-radius:0; font-size:{{MobileMenuLinkSize}}; font-weight:{{H2FontWeight}}; line-height:{{H2LineHeight}}; letter-spacing:{{H2LetterSpacing}}; background:none; white-space:normal; }
+ .portfolio-shell header nav > a::after { content:attr(data-number); display:inline-block; vertical-align:top; margin-left:{{MobileMenuGap}}; color:var(--accent); font-size:{{MobileMenuNumberSize}}; line-height:{{H2LineHeight}}; letter-spacing:normal; }
+ .portfolio-shell header nav > a:hover, .portfolio-shell header nav > a:focus-visible { background:none; color:var(--accent); }
+ .portfolio-shell > .navigation-toggle { width:auto; display:flex; align-items:center; gap:{{MobileMenuGap}}; }
+ .portfolio-shell .mobile-menu-label { display:inline; font-size:{{MobileMenuLabelSize}}; }
+ .portfolio-shell .navigation-toggle .menu-icon { position:relative; display:block; width:{{MobileMenuIconSize}}; height:{{MobileMenuIconSize}}; }
+ .portfolio-shell .navigation-toggle .menu-icon span { display:none; }
+ .portfolio-shell .navigation-toggle .menu-icon::before, .portfolio-shell .navigation-toggle .menu-icon::after { content:''; position:absolute; top:50%; left:0; width:100%; height:{{MenuIconSpanHeight}}; background:currentColor; }
+ .portfolio-shell .navigation-toggle .menu-icon::after { transform:rotate(90deg); }
+ .portfolio-shell .navigation-toggle[aria-expanded=true] .menu-icon { transform:rotate(45deg); }
+}
+@media (max-width:{{narrowBreakpoint}}) {
+ .portfolio-shell .home-page .landing-actions { width:100%; grid-template-columns:{{MobileActionEqualColumns}}; align-items:stretch; }
+ .portfolio-shell .home-page .landing-actions .landing-action { min-width:0; width:100%; gap:{{MobileMenuGap}}; }
+ .portfolio-shell .home-page .landing-actions .action-text { width:auto; grid-column:1 / -1; justify-self:start; }
+ .portfolio-shell .hero-status .current-work { min-width:0; max-width:100%; }
+ .current-work .type-shell { min-width:0; }
+}
+@media (prefers-reduced-motion:reduce) { .portfolio-shell header nav, .portfolio-shell header[data-expanded=false] nav { transition:none; } }
+
+/* Shared ambient green glow, clipped to the landing area above the stripe. */
+.portfolio-shell .landing .hero::before { content:''; position:absolute; inset:0 calc(50% - 50vw); pointer-events:none; z-index:-1; background:radial-gradient(ellipse {{LandingGlowWidth}} {{LandingGlowHeight}} at {{LandingGlowPosition}}, {{LandingGlowColor}}, transparent {{LandingGlowFadeStop}}); }

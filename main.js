@@ -25,6 +25,8 @@ async function startApp() {
   const toggle = element('button', undefined, 'navigation-toggle');
   toggle.type = 'button';
   toggle.title = page.navigationToggle;
+  toggle.dataset.openLabel = page.mobileMenuLabel;
+  toggle.dataset.closeLabel = page.mobileMenuCloseLabel;
   toggle.setAttribute('aria-label', page.navigationToggle);
   toggle.setAttribute('aria-expanded', 'true');
   toggle.setAttribute('aria-controls', 'section-navigation');
@@ -37,8 +39,9 @@ async function startApp() {
   const nav = element('nav');
   nav.id = 'section-navigation';
   nav.setAttribute('aria-label', page.navigationLabel);
-  for (const item of navigation) {
+  for (const [index, item] of navigation.entries()) {
     const itemLink = link(item.label, item.url);
+    itemLink.dataset.number = String(index + 1).padStart(2, '0');
     nav.append(itemLink);
   }
   const brand = element('div', undefined, 'header-identity');

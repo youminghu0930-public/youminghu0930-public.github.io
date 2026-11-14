@@ -78,15 +78,16 @@ export function installPointerEffects(hero) {
     const inside = pointer && (pointer.touch || fine.matches) && !reduced.matches
       && pointer.x >= rect.left && pointer.x < rect.right
       && pointer.y >= bounds.top && pointer.y < interactionBottom;
+    const influenceRadius = pointer?.touch ? options.touchDotInfluenceRadius : options.dotInfluenceRadius;
     for (let y = options.dotSpacing / 2; y < rect.height; y += options.dotSpacing) {
       for (let x = options.dotSpacing / 2; x < rect.width; x += options.dotSpacing) {
         const dx = inside ? x - (pointer.x - rect.left) : 0;
         const dy = inside ? y - (pointer.y - rect.top) : 0;
         const distance = Math.hypot(dx, dy);
-        const t = inside ? Math.max(0, 1 - distance / options.dotInfluenceRadius) : 0;
+        const t = inside ? Math.max(0, 1 - distance / influenceRadius) : 0;
         // Smoothstep gives a soft boundary and avoids a sharp central pinch.
         const influence = t * t * (3 - 2 * t);
-        const offset = influence * options.dotDisplacement * Math.min(1, distance / options.dotInfluenceRadius);
+        const offset = influence * options.dotDisplacement * Math.min(1, distance / influenceRadius);
         ctx.globalAlpha = options.dotBaseOpacity + influence * (options.dotHighlightOpacity - options.dotBaseOpacity);
         ctx.fillStyle = influence > 0 ? accent : muted;
         ctx.beginPath();

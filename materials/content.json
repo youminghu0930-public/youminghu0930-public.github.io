@@ -32,7 +32,9 @@
       "clockLabel": "Current time in Taipei"
     },
     "breadcrumbLabel": "Breadcrumb",
-    "mobileMenuLabel": "Menu"
+    "mobileMenuLabel": "Menu",
+    "mobileMenuCloseLabel": "Close",
+    "mobileSocialLabel": "Elsewhere"
   },
   "projects": [
     {
