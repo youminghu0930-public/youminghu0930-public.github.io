@@ -17,6 +17,12 @@ async function startApp() {
   const response = await fetch(new URL('./materials/content.json', import.meta.url));
   if (!response.ok) throw new Error(`Content request failed: ${response.status}`);
   const { page, projects, navigation, landings } = await response.json();
+  // Measure and animate against the final fonts, avoiding fallback-font line wraps.
+  if (document.fonts) await Promise.all([
+    document.fonts.load('400 16px Inter'),
+    document.fonts.load('500 32px "Noto Sans TC"'),
+    document.fonts.load('700 80px "Noto Sans TC"')
+  ]).catch(error => console.warn('Using available font fallback:', error));
   const app = document.querySelector('#app');
   let currentRoute;
   let cleanup = () => {};

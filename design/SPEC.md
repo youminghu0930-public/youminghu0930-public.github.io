@@ -9,3 +9,7 @@ Run `node scripts/sync-design.mjs` after editing. It generates matching `styles.
 Keep copy in `materials/content.json`, assets in `materials/data/`, and rough background notes in `materials/draft.md`. The draft is excluded from preview serving and deployment artifacts. It can still be present in Git history if committed to a public repository. Never store confidential source or secrets there.
 
 Both renderers use `.hero`, `.eyebrow`, `h1`, `.intro`, `main section`, `h2`, `.projects`, and `.project` cards with `h3` and paragraphs. Preserve this shared markup contract. The GitHub parent link belongs in the left navigator; the personal/portfolio cross-page entrance appears once in the hero.
+
+Large titles use locally bundled Noto Sans TC at 700, with -0.025em tracking. Title entrances animate complete words so font kerning is preserved during and after motion. The SIL license is stored beside the font in materials/data/fonts.
+
+Typography pairing: Noto Sans TC 700 for large titles, 500 for job titles and section headings, 600 for project headings; Inter for body text, navigation, buttons, and supporting UI. Both variable fonts and their licenses are stored locally. The public app waits for the font faces before measuring animated paragraph wraps.

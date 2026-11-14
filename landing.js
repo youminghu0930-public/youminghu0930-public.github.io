@@ -64,12 +64,27 @@ function installPageEntrance(hero, header, stripe = null, {animateHeader = true}
   let disposed = false;
   const controller = new AbortController();
   const tickerObserver = new ResizeObserver(sizeTicker);
+  let stripeVisible = true;
+  function updateTickerPlayback() {
+    if (track) track.style.animationPlayState = stripeVisible && !document.hidden ? 'running' : 'paused';
+  }
+  const visibilityObserver = new IntersectionObserver(entries => {
+    stripeVisible = entries[0].isIntersecting;
+    updateTickerPlayback();
+  }, {threshold:0});
+  if (stripe) {
+    const rect = stripe.getBoundingClientRect();
+    stripeVisible = rect.bottom > 0 && rect.top < window.innerHeight;
+    visibilityObserver.observe(stripe);
+    updateTickerPlayback();
+  }
+  document.addEventListener('visibilitychange', updateTickerPlayback, {signal:controller.signal});
   if (track) {
     sizeTicker();
     tickerObserver.observe(track.firstElementChild);
     document.fonts?.ready.then(() => { if (!disposed) sizeTicker(); });
   }
-  const stopTicker = () => { disposed = true; tickerObserver.disconnect(); controller.abort(); };
+  const stopTicker = () => { disposed = true; tickerObserver.disconnect(); visibilityObserver.disconnect(); controller.abort(); };
   if (motion.matches) return stopTicker;
   const jobs = [];
   const lineObservers = [];
@@ -169,15 +184,11 @@ function createTitle(config) {
   const line = element('span', undefined, 'name-line');
   line.setAttribute('aria-hidden', 'true');
   const words = text.split(/\s+/);
-  let index = 0;
   words.forEach((text, wordIndex) => {
     const last = wordIndex === words.length - 1;
     const word = element('span', undefined, config.accentLastWord && last ? 'title-word title-accent' : 'title-word');
-    for (const character of Array.from(text)) {
-      const letter = element('span', character, 'name-letter');
-      letter.style.setProperty('--letter-index', index++);
-      word.append(letter);
-    }
+    word.textContent = text;
+    word.style.setProperty('--word-index', wordIndex);
     line.append(word);
     if (!last) line.append(' ');
   });

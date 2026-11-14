@@ -1,3 +1,5 @@
+@font-face { font-family:"Inter"; src:{{BodyFontSource}} format("truetype"); font-weight:100 900; font-style:normal; font-display:swap; }
+@font-face { font-family:"Noto Sans TC"; src:{{TitleFontSource}} format("truetype"); font-weight:100 900; font-style:normal; font-display:swap; }
 :root { color-scheme: {{RootColorScheme}}; font-family: {{RootFontFamily}}; font-synthesis: none; font-size: {{RootFontSize}}; color: {{RootColor}}; background: {{RootBackground}}; --muted: {{RootMuted}}; --accent: {{RootAccent}}; --secondary: {{RootSecondary}}; --border: {{RootBorder}}; --surface: {{RootSurface}}; --button-text: {{RootButtonText}}; --overlay: {{RootOverlay}}; --toggle-background: {{RootToggleBackground}}; }
 * { box-sizing: border-box; }
 html { scroll-behavior: smooth; }
@@ -215,7 +217,7 @@ body:has(.portfolio-shell) { overflow-x:clip; }
 @media (prefers-reduced-motion:reduce) { .portfolio-shell h1 .name-letter { animation:none; } }
 
 /* Clip the lower entry so each letter emerges upward into its final line. */
-.portfolio-shell h1 .name-line { overflow:hidden; overflow:clip; padding-block:.15em; margin-block:-.15em; }
+.portfolio-shell h1 .name-line { overflow:hidden; overflow:clip; padding:{{TitleRevealLinePadding}}; margin:0; }
 
 /* Independent navigation destinations share the same header and visual system. */
 .portfolio-shell > .inner-page, .portfolio-shell > header[data-expanded=false] ~ .inner-page { padding:{{InnerPagePadding}}; min-height:{{InnerPageMinHeight}}; }
@@ -256,7 +258,7 @@ body:has(.portfolio-shell) { overflow-x:clip; }
 @keyframes nav-arrive { from { opacity:0; transform:translateY(-{{NavEntranceLift}}); } to { opacity:1; transform:translateY(0); } }
 .stripe-entrance { animation:stripe-arrive {{StripeEntranceDuration}} ease-out {{StripeEntranceDelay}} both; }
 @keyframes stripe-arrive { from { opacity:0; } to { opacity:1; } }
-.stripe-entrance .stripe-track { animation-delay:calc({{StripeEntranceDuration}} + {{StripeEntranceDelay}}); }
+.stripe-entrance .stripe-track { animation-delay:0s; }
 @media (prefers-reduced-motion:reduce) {
  .nav-entrance, .identity-entrance, .stripe-entrance { animation:none; }
 }
@@ -435,3 +437,15 @@ body:has(.portfolio-shell) { overflow-x:clip; }
 .portfolio-shell h1[tabindex="-1"]:focus { outline:none; }
 .portfolio-shell a:focus-visible, .portfolio-shell button:focus-visible { outline-color:var(--accent); }
 @media (prefers-reduced-motion:reduce) { .portfolio-shell header[data-expanded=true] nav > a::after { animation:none; opacity:1; } }
+
+/* Real shaped word runs retain the font's natural kerning throughout the reveal. */
+.portfolio-page h1 { font-family:{{TitleFontFamily}}; font-weight:{{H1FontWeight}}; font-kerning:normal; font-feature-settings:"kern" 1; }
+.portfolio-shell h1 .title-word { animation:name-reveal {{NameRevealDuration}} {{NameRevealEasing}} both; animation-delay:calc({{NameRevealDelay}} + var(--word-index) * {{NameRevealStagger}}); }
+@media (prefers-reduced-motion:reduce) { .portfolio-shell h1 .title-word { animation:none; } }
+
+/* Consistent display/body pairing across the shared polished-page system. */
+.portfolio-page h2, .portfolio-page h3, .portfolio-shell .eyebrow { font-family:{{SubtitleFontFamily}}; font-kerning:normal; }
+.portfolio-page h2 { font-weight:{{H2FontWeight}}; }
+.portfolio-page h3 { font-weight:{{H3FontWeight}}; }
+
+.portfolio-shell .landing .hero-details { margin-top:{{LandingTitleDescriptionGap}}; }
