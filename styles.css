@@ -96,7 +96,7 @@ section, article { scroll-margin-top: 76px; }
 .portfolio-shell .return-main-page { margin:0; }
 .portfolio-shell .return-main-page::before { display:none; }
 .portfolio-shell > .navigation-toggle { display:none; }
-.portfolio-shell > main, .portfolio-shell > header[data-expanded=false] ~ main { width:min(1440px, calc(100% - clamp(40px, 10vw, 176px))); margin-inline:auto; padding:0; }
+.portfolio-shell > main, .portfolio-shell > header[data-expanded=false] ~ main { width:min(1360px, calc(100% - clamp(80px, 14vw, 240px))); margin-inline:auto; padding:0; }
 .portfolio-shell .hero { min-height:120svh; padding-top:52svh; padding-bottom:22svh; }
 .portfolio-shell h1 { font-size:clamp(4rem, 10vw, 10rem); margin:0; }
 .portfolio-shell h1 span:last-child { color:inherit; }
@@ -280,7 +280,7 @@ body:has(.portfolio-shell) { overflow-x:clip; }
 
 /* Shared narrow-screen contract applies to all routes. */
 @media (max-width:600px) {
- .portfolio-shell > main, .portfolio-shell > header[data-expanded=false] ~ main { width:calc(100% - 40px); }
+ .portfolio-shell > main, .portfolio-shell > header[data-expanded=false] ~ main { width:calc(100% - 56px); }
  .portfolio-shell .landing .hero { padding-top:clamp(200px, 40svh, 360px); padding-bottom:32px; }
  .portfolio-shell .landing h1, .portfolio-shell .inner-page .landing h1 { font-size:clamp(2.75rem, 12vw, 4.5rem); }
  .portfolio-shell .eyebrow { font-size:clamp(1.15rem, 5vw, 1.65rem); }

@@ -119,8 +119,9 @@
           "style": "outline"
         },
         {
-          "label": "Resume",
-          "style": "text"
+          "label": "More about me",
+          "style": "text",
+          "url": "https://youminghu0930.github.io/"
         }
       ]
     },
