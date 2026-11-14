@@ -1,9 +1,10 @@
+import { design } from './design-settings.js';
 export function installNavigation() {
 const header = document.querySelector('header');
 const nav = document.querySelector('#section-navigation');
 const toggle = document.querySelector('.navigation-toggle');
 const backdrop = document.querySelector('.navigation-backdrop');
-const mobile = matchMedia('(max-width: 1000px)');
+const mobile = matchMedia(`(max-width: ${design.mobileBreakpoint})`);
 function setNavigation(expanded) {
   toggle.setAttribute('aria-expanded', String(expanded));
   header.dataset.expanded = String(expanded);

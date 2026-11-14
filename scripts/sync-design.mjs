@@ -19,7 +19,16 @@ for (const target of targets) {
   await access(resolve(dirname(target), 'main.js'));
   await access(target);
 }
+const settings = JSON.stringify({ mobileBreakpoint: theme.tokens.mobileBreakpoint, effects: theme.effects });
+const runtime = `// Generated from design/theme.json.\nexport const design = ${settings};\n`;
+const runtimeTargets = targets.map(target => resolve(dirname(target), 'design-settings.js'));
 let drift = false;
+for (const target of runtimeTargets) {
+  if (args.includes('--check')) {
+    let actual; try { actual = await readFile(target, 'utf8'); } catch { actual = ''; }
+    if (actual !== runtime) { console.error(`Design settings differ: ${target}`); drift = true; }
+  } else await writeFile(target, runtime);
+}
 for (const target of targets) {
   if (args.includes('--check')) {
     if (await readFile(target, 'utf8') !== css) {

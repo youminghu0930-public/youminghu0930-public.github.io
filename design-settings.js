@@ -1,0 +1,2 @@
+// Generated from design/theme.json.
+export const design = {"mobileBreakpoint":"1000px","effects":{"dotSpacing":35,"dotRadius":1,"dotInfluenceRadius":340,"dotDisplacement":9,"dotEnlargement":0.8,"dotBaseOpacity":0.12,"dotHighlightOpacity":0.4,"cursorRotation":45,"breadcrumbCursorPadding":8,"typeCharacterMs":18,"typeStatusDelay":180,"typeLocationDelay":450,"typeRoleDelay":700,"typeDescriptionDelay":1300,"stripePixelsPerSecond":28,"heroTypingDelay":700}};

@@ -1,78 +1,267 @@
-:root { color-scheme: light; font-family: system-ui, sans-serif; color: #19332d; background: #f5f3ed; }
-      body { margin: 0; }
-      main { padding: 90px 0 64px; }
-      .eyebrow { text-transform: uppercase; letter-spacing: .16em; font-size: .8rem; }
-      h1 { font-size: clamp(3rem, 9vw, 6rem); letter-spacing: -.06em; line-height: 1.05; margin: 24px 0; }
-      .intro { font-size: 1.25rem; line-height: 1.7; max-width: 540px; }
-      main a { display: inline-block; margin-top: 24px; padding: 14px 22px; background: {{buttonBackground}}; color: white; border-radius: {{buttonRadius}}; text-decoration: none; }
-      main a:hover { background: {{buttonHoverBackground}}; }
-      main section { margin-top: 64px; }
-      .projects { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; }
-      .project { border: 1px solid #cbd5cc; border-radius: {{cardRadius}}; padding: 24px; }
-      .project p { line-height: 1.6; }
-      a:focus-visible { outline: 3px solid #ad642b; outline-offset: 4px; }
-:root {
-  color-scheme: light;
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-  color: {{textColor}};
-  background: {{pageBackground}};
-  font-synthesis: none;
-  --muted: #5f706a;
-  --accent: #27664e;
-  --border: #dce4dc;
-  --viewer-surface: #edf2ea;
-  --viewer-card: #f4f7f0;
-  --viewer-heading: #e2eadf;
-  --viewer-border: #cdd9ca;
-  --viewer-matte: #748378;
-}
+:root { color-scheme: {{RootColorScheme}}; font-family: {{RootFontFamily}}; font-synthesis: none; font-size: {{RootFontSize}}; color: {{RootColor}}; background: {{RootBackground}}; --muted: {{RootMuted}}; --accent: {{RootAccent}}; --secondary: {{RootSecondary}}; --border: {{RootBorder}}; --surface: {{RootSurface}}; --button-text: {{RootButtonText}}; --overlay: {{RootOverlay}}; --toggle-background: {{RootToggleBackground}}; }
 * { box-sizing: border-box; }
 html { scroll-behavior: smooth; }
-body { margin: 0; }
-main, footer { width: min(1120px, calc(100% - 292px)); margin-left: 260px; margin-right: 32px; transition: width 300ms cubic-bezier(.22, 1, .36, 1), margin-left 300ms cubic-bezier(.22, 1, .36, 1); }
-header { position: fixed; inset: 0 auto 0 0; width: 228px; padding: 80px 12px 24px; border-right: 1px solid var(--border); background: var(--viewer-surface); z-index: 20; overflow: hidden auto; transition: width 300ms cubic-bezier(.22, 1, .36, 1), box-shadow 300ms ease; }
-nav { display: flex; flex-direction: column; gap: 10px; }
-nav a { display: block; padding: 12px; border-radius: 6px; line-height: 1.5; }
-nav a:hover { background: var(--viewer-heading); text-decoration: none; }
-.return-main-page { position: relative; margin-top: 28px; }
-/* Keep the divider outside the rounded link hover area. */
-.return-main-page::before { content: ''; position: absolute; top: -14px; left: 0; right: 0; border-top: 1px solid var(--viewer-border); pointer-events: none; }
-.return-main-page[aria-disabled=true] { opacity: .5; cursor: default; }
-.return-main-page[aria-disabled=true]:hover { background: transparent; }
-.navigation-toggle { position: fixed; top: 16px; left: 6px; z-index: 21; display: grid; place-items: center; width: 44px; height: 44px; padding: 0; border: 0; border-radius: 6px; color: var(--accent); background: transparent; cursor: pointer; }
-.navigation-toggle:hover { background: var(--viewer-heading); }
-.menu-icon { display: grid; gap: 5px; width: 20px; }
-.menu-icon span { display: block; height: 2px; border-radius: 1px; background: currentColor; }
-header nav { margin-top: 0; width: 200px; opacity: 1; transform: translateX(0); visibility: visible; transition: opacity 180ms ease, transform 300ms cubic-bezier(.22, 1, .36, 1), visibility 0s; }
-header[data-expanded=false] { width: 56px; background: var(--viewer-surface); overflow: hidden; }
-header[data-expanded=false] nav { opacity: 0; transform: translateX(-12px); visibility: hidden; pointer-events: none; transition: opacity 140ms ease, transform 300ms cubic-bezier(.22, 1, .36, 1), visibility 0s 300ms; }
-header[data-expanded=false] ~ main, header[data-expanded=false] ~ footer { width: min(1120px, calc(100% - 112px)); margin-left: 88px; margin-right: 24px; }
-a { color: var(--muted); text-decoration: none; font-size: 14px; }
-a:hover { color: var(--accent); text-decoration: underline; text-underline-offset: 6px; }
-a:focus-visible { outline: 2px solid var(--accent); outline-offset: 6px; }
+body { margin: 0; line-height: {{BodyLineHeight}}; }
+main, footer { width: {{MainFooterWidth}}; margin-left: {{MainFooterMarginLeft}}; margin-right: {{MainFooterMarginRight}}; transition: {{MainFooterTransition}}; }
+main { padding: {{MainPadding}}; }
+.hero { max-width: {{HeroMaxWidth}}; }
+.eyebrow { color: var(--accent); text-transform: {{EyebrowTextTransform}}; letter-spacing: {{EyebrowLetterSpacing}}; font-size: {{EyebrowFontSize}}; }
+h1 { font-size: {{H1FontSize}}; font-weight: {{H1FontWeight}}; letter-spacing: {{H1LetterSpacing}}; line-height: {{H1LineHeight}}; margin: {{H1Margin}}; }
+h2 { font-size: {{H2FontSize}}; font-weight: {{H2FontWeight}}; letter-spacing: {{H2LetterSpacing}}; line-height: {{H2LineHeight}}; margin: {{H2Margin}}; }
+h3 { font-size: {{H3FontSize}}; font-weight: {{H3FontWeight}}; line-height: {{H3LineHeight}}; margin: {{H3Margin}}; }
+.intro { font-size: {{IntroFontSize}}; line-height: {{IntroLineHeight}}; max-width: {{IntroMaxWidth}}; }
+.body-copy { max-width: {{BodyCopyMaxWidth}}; font-size: {{BodyCopyFontSize}}; line-height: {{BodyCopyLineHeight}}; }
+.section-intro { color: var(--muted); line-height: {{SectionIntroLineHeight}}; }
+main section { margin-top: {{MainSectionMarginTop}}; }
+.projects { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(250px, 100%), 1fr)); gap: {{ProjectsGap}}; }
+.project { border: {{ProjectBorder}}; border-radius: {{ProjectBorderRadius}}; padding: {{ProjectPadding}}; background: var(--surface); }
+.project p { color: var(--muted); line-height: {{ProjectPLineHeight}}; }
+a { color: var(--muted); text-decoration: none; font-size: {{AFontSize}}; }
+a:hover { color: var(--accent); text-decoration: {{AHoverTextDecoration}}; text-underline-offset: {{AHoverTextUnderlineOffset}}; }
+a:focus-visible, button:focus-visible { outline: {{AFocusVisibleButtonFocusVisibleOutline}}; outline-offset: {{AFocusVisibleButtonFocusVisibleOutlineOffset}}; }
+main a { display: inline-block; margin-top: {{MainAMarginTop}}; padding: {{MainAPadding}}; background: var(--accent); color: var(--button-text); border-radius: {{MainABorderRadius}}; font-weight: {{MainAFontWeight}}; text-decoration: none; transition: {{MainATransition}}; }
+main a:hover { background: var(--secondary); color: var(--button-text); text-decoration: none; }
+header { position: fixed; inset: 0 auto 0 0; width: {{HeaderWidth}}; padding: {{HeaderPadding}}; border-right: {{HeaderBorderRight}}; background: var(--surface); z-index: 20; overflow: hidden auto; transition: {{HeaderTransition}}; }
+header nav { display: flex; flex-direction: column; gap: {{HeaderNavGap}}; width: {{HeaderNavWidth}}; opacity: 1; visibility: visible; transition: {{HeaderNavTransition}}; }
+header nav a { display: block; padding: {{HeaderNavAPadding}}; border-radius: {{HeaderNavABorderRadius}}; font-size: {{HeaderNavAFontSize}}; font-weight: {{HeaderNavAFontWeight}}; line-height: {{HeaderNavALineHeight}}; }
+header nav a:hover { background: var(--border); text-decoration: none; }
+.return-main-page { position: relative; margin-top: {{ReturnMainPageMarginTop}}; }
+.return-main-page::before { content: ''; position: absolute; top: {{ReturnMainPageBeforeTop}}; left: 0; right: 0; border-top: {{ReturnMainPageBeforeBorderTop}}; pointer-events: none; }
+.navigation-toggle { position: fixed; top: {{NavigationToggleTop}}; left: {{NavigationToggleLeft}}; z-index: 21; display: grid; place-items: center; width: {{NavigationToggleWidth}}; height: {{NavigationToggleHeight}}; padding: 0; border: 0; border-radius: {{NavigationToggleBorderRadius}}; color: var(--muted); background: var(--toggle-background); cursor: pointer; }
+.navigation-toggle:hover { background: var(--border); color: var(--accent); }
+.menu-icon { display: grid; gap: {{MenuIconGap}}; width: {{MenuIconWidth}}; }
+.menu-icon span { display: block; height: {{MenuIconSpanHeight}}; border-radius: {{MenuIconSpanBorderRadius}}; background: currentColor; }
+header[data-expanded=false] { width: 0; padding-inline: 0; border: 0; }
+header[data-expanded=false] nav { opacity: 0; transform: translateX(-12px); visibility: hidden; pointer-events: none; }
+header[data-expanded=false] ~ main, header[data-expanded=false] ~ footer { width: {{HeaderDataExpandedFalseMainHeaderDataExpandedFalseFooterWidth}}; margin-left: {{HeaderDataExpandedFalseMainHeaderDataExpandedFalseFooterMarginLeft}}; margin-right: {{HeaderDataExpandedFalseMainHeaderDataExpandedFalseFooterMarginRight}}; }
+.navigation-backdrop { position: fixed; inset: 0; z-index: 19; background: var(--overlay); opacity: 0; visibility: hidden; transition: {{NavigationBackdropTransition}}; }
+.navigation-backdrop[data-visible=true] { opacity: 1; visibility: visible; }
+section, article { scroll-margin-top: {{SectionArticleScrollMarginTop}}; }
+@media (max-width: {{mobileBreakpoint}}) {
+ main, header[data-expanded=false] ~ main { width: {{MainHeaderDataExpandedFalseMainWidth}}; margin-inline: {{MainHeaderDataExpandedFalseMainMarginInline}}; padding-top: {{MainHeaderDataExpandedFalseMainPaddingTop}}; }
+ header, header[data-expanded=false] { width: {{HeaderHeaderDataExpandedFalseWidth}}; padding-inline: {{HeaderHeaderDataExpandedFalsePaddingInline}}; border-right: {{HeaderHeaderDataExpandedFalseBorderRight}}; transition: {{HeaderHeaderDataExpandedFalseTransition}}; }
+ header[data-expanded=false] { transform: translateX(-100%); }
+}
+@media (prefers-reduced-motion: reduce) {
+ html { scroll-behavior: auto; }
+ header, header nav, header[data-expanded=false] nav, main, .navigation-backdrop, main a { transition: none; }
+}
 
-.navigation-backdrop { position:fixed; inset:0; z-index:19; background:#15251f40; opacity:0; visibility:hidden; transition:opacity 240ms ease,visibility 240ms; }
-.navigation-backdrop[data-visible=true] { opacity:1; visibility:visible; }
-header { background:#f1f2ee; padding-top:76px; }
-header nav { gap:4px; }
-header nav a { padding:9px 12px; font-size:13px; font-weight:500; }
-.navigation-toggle { left:12px; background:#fafbf8ed; color:var(--muted); }
-header[data-expanded=false] { width:0; padding-inline:0; border:0; }
-section, article { scroll-margin-top:76px; }
-@media (max-width:1000px) {
- main, header[data-expanded=false] ~ main { width:calc(100% - 32px); margin-inline:16px; padding-top:90px; }
- header,header[data-expanded=false] { width:min(280px,calc(100vw - 56px)); padding-inline:12px; border-right:1px solid var(--border); transition:transform 280ms cubic-bezier(.22,1,.36,1); }
- header[data-expanded=false] { transform:translateX(-100%); }
+/* Editorial portfolio layout. Shared baseline remains compatible with the personal page. */
+.portfolio-page .hero { max-width:none; min-height:{{PortfolioHeroMinHeight}}; margin-top:0; display:flex; flex-direction:column; gap:0; }
+.hero-topline { display:flex; justify-content:space-between; gap:{{PortfolioHeroGap}}; color:var(--muted); font-size:{{PortfolioToplineFontSize}}; letter-spacing:{{PortfolioToplineTracking}}; text-transform:uppercase; }
+.portfolio-page h1 { font-size:{{PortfolioNameFontSize}}; line-height:{{PortfolioNameLineHeight}}; letter-spacing:{{PortfolioNameTracking}}; font-weight:{{PortfolioNameWeight}}; margin:{{PortfolioNameMargin}}; }
+.portfolio-page h1 > span { display:block; }
+.portfolio-page h1 span:last-child { color:var(--accent); }
+.hero-details { display:grid; grid-template-columns:{{PortfolioDetailsColumns}}; align-items:end; gap:{{PortfolioDetailsGap}}; }
+.portfolio-page .intro { max-width:{{PortfolioIntroWidth}}; font-size:{{PortfolioIntroFontSize}}; }
+.hero-actions { display:flex; flex-direction:column; align-items:stretch; gap:{{PortfolioActionGap}}; }
+.hero-actions a { margin-top:0; text-align:center; }
+.portfolio-page .secondary-action { background:transparent; color:var(--muted); border:{{ProjectBorder}}; }
+.portfolio-page .secondary-action:hover { border-color:var(--accent); color:var(--accent); }
+.focus-strip, .project-tags { list-style:none; display:flex; flex-wrap:wrap; padding:0; }
+.focus-strip { border-top:{{ProjectBorder}}; border-bottom:{{ProjectBorder}}; padding:{{PortfolioStripPadding}}; gap:{{PortfolioStripGap}}; margin-top:{{PortfolioHeroGap}}; color:var(--muted); font-size:{{PortfolioStripFontSize}}; }
+.scroll-hint { font-size:{{PortfolioToplineFontSize}}; color:var(--muted); }
+.portfolio-page #projects { margin-top:{{PortfolioSectionGap}}; }
+.section-heading { display:grid; grid-template-columns:{{PortfolioHeadingColumns}}; gap:{{PortfolioHeadingGap}}; align-items:start; margin-bottom:{{PortfolioHeroGap}}; }
+.section-number { color:var(--accent); font-size:{{PortfolioToplineFontSize}}; }
+.section-heading h2, .section-heading p { margin:0; }
+.portfolio-page .projects { display:block; }
+.portfolio-page .project { display:grid; grid-template-columns:{{PortfolioRowColumns}}; gap:{{PortfolioRowGap}}; padding:{{PortfolioRowPadding}}; border:0; border-top:{{ProjectBorder}}; border-radius:0; background:transparent; }
+.project-index { display:flex; flex-direction:column; gap:{{PortfolioActionGap}}; color:var(--muted); font-size:{{PortfolioToplineFontSize}}; text-transform:uppercase; letter-spacing:{{PortfolioToplineTracking}}; }
+.project-index span:first-child { color:var(--accent); }
+.portfolio-page h3 { font-size:{{PortfolioProjectTitleSize}}; font-weight:{{H2FontWeight}}; letter-spacing:{{H2LetterSpacing}}; }
+.project-tags { gap:{{PortfolioActionGap}}; }
+.project-tags li { border:{{ProjectBorder}}; border-radius:{{PortfolioTagRadius}}; padding:{{PortfolioTagPadding}}; font-size:{{PortfolioTagFontSize}}; color:var(--muted); }
+.portfolio-footer { display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:{{PortfolioActionGap}}; border-top:{{ProjectBorder}}; margin-top:{{PortfolioHeroGap}}; padding:{{PortfolioFooterPadding}}; color:var(--muted); }
+.portfolio-page .text-action { padding:0; margin:0; background:transparent; color:var(--accent); }
+@media (max-width:{{mobileBreakpoint}}) {
+ .portfolio-page h1 { font-size:{{PortfolioMobileNameSize}}; }
+ .hero-details, .section-heading, .portfolio-page .project { grid-template-columns:minmax(0, 1fr); gap:{{PortfolioMobileGap}}; }
+ .hero-actions { align-items:flex-start; }
+ .hero-topline { flex-wrap:wrap; }
+ .portfolio-page .hero { min-height:auto; }
+ .portfolio-page .project { padding:{{PortfolioMobileRowPadding}}; }
+ .project-index { flex-direction:row; justify-content:space-between; }
+}
+
+/* Public portfolio: top-right navigation and a low-set opening composition. */
+.portfolio-shell > header, .portfolio-shell > header[data-expanded=false] { inset:0 0 auto; width:100%; height:{{TopbarHeight}}; padding:{{TopbarPadding}}; display:flex; align-items:center; justify-content:space-between; border:0; background:{{TopbarBackground}}; overflow:visible; transform:none; }
+.portfolio-shell .navigation-brand { color:var(--accent); font-size:{{TopbarBrandSize}}; white-space:nowrap; }
+.portfolio-shell header nav, .portfolio-shell header[data-expanded=false] nav { display:flex; flex-direction:row; align-items:center; gap:{{TopbarGap}}; width:auto; opacity:1; visibility:visible; transform:none; pointer-events:auto; }
+.portfolio-shell header nav a { white-space:nowrap; }
+.portfolio-shell .return-main-page { margin:0; }
+.portfolio-shell .return-main-page::before { display:none; }
+.portfolio-shell > .navigation-toggle { display:none; }
+.portfolio-shell > main, .portfolio-shell > header[data-expanded=false] ~ main { width:{{PortfolioCanvasWidth}}; margin-inline:auto; padding:0; }
+.portfolio-shell .hero { min-height:{{HeroOpeningMinHeight}}; padding-top:{{HeroTopSpace}}; padding-bottom:{{HeroBottomSpace}}; }
+.portfolio-shell h1 { font-size:{{HeroSingleLineSize}}; margin:0; }
+.portfolio-shell h1 span:last-child { color:inherit; }
+.portfolio-shell .hero-details { display:block; }
+.portfolio-shell .eyebrow { font-size:{{HeroRoleSize}}; font-weight:{{HeroRoleWeight}}; letter-spacing:normal; text-transform:none; margin:{{HeroRoleMargin}}; }
+.portfolio-shell .intro { white-space:pre-line; line-height:{{HeroDescriptionLineHeight}}; max-width:none; margin:0; color:var(--muted); }
+.portfolio-shell .hero-actions { flex-direction:{{HeroActionsDirection}}; flex-wrap:wrap; justify-content:flex-start; margin:{{HeroActionsMargin}}; }
+.portfolio-shell #projects { margin-top:{{HeroNextSectionSpace}}; }
+@media (max-width:{{mobileBreakpoint}}) {
+ .portfolio-shell > .navigation-toggle { display:grid; left:auto; right:{{NavigationToggleLeft}}; }
+ .portfolio-shell header nav, .portfolio-shell header[data-expanded=false] nav { position:absolute; top:100%; left:0; right:0; flex-direction:column; align-items:stretch; padding:{{TopbarMobileMenuPadding}}; background:var(--surface); border-bottom:{{ProjectBorder}}; max-height:calc(100svh - {{TopbarHeight}}); overflow-y:auto; }
+ .portfolio-shell header[data-expanded=false] nav { visibility:hidden; opacity:0; pointer-events:none; }
+ .portfolio-shell .hero { padding-top:{{HeroMobileTopSpace}}; padding-bottom:{{HeroMobileBottomSpace}}; }
+}
+
+/* Landing-only dot illumination, separator stripe, and instant pointer marker. */
+body:has(.portfolio-shell) { overflow-x:clip; }
+.portfolio-shell .navigation-brand { font-weight:{{TopbarBrandWeight}}; }
+.portfolio-shell .hero { position:relative; isolation:isolate; }
+.portfolio-shell .hero > :not(.hero-dots) { position:relative; z-index:1; }
+.hero-dots { position:absolute; top:0; bottom:0; left:calc(50% - 50vw); right:calc(50% - 50vw); pointer-events:none; width:100vw; height:100%; }
+.landing-stripe { position:relative; padding:{{StripePadding}}; }
+.landing-stripe::before { content:''; position:absolute; inset:0 calc(50% - 50vw); background:var(--RootBackground, hsl(0 0% 13%)); z-index:-1; }
+.landing-stripe { isolation:isolate; color:var(--muted); }
+.landing-stripe ul { display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between; list-style:none; margin:0; padding:0; gap:{{StripeGap}}; font-size:{{StripeFontSize}}; font-weight:{{MainAFontWeight}}; letter-spacing:{{StripeTracking}}; text-transform:uppercase; }
+.pointer-diamond { position:fixed; top:0; left:0; width:0; height:0; pointer-events:none; z-index:9999; transition:none; }
+@media (hover:none), (pointer:coarse), (prefers-reduced-motion:reduce) {
+ .pointer-diamond { display:none; }
+ .hero-dots::after { display:none; }
+}
+
+/* Viewport opening: the stripe is the final row, rather than content below it. */
+.portfolio-shell .landing { min-height:{{LandingMinHeight}}; display:grid; grid-template-rows:1fr auto; }
+.portfolio-shell .landing .hero { min-height:0; margin:0; padding-top:{{LandingHeroTopPadding}}; padding-bottom:{{LandingHeroBottomPadding}}; }
+.portfolio-shell .landing-stripe { padding:{{LandingStripePadding}}; }
+.portfolio-shell header nav { background:{{NavPillBackground}}; border:{{ProjectBorder}}; border-radius:{{NavPillRadius}}; padding:{{NavPillPadding}}; gap:0; }
+.portfolio-shell header nav a { border-radius:{{NavPillRadius}}; transition:{{NavHoverTransition}}; }
+.portfolio-shell header nav a:hover, .portfolio-shell header nav a:focus-visible { background:{{NavHoverBackground}}; color:{{NavHoverText}}; }
+.cursor-frame { position:absolute; width:{{CursorFrameSize}}; height:{{CursorFrameSize}}; transform:translate(-50%, -50%); color:{{CursorIdleColor}}; transition:none; }
+.pointer-diamond[data-link=true] .cursor-frame { color:var(--accent); }
+.cursor-frame i { position:absolute; width:{{CursorCornerLength}}; height:{{CursorCornerLength}}; border:0 solid currentColor; }
+.cursor-frame i:nth-child(1) { top:0; left:0; border-top-width:{{CursorStroke}}; border-left-width:{{CursorStroke}}; }
+.cursor-frame i:nth-child(2) { top:0; right:0; border-top-width:{{CursorStroke}}; border-right-width:{{CursorStroke}}; }
+.cursor-frame i:nth-child(3) { bottom:0; right:0; border-bottom-width:{{CursorStroke}}; border-right-width:{{CursorStroke}}; }
+.cursor-frame i:nth-child(4) { bottom:0; left:0; border-bottom-width:{{CursorStroke}}; border-left-width:{{CursorStroke}}; }
+@media (max-width:{{mobileBreakpoint}}) {
+ .portfolio-shell header nav { border-radius:0; background:var(--surface); }
 }
 @media (prefers-reduced-motion:reduce) {
- html { scroll-behavior:auto; }
- header, header nav, header[data-expanded=false] nav, main, .navigation-backdrop { transition:none; }
+ .portfolio-shell header nav a { transition:none; }
 }
 
-/* Shared presentation rules for the personal introduction and portfolio. */
-h2 { font-size:clamp(1.8rem,4vw,2.6rem); font-weight:500; letter-spacing:-.04em; margin:0 0 24px; }
-h3 { font-size:1.2rem; font-weight:600; margin:0 0 16px; }
-.body-copy { max-width:740px; font-size:1.12rem; line-height:1.8; }
-.section-intro { color:var(--muted); line-height:1.7; }
-.project p { color:var(--muted); }
-main a:hover { color:white; text-decoration:none; }
+/* Slim continuous ticker and a soft moving title highlight. */
+.portfolio-shell .landing-stripe { width:100vw; margin-left:calc(50% - 50vw); border-top:{{ProjectBorder}}; border-bottom:{{ProjectBorder}}; overflow:hidden; }
+.portfolio-shell .landing-stripe::before { display:none; }
+.stripe-track { display:flex; width:max-content; animation:stripe-roll var(--stripe-duration, {{StripeMotionDuration}}) linear infinite {{StripeMotionDirection}}; }
+.portfolio-shell .landing-stripe ul { display:flex; flex:none; flex-wrap:nowrap; justify-content:flex-start; white-space:nowrap; gap:{{StripeGap}}; padding-right:{{StripeGap}}; font-weight:{{H2FontWeight}}; }
+.landing-stripe li::after { content:'·'; margin-left:{{StripeGap}}; }
+@keyframes stripe-roll { from { transform:translateX(0); } to { transform:translateX(-50%); } }
+.portfolio-shell .eyebrow { width:fit-content; max-width:100%; color:var(--accent); background:linear-gradient(110deg, var(--accent) 0%, var(--accent) 35%, {{RoleShimmerHighlight}} 50%, var(--accent) 65%, var(--accent) 100%); background-size:{{RoleShimmerBackgroundSize}}; background-clip:text; -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-repeat:repeat-x; animation:role-shimmer {{RoleShimmerDuration}} linear infinite; }
+@keyframes role-shimmer { from { background-position:0% 50%; } to { background-position:{{RoleShimmerLoopPosition}}; } }
+@media (prefers-reduced-motion:reduce) {
+ .stripe-track, .portfolio-shell .eyebrow { animation:none; }
+ .portfolio-shell .eyebrow { background:none; -webkit-text-fill-color:currentColor; }
+}
+
+/* Header identity is presentational until its action is defined. */
+.header-identity { display:flex; align-items:center; gap:{{BrandIdentityGap}}; flex-shrink:0; }
+.brand-monogram { display:grid; place-items:center; width:{{BrandMarkSize}}; height:{{BrandMarkSize}}; border:{{ProjectBorder}}; border-radius:{{BrandMarkRadius}}; color:var(--accent); font-size:{{BrandMarkFontSize}}; font-weight:{{BrandNameWeight}}; }
+.brand-name { font-size:{{BrandNameFontSize}}; font-weight:{{BrandNameWeight}}; }
+
+/* Rotation is independent of pointer translation, so tracking remains immediate. */
+.pointer-diamond[data-link=false] .cursor-rotor { animation:cursor-spin {{CursorRotationDuration}} linear infinite; }
+@keyframes cursor-spin { from { transform:rotate({{PointerRotation}}); } to { transform:rotate(calc({{PointerRotation}} + 360deg)); } }
+@media (prefers-reduced-motion:reduce) {
+ .pointer-diamond .cursor-rotor { animation:none; }
+}
+
+/* Center the outer frame first; rotate only its centered inner decoration. */
+.cursor-rotor { position:absolute; inset:0; transform-origin:50% 50%; transform:rotate({{PointerRotation}}); }
+.pointer-diamond[data-link=true] .cursor-rotor { transform:rotate(0deg); }
+.current-work { display:flex; align-items:center; gap:{{BrandIdentityGap}}; font-size:{{CurrentWorkFontSize}}; margin:{{CurrentWorkMargin}}; color:var(--muted); }
+.current-work::before { content:''; width:{{CursorCornerLength}}; height:{{CursorCornerLength}}; flex:none; border-radius:50%; background:var(--accent); }
+
+/* Current role and local time share a row, as in the reference. */
+.hero-status { display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:{{StatusRowGap}}; margin:{{CurrentWorkMargin}}; }
+.hero-status .current-work { margin:0; padding:{{StatusPillPadding}}; border:{{ProjectBorder}}; border-radius:{{StatusPillRadius}}; }
+.current-work::before { animation:status-beat {{StatusPulseDuration}} ease-out infinite; }
+.local-status { display:flex; align-items:center; flex-wrap:wrap; gap:{{StatusClockGap}}; color:var(--muted); font-size:{{CurrentWorkFontSize}}; letter-spacing:{{StatusLocationTracking}}; }
+.local-status time { font-variant-numeric:tabular-nums; white-space:nowrap; }
+@keyframes status-beat {
+ 0%, 100% { box-shadow:0 0 0 0 transparent; }
+ 15% { box-shadow:0 0 0 0 {{StatusPulseGlow}}; }
+ 75% { box-shadow:0 0 0 {{StatusPulseSpread}} transparent; }
+}
+@media (prefers-reduced-motion:reduce) { .current-work::before { animation:none; } }
+
+/* Keep status near the top, independently of the lower name composition. */
+.portfolio-shell .hero > .hero-status { position:absolute; top:{{StatusRowTop}}; left:0; right:0; margin:0; }
+
+/* Frost the scenery behind the translucent navigation without blurring its labels. */
+.portfolio-shell header nav { -webkit-backdrop-filter:blur({{NavBackdropBlur}}); backdrop-filter:blur({{NavBackdropBlur}}); transition:{{NavBackdropTransition}}; }
+.portfolio-shell header nav:has(a:hover), .portfolio-shell header nav:focus-within { -webkit-backdrop-filter:blur({{NavHoverBackdropBlur}}); backdrop-filter:blur({{NavHoverBackdropBlur}}); }
+@media (prefers-reduced-motion:reduce) { .portfolio-shell header nav { transition:none; } }
+
+/* The left identity receives the same frosted treatment as the navigation. */
+.portfolio-shell .header-identity { border-radius:{{NavPillRadius}}; -webkit-backdrop-filter:blur({{NavBackdropBlur}}); backdrop-filter:blur({{NavBackdropBlur}}); transition:{{NavBackdropTransition}}; }
+.portfolio-shell .header-identity:hover { -webkit-backdrop-filter:blur({{NavHoverBackdropBlur}}); backdrop-filter:blur({{NavHoverBackdropBlur}}); }
+@media (prefers-reduced-motion:reduce) { .portfolio-shell .header-identity { transition:none; } }
+
+.portfolio-shell .placeholder-section { border-top:{{ProjectBorder}}; padding:{{PlaceholderPadding}}; }
+
+/* One-time letter reveal; h1 retains a single accessible name. */
+.portfolio-shell h1 .name-letter { display:inline-block; white-space:pre; animation:name-reveal {{NameRevealDuration}} {{NameRevealEasing}} both; animation-delay:calc({{NameRevealDelay}} + var(--letter-index) * {{NameRevealStagger}}); }
+@keyframes name-reveal {
+ from { opacity:0; filter:blur({{NameRevealBlur}}); transform:translateY({{NameRevealLift}}); }
+ to { opacity:1; filter:blur(0); transform:translateY(0); }
+}
+@media (prefers-reduced-motion:reduce) { .portfolio-shell h1 .name-letter { animation:none; } }
+
+/* Clip the lower entry so each letter emerges upward into its final line. */
+.portfolio-shell h1 .name-line { overflow:hidden; overflow:clip; padding-block:.15em; margin-block:-.15em; }
+
+/* Independent navigation destinations share the same header and visual system. */
+.portfolio-shell > .inner-page, .portfolio-shell > header[data-expanded=false] ~ .inner-page { padding:{{InnerPagePadding}}; min-height:{{InnerPageMinHeight}}; }
+.portfolio-shell .inner-page > section { margin-top:0; }
+.portfolio-shell .inner-page h1 { font-size:{{InnerPageTitleSize}}; }
+.portfolio-shell header nav a[aria-current=page] { color:var(--accent); }
+.portfolio-shell header nav a[aria-current=page]:hover { color:{{NavHoverText}}; }
+
+/* Subpage path and oversized editorial title. Header navigation is unchanged. */
+.breadcrumbs { margin-bottom:{{BreadcrumbTitleSpace}}; }
+.breadcrumbs ol { display:flex; align-items:center; flex-wrap:wrap; gap:{{BreadcrumbGap}}; padding:0; margin:0; list-style:none; color:var(--muted); font-size:{{BreadcrumbFontSize}}; }
+.breadcrumbs li + li::before { content:'/'; margin-right:{{BreadcrumbGap}}; color:var(--muted); }
+.breadcrumbs li[aria-current=page] { color:inherit; }
+.portfolio-shell .breadcrumbs a { display:inline; padding:0; margin:0; background:none; color:var(--muted); border-radius:0; font-size:inherit; font-weight:{{H2FontWeight}}; }
+.portfolio-shell .breadcrumbs a:hover { color:var(--accent); background:none; }
+.portfolio-shell .inner-page .section-heading { display:flex; flex-direction:column; gap:{{InnerHeadingGap}}; align-items:flex-start; }
+.inner-page .section-number { display:flex; align-items:center; gap:{{BreadcrumbGap}}; color:var(--muted); text-transform:uppercase; letter-spacing:{{SectionLabelTracking}}; }
+.inner-page .section-number::before { content:''; width:{{SectionLabelRuleWidth}}; height:{{SectionLabelRuleHeight}}; background:var(--accent); }
+.portfolio-shell .inner-page h1 { font-size:{{InnerPageTitleSize}}; line-height:{{H1LineHeight}}; letter-spacing:{{H1LetterSpacing}}; max-width:100%; overflow-wrap:break-word; }
+.inner-page .section-intro { max-width:{{InnerHeadingDescriptionWidth}}; }
+.portfolio-shell .inner-page .placeholder-section { border-top:0; padding-top:0; }
+
+/* Every subpage opens with a complete viewport before its body content. */
+.portfolio-shell > .inner-page, .portfolio-shell > header[data-expanded=false] ~ .inner-page { padding:0; }
+.subpage-landing { min-height:{{SubpageLandingHeight}}; padding:{{SubpageLandingPadding}}; }
+.portfolio-shell .inner-page h1 .title-accent { display:inline; color:var(--accent); }
+
+/* Homepage entrance effects; typing is driven by a single finite text reveal. */
+.visually-hidden { position:absolute; width:1px; height:1px; padding:0; margin:-1px; overflow:hidden; clip-path:inset(50%); white-space:nowrap; border:0; }
+.type-shell { display:inline-grid; grid-template-columns:minmax(0, 1fr); position:relative; max-width:100%; }
+.type-reserved, .type-visible { grid-area:1 / 1; white-space:inherit; }
+.type-reserved { visibility:hidden; }
+.type-visible { align-self:start; }
+.intro .type-shell { display:grid; width:100%; }
+.portfolio-shell .eyebrow.typing-active { background:none; -webkit-text-fill-color:currentColor; animation:none; }
+.nav-entrance { animation:nav-arrive {{NavEntranceDuration}} ease-out both; animation-delay:calc({{NavEntranceDelay}} + var(--item-index) * {{NavEntranceStagger}}); }
+.identity-entrance { animation:nav-arrive {{NavEntranceDuration}} ease-out both; }
+@keyframes nav-arrive { from { opacity:0; transform:translateY(-{{NavEntranceLift}}); } to { opacity:1; transform:translateY(0); } }
+.stripe-entrance { animation:stripe-arrive {{StripeEntranceDuration}} ease-out {{StripeEntranceDelay}} both; }
+@keyframes stripe-arrive { from { opacity:0; } to { opacity:1; } }
+.stripe-entrance .stripe-track { animation-delay:calc({{StripeEntranceDuration}} + {{StripeEntranceDelay}}); }
+@media (prefers-reduced-motion:reduce) {
+ .nav-entrance, .identity-entrance, .stripe-entrance { animation:none; }
+}
+
+/* Shared entrance markup preserves subpage word boundaries and accent colors. */
+.portfolio-shell .inner-page h1 .title-word { display:inline-block; white-space:nowrap; }
+.section-intro .type-shell { display:grid; width:100%; }
+.section-intro .type-visible, .section-intro .type-reserved { white-space:pre-line; }

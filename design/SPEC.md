@@ -1,25 +1,11 @@
 # Shared polished-page design
 
-This directory in `main-public.github.io` is the canonical appearance source for both polished pages.
+`design/theme.json` is the canonical design control file for both public and personal polished pages. It controls the palette, type family, font sizes and weights, line heights, tracking, spacing, dimensions, borders, radii, focus styling, motion, and mobile breakpoint. Token names identify their selector and property. CSS structural behavior lives in `design/styles.template.css`; keep visual values in the JSON and use `{{tokenName}}` placeholders in the template.
 
-- Edit `theme.json` for common colors and corner radii.
-- Edit `styles.template.css` for typography, spacing, layout, responsive rules, navigation, and all other styling. `{{tokenName}}` values come from the theme.
-- Do not edit either generated `styles.css` directly or add page-specific style overrides.
-- Keep page-specific copy and destinations in each page’s `materials/content.json`.
+The palette follows https://www.tajmirul.site/: charcoal background, gray surfaces and text, bright green primary, and cyan secondary. The font remains a local system stack; no external font download is required.
 
-## Shared markup contract
+Run `node scripts/sync-design.mjs` after editing. It generates matching `styles.css` and `design-settings.js` in both checkouts. Do not edit those generated files. `--local` updates only this checkout; `--check` verifies synchronization. The breakpoint in the JSON drives both CSS and navigation JavaScript.
 
-Both renderers use `.hero` with `.eyebrow`, `h1`, `.intro`, and one cross-page button; `main section` with `h2`; `.projects` containing `.project` cards with `h3` and paragraphs; and the same collapsible left navigation with `.return-main-page`. Use the same font, heading hierarchy, button treatment, card treatment, navigation labels for equivalent actions, and responsive behavior. Content and section counts may differ. The GitHub parent link belongs in the navigator. The cross-page entrance appears once in the hero.
+Keep copy in `materials/content.json`, assets in `materials/data/`, and rough background notes in `materials/draft.md`. The draft is excluded from preview serving and deployment artifacts. It can still be present in Git history if committed to a public repository. Never store confidential source or secrets there.
 
-## Update both pages
-
-From `main-public.github.io`:
-
-```sh
-node scripts/sync-design.mjs
-node scripts/sync-design.mjs --check
-```
-
-The default personal checkout is `../../Private/main-private.github.io`. For another location, pass `--personal /absolute/path/to/main-private.github.io`. The script validates both checkouts before writing. Commit the generated stylesheet in each repository so GitHub Pages builds remain independent.
-
-`node scripts/sync-design.mjs --local --check` checks only this repository and runs automatically before its build. The cross-repository check requires both checkouts and should run after appearance or renderer changes. CSS equality is checked automatically; the markup contract above still requires review when editing renderers.
+Both renderers use `.hero`, `.eyebrow`, `h1`, `.intro`, `main section`, `h2`, `.projects`, and `.project` cards with `h3` and paragraphs. Preserve this shared markup contract. The GitHub parent link belongs in the left navigator; the personal/portfolio cross-page entrance appears once in the hero.

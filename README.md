@@ -50,3 +50,18 @@ The personal and public GitHub landing READMEs link to each other and to their o
 ## Shared appearance
 
 The canonical design lives in `main-public.github.io/design/`: edit `theme.json` for colors and corner radii or `styles.template.css` for layout and typography. From that repository, run `node scripts/sync-design.mjs` to update both pages, then `node scripts/sync-design.mjs --check` to check for differences. Both `styles.css` files are generated. See `design/SPEC.md` in the public polished-page repository for the shared markup contract and alternate checkout paths.
+
+## Design and working notes
+
+Edit `design/theme.json` for visual controls and run `node scripts/sync-design.mjs` to update both polished pages. The shared layout is in `design/styles.template.css`; generated CSS should not be edited directly. See `design/SPEC.md`.
+
+Use `materials/draft.md` for rough thoughts and background. Rewritten presentation copy belongs in `materials/content.json`. The draft is excluded from serving and deployment, but committing it to a public repo still makes it accessible through GitHub.
+
+## Pages
+
+- `/`: Home landing, reserved for future content.
+- `/works/`: Major project presentations.
+- `/skills/`: Skills placeholder.
+- `/contact/`: Contact placeholder.
+
+Each route has its own static `index.html`, so direct links and refreshes work on GitHub Pages. All share `main.js` and `materials/content.json`. Restart the local server after this routing change.

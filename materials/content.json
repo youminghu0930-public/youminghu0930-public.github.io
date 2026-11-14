@@ -1,10 +1,10 @@
 {
   "page": {
-    "title": "Youming Hu | Portfolio",
+    "title": "You-Ming Hu’s Portfolio",
     "description": "Youming Hu's portfolio and projects.",
     "eyebrow": "Portfolio & projects",
-    "heading": "Hi, I'm Youming.",
-    "intro": "I build computer-vision systems that turn ordinary video into useful movement insights. Explore my golf swing analysis projects below.",
+    "heading": "You-Ming Hu",
+    "intro": "A short introduction about my background and interests will go here.\nThis space will describe the problems I enjoy working on.\nMore details about my approach and direction will follow.",
     "navigationLabel": "Portfolio sections",
     "navigationToggle": "Toggle section navigation",
     "mainPage": {
@@ -14,16 +14,47 @@
     "personalPage": {
       "label": "More about me →",
       "url": "https://youminghu0930.github.io/"
-    }
+    },
+    "nameLines": [
+      "You-Ming Hu"
+    ],
+    "role": "Artificial Intelligence Engineer",
+    "workLinkLabel": "View selected work ↗",
+    "identityLabel": "Youming Hu / Portfolio",
+    "sectionNumber": "01",
+    "scrollLabel": "Scroll to explore ↓",
+    "footerLabel": "From video to movement insights.",
+    "footerLinkLabel": "Back to top ↑",
+    "focusAreas": [
+      "Pose estimation",
+      "Object detection",
+      "3D reconstruction",
+      "Motion analysis"
+    ],
+    "brandLabel": "You-Ming Hu",
+    "brandMonogram": "YM",
+    "currentWork": {
+      "label": "Now:",
+      "role": "Artificial Intelligence Engineer",
+      "company": "Ideas Lab",
+      "connector": "at",
+      "location": "Neihu, Taipei, Taiwan",
+      "timeZone": "Asia/Taipei",
+      "timeZoneLabel": "UTC+8",
+      "clockLabel": "Current time in Taipei"
+    },
+    "breadcrumbLabel": "Breadcrumb"
   },
   "sections": [
     {
       "id": "about",
-      "title": "About"
+      "title": "Intro"
     },
     {
       "id": "projects",
-      "title": "Selected projects"
+      "title": "Selected projects",
+      "number": "02",
+      "intro": "Two connected projects exploring how ordinary video becomes reliable, interpretable movement information."
     }
   ],
   "projects": [
@@ -33,7 +64,14 @@
       "title": "Golf Swing Analysis with RGB Video",
       "summary": "Explore 2D pose estimation, golfer and club detection, data augmentation, and trajectory reconstruction.",
       "url": "https://youminghu0930-public.github.io/golf-swing-analysis-poc/",
-      "linkLabel": "Explore 2D analysis →"
+      "linkLabel": "Explore 2D analysis →",
+      "number": "01",
+      "category": "2D perception",
+      "tags": [
+        "Pose estimation",
+        "Golfer & club detection",
+        "Trajectory reconstruction"
+      ]
     },
     {
       "id": "golf-3d",
@@ -41,7 +79,50 @@
       "title": "Golf True 3D",
       "summary": "Explore 3D reconstruction, synchronization across camera views, and movement information extracted from golf swings.",
       "url": "https://youminghu0930-public.github.io/golf-true-3d-product/",
-      "linkLabel": "Explore True 3D →"
+      "linkLabel": "Explore True 3D →",
+      "number": "02",
+      "category": "3D movement",
+      "tags": [
+        "Multi-view geometry",
+        "Time synchronization",
+        "Movement measurements"
+      ]
+    }
+  ],
+  "navigation": [
+    {
+      "label": "Home",
+      "page": "home",
+      "url": "/"
+    },
+    {
+      "label": "Works",
+      "page": "works",
+      "url": "/works/"
+    },
+    {
+      "label": "Skills",
+      "page": "skills",
+      "url": "/skills/"
+    },
+    {
+      "label": "Contact",
+      "page": "contact",
+      "url": "/contact/"
+    }
+  ],
+  "placeholders": [
+    {
+      "id": "skills",
+      "title": "Skills",
+      "number": "03",
+      "description": "Skills and areas of expertise will be added here."
+    },
+    {
+      "id": "contact",
+      "title": "Contact",
+      "number": "04",
+      "description": "Contact information will be added here."
     }
   ]
 }
