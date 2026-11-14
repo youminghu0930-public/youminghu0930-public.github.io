@@ -383,3 +383,33 @@ body:has(.portfolio-shell) { overflow-x:clip; }
 @media (hover:none) and (pointer:coarse) {
  .portfolio-shell .landing { min-height:{{MobileStableLandingHeight}}; }
 }
+
+/* Bare Menu/Close control with overlapping, softly exchanged labels. */
+.mobile-menu-label { position:relative; }
+.mobile-menu-label > span { grid-area:1 / 1; transition:{{MenuLabelTransition}}; }
+.menu-label-close { opacity:0; transform:translateY({{MenuLabelLift}}); }
+.portfolio-shell .navigation-toggle[aria-expanded=true] .menu-label-open { opacity:0; transform:translateY(-{{MenuLabelLift}}); }
+.portfolio-shell .navigation-toggle[aria-expanded=true] .menu-label-close { opacity:1; transform:translateY(0); }
+.menu-letter { display:inline-block; white-space:pre; }
+@media (max-width:{{mobileBreakpoint}}) {
+ .portfolio-shell > .navigation-toggle, .portfolio-shell > .navigation-toggle:hover, .portfolio-shell > .navigation-toggle:active { background:transparent; -webkit-tap-highlight-color:transparent; }
+ .portfolio-shell .mobile-menu-label { display:inline-grid; }
+ .portfolio-shell .navigation-toggle .menu-icon { transition:{{MenuIconTransition}}; }
+ .portfolio-shell header nav > a { animation:none; }
+ .menu-word { display:inline-block; overflow:hidden; overflow:clip; padding-block:.15em; margin-block:-.15em; vertical-align:bottom; }
+ .portfolio-shell header[data-expanded=false] .menu-letter { animation:none; opacity:0; }
+ .portfolio-shell header[data-expanded=true] .menu-letter { --menu-reveal-delay:calc({{MenuItemRevealDelay}} + var(--menu-index) * {{MenuItemRevealStagger}} + var(--letter-index) * {{NameRevealStagger}}); animation:name-reveal calc({{MenuRevealTotalDuration}} - var(--menu-reveal-delay)) {{NameRevealEasing}} both; animation-delay:var(--menu-reveal-delay); }
+}
+@media (prefers-reduced-motion:reduce) {
+ .mobile-menu-label > span, .portfolio-shell .navigation-toggle .menu-icon { transition:none; }
+ .portfolio-shell header[data-expanded=true] .menu-letter { animation:none; opacity:1; }
+}
+
+/* Elastic menu content: the panel and close control stay fixed. */
+@media (max-width:{{mobileBreakpoint}}) {
+ .portfolio-shell header nav > a { translate:0 var(--menu-drag-y, 0px); scale:1 var(--menu-drag-scale, 1); transition:{{NavHoverTransition}}, {{MenuElasticReturn}}; }
+ .portfolio-shell header nav[data-dragging=true] > a { transition:{{NavHoverTransition}}; }
+}
+@media (prefers-reduced-motion:reduce) {
+ .portfolio-shell header nav > a { translate:none; scale:none; }
+}

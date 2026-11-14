@@ -75,10 +75,15 @@ function installPageEntrance(hero, header, stripe = null, {animateHeader = true}
     const job = {node, visible, text, chars, lines, lineNodes, delay, duration, done:false};
     jobs.push(job);
     if (parallelLines) {
-      const width = node.getBoundingClientRect().width;
+      let width = node.getBoundingClientRect().width;
       const observer = new ResizeObserver(() => {
-        // A genuine width change restores normal text rather than keeping stale wraps.
-        if (!job.done && Math.abs(node.getBoundingClientRect().width - width) > 1) finish(job);
+        const nextWidth = node.getBoundingClientRect().width;
+        if (Math.abs(nextWidth - width) <= 1) return;
+        width = nextWidth;
+        job.lines = measureRenderedLines(reserved, text).map(line => Array.from(line));
+        job.lineNodes = job.lines.map(line => element('span', line.join(''), 'type-line'));
+        visible.replaceChildren(...job.lineNodes);
+        finish(job);
       });
       observer.observe(node);
       lineObservers.push(observer);
@@ -93,7 +98,10 @@ function installPageEntrance(hero, header, stripe = null, {animateHeader = true}
   prepare(title, settings.heroTypingDelay, Infinity, sharedDuration);
   prepare(paragraph, settings.heroTypingDelay, Infinity, sharedDuration, true);
   function finish(job) {
-    job.node.textContent = job.text;
+    if (job.lines) {
+      // Keep the exact same boxes and line breaks on the final animation frame.
+      job.lines.forEach((line, index) => { job.lineNodes[index].textContent = line.join(''); });
+    } else job.node.textContent = job.text;
     job.node.classList.remove('typing-active');
     delete job.node.dataset.typing;
     job.done = true;

@@ -33,14 +33,27 @@ async function startApp() {
   const icon = element('span', undefined, 'menu-icon');
   icon.setAttribute('aria-hidden', 'true');
   icon.append(element('span'), element('span'), element('span'));
-  toggle.append(element('span', page.mobileMenuLabel, 'mobile-menu-label'), icon);
+  const menuLabel = element('span', undefined, 'mobile-menu-label');
+  menuLabel.setAttribute('aria-hidden', 'true');
+  menuLabel.append(element('span', page.mobileMenuLabel, 'menu-label-open'), element('span', page.mobileMenuCloseLabel, 'menu-label-close'));
+  toggle.append(menuLabel, icon);
   const header = element('header');
   header.dataset.expanded = 'true';
   const nav = element('nav');
   nav.id = 'section-navigation';
   nav.setAttribute('aria-label', page.navigationLabel);
   for (const [index, item] of navigation.entries()) {
-    const itemLink = link(item.label, item.url);
+    const itemLink = link('', item.url);
+    itemLink.setAttribute('aria-label', item.label);
+    const word = element('span', undefined, 'menu-word');
+    word.setAttribute('aria-hidden', 'true');
+    Array.from(item.label).forEach((character, letterIndex) => {
+      const letter = element('span', character, 'menu-letter');
+      letter.style.setProperty('--letter-index', letterIndex);
+      word.append(letter);
+    });
+    itemLink.style.setProperty('--menu-index', index);
+    itemLink.append(word);
     itemLink.dataset.number = String(index + 1).padStart(2, '0');
     nav.append(itemLink);
   }

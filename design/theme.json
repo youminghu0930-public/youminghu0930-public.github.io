@@ -287,7 +287,14 @@
     "LandingGlowHeight": "115%",
     "LandingGlowFadeStop": "90%",
     "LandingGlowPosition": "60% -30%",
-    "MobileStableLandingHeight": "100svh"
+    "MobileStableLandingHeight": "100svh",
+    "MenuLabelTransition": "opacity 200ms ease, transform 200ms ease",
+    "MenuLabelLift": "6px",
+    "MenuItemRevealDelay": "120ms",
+    "MenuItemRevealStagger": "90ms",
+    "MenuIconTransition": "transform 200ms ease",
+    "MenuRevealTotalDuration": "1500ms",
+    "MenuElasticReturn": "translate 450ms cubic-bezier(.2,.8,.2,1), scale 450ms cubic-bezier(.2,.8,.2,1)"
   },
   "layoutReference": "https://aaftab.is-a.dev/",
   "effects": {
@@ -316,6 +323,9 @@
     "touchDotInfluenceRadius": 145,
     "touchDotDisplacement": 0,
     "touchFadeInMs": 180,
-    "touchFadeOutMs": 350
+    "touchFadeOutMs": 350,
+    "menuElasticMaxDistance": 48,
+    "menuElasticResistance": 160,
+    "menuElasticCompression": 0.025
   }
 }
