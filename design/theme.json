@@ -303,7 +303,8 @@
     "BodyFontSource": "url(\"materials/data/fonts/Inter-variable.ttf\")",
     "SubtitleFontFamily": "\"Noto Sans TC\", \"Segoe UI\", system-ui, sans-serif",
     "TitleRevealLinePadding": ".04em 0 .12em",
-    "LandingTitleDescriptionGap": "clamp(16px, 2vw, 28px)"
+    "LandingTitleDescriptionGap": "clamp(16px, 2vw, 28px)",
+    "MobileMenuControlColor": "#ffffff"
   },
   "layoutReference": "https://aaftab.is-a.dev/",
   "effects": {

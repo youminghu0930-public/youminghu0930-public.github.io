@@ -450,3 +450,11 @@ body:has(.portfolio-shell) { overflow-x:clip; }
 .portfolio-page h3 { font-weight:600; }
 
 .portfolio-shell .landing .hero-details { margin-top:clamp(16px, 2vw, 28px); }
+
+/* Mobile Menu/Close stays white through hover, tap, and open states. */
+@media (max-width:1000px) {
+ .portfolio-shell > .navigation-toggle,
+ .portfolio-shell > .navigation-toggle:hover,
+ .portfolio-shell > .navigation-toggle:active,
+ .portfolio-shell > .navigation-toggle[aria-expanded=true] { color:#ffffff; background:transparent; }
+}
