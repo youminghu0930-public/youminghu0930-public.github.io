@@ -72,9 +72,9 @@ export function installPointerEffects(hero) {
       const x = end.left + end.width / 2, y = end.top + end.height / 2;
       const from = previous[index] || {x:pointer.x, y:pointer.y};
       flights.push(corner.animate([
-        {transform:`translate(${from.x - x}px, ${from.y - y}px) rotate(0deg)`, offset:0},
-        {transform:`translate(${center.x - x}px, ${center.y - y}px) rotate(180deg) scale(.65)`, offset:options.cursorGatherOffset},
-        {transform:'translate(0, 0) rotate(360deg) scale(1)', offset:1}
+        {transform:`translate(${from.x - x}px, ${from.y - y}px) `, offset:0},
+        {transform:`translate(${center.x - x}px, ${center.y - y}px) scale(1)`, offset:options.cursorGatherOffset},
+        {transform:'translate(0, 0) scale(1)', offset:1}
       ], {duration:options.cursorFlightDuration, delay:index * options.cursorFlightStagger, easing:'cubic-bezier(.2,.7,.25,1)', fill:'backwards'}));
     });
   }

@@ -290,13 +290,14 @@
     "MobileStableLandingHeight": "100svh",
     "MenuLabelTransition": "opacity 200ms ease, transform 200ms ease",
     "MenuLabelLift": "6px",
-    "MenuItemRevealDelay": "120ms",
-    "MenuItemRevealStagger": "90ms",
+    "MenuItemRevealDelay": "60ms",
+    "MenuItemRevealStagger": "45ms",
     "MenuIconTransition": "transform 200ms ease",
-    "MenuRevealTotalDuration": "1500ms",
+    "MenuRevealTotalDuration": "750ms",
     "MenuElasticReturn": "translate 450ms cubic-bezier(.2,.8,.2,1), scale 450ms cubic-bezier(.2,.8,.2,1)",
     "ContactActionBackdropBlur": "6px",
-    "ContactActionBackground": "rgb(12 12 12 / 25%)"
+    "ContactActionBackground": "rgb(12 12 12 / 25%)",
+    "MenuLetterRevealStagger": "22.5ms"
   },
   "layoutReference": "https://aaftab.is-a.dev/",
   "effects": {

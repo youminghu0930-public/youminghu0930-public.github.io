@@ -75,11 +75,11 @@ export function installNavigation() {
   }
   setNavigation(!mobile.matches);
   mobile.addEventListener('change', () => setNavigation(!mobile.matches));
-  toggle.addEventListener('click', () => {
+  toggle.addEventListener('click', event => {
     const expanded = toggle.getAttribute('aria-expanded') !== 'true';
-    setNavigation(expanded, expanded);
+    setNavigation(expanded, expanded && event.detail === 0);
   });
-  function close() { setNavigation(false); (restoreFocus || toggle).focus(); restoreFocus = null; }
+  function close() { setNavigation(false); if (restoreFocus) restoreFocus.focus(); else if (nav.contains(document.activeElement)) document.activeElement.blur(); restoreFocus = null; }
   backdrop.addEventListener('click', close);
   nav.addEventListener('click', event => { if (mobile.matches && event.target.closest('a')) close(); });
   document.addEventListener('keydown', event => {

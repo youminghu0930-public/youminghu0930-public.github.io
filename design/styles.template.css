@@ -398,7 +398,7 @@ body:has(.portfolio-shell) { overflow-x:clip; }
  .portfolio-shell header nav > a { animation:none; }
  .menu-word { display:inline-block; overflow:hidden; overflow:clip; padding-block:.15em; margin-block:-.15em; vertical-align:bottom; }
  .portfolio-shell header[data-expanded=false] .menu-letter { animation:none; opacity:0; }
- .portfolio-shell header[data-expanded=true] .menu-letter { --menu-reveal-delay:calc({{MenuItemRevealDelay}} + var(--menu-index) * {{MenuItemRevealStagger}} + var(--letter-index) * {{NameRevealStagger}}); animation:name-reveal calc({{MenuRevealTotalDuration}} - var(--menu-reveal-delay)) {{NameRevealEasing}} both; animation-delay:var(--menu-reveal-delay); }
+ .portfolio-shell header[data-expanded=true] .menu-letter { --menu-reveal-delay:calc({{MenuItemRevealDelay}} + var(--menu-index) * {{MenuItemRevealStagger}} + var(--letter-index) * {{MenuLetterRevealStagger}}); animation:name-reveal calc({{MenuRevealTotalDuration}} - var(--menu-reveal-delay)) {{NameRevealEasing}} both; animation-delay:var(--menu-reveal-delay); }
 }
 @media (prefers-reduced-motion:reduce) {
  .mobile-menu-label > span, .portfolio-shell .navigation-toggle .menu-icon { transition:none; }
@@ -418,3 +418,20 @@ body:has(.portfolio-shell) { overflow-x:clip; }
 .portfolio-shell .landing-actions .action-outline { background:{{NavPillBackground}}; -webkit-backdrop-filter:blur({{NavBackdropBlur}}); backdrop-filter:blur({{NavBackdropBlur}}); transition:{{NavHoverTransition}}, {{NavBackdropTransition}}, {{ButtonMagnetTransition}}; }
 .portfolio-shell .landing-actions .action-outline:hover, .portfolio-shell .landing-actions .action-outline:focus-visible, .portfolio-shell .landing-actions .action-outline:active { -webkit-backdrop-filter:blur({{NavHoverBackdropBlur}}); backdrop-filter:blur({{NavHoverBackdropBlur}}); }
 @media (prefers-reduced-motion:reduce) { .portfolio-shell .landing-actions .action-outline { transition:none; } }
+
+/* Menu numbers share the same reveal and completion time as their labels. */
+@media (max-width:{{mobileBreakpoint}}) {
+ .portfolio-shell header[data-expanded=false] nav > a::after { animation:none; opacity:0; }
+ .portfolio-shell header[data-expanded=true] nav > a::after { --number-delay:calc({{MenuItemRevealDelay}} + var(--menu-index) * {{MenuItemRevealStagger}}); animation:name-reveal calc({{MenuRevealTotalDuration}} - var(--number-delay)) {{NameRevealEasing}} both; animation-delay:var(--number-delay); }
+}
+/* Touch must not retain a second item's synthetic hover color. */
+@media (hover:none) and (pointer:coarse) {
+ .portfolio-shell a, .portfolio-shell button { -webkit-tap-highlight-color:transparent; }
+ .portfolio-shell header nav > a:hover { background:none; color:var(--muted); }
+ .portfolio-shell header nav > a[aria-current=page], .portfolio-shell header nav > a[aria-current=page]:hover { color:var(--accent); }
+ .portfolio-shell a:focus:not(:focus-visible), .portfolio-shell button:focus:not(:focus-visible) { outline:none; }
+}
+/* Route headings receive semantic focus without a browser-drawn selection box. */
+.portfolio-shell h1[tabindex="-1"]:focus { outline:none; }
+.portfolio-shell a:focus-visible, .portfolio-shell button:focus-visible { outline-color:var(--accent); }
+@media (prefers-reduced-motion:reduce) { .portfolio-shell header[data-expanded=true] nav > a::after { animation:none; opacity:1; } }

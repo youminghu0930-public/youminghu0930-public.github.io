@@ -15,23 +15,42 @@ export function measureRenderedLines(reserved, text) {
   const range = document.createRange();
   const source = reserved.firstChild;
   const lines = [];
-  let line = '', top = null, offset = 0;
-  for (const character of Array.from(text)) {
-    if (character === '\n') {
-      lines.push(line); line = ''; top = null; offset++;
-      continue;
+  let line = '', top = null, offset = 0, space = '';
+  function add(value, y) {
+    if (top !== null && Math.abs(y - top) > 1) {
+      lines.push(line.trimEnd()); line = ''; space = '';
     }
-    range.setStart(source, offset);
-    offset += character.length;
-    range.setEnd(source, offset);
-    const rect = range.getBoundingClientRect();
-    if (rect.height && top !== null && Math.abs(rect.top - top) > 1) {
-      lines.push(line); line = '';
-    }
-    if (rect.height) top = rect.top;
-    line += character;
+    if (line) line += space;
+    space = '';
+    line += value;
+    top = y;
   }
-  lines.push(line);
+  for (const token of text.match(/\n|[^\S\n]+|[^\s]+/gu) || []) {
+    if (token === '\n') {
+      lines.push(line.trimEnd()); line = ''; space = ''; top = null;
+    } else if (/^\s+$/u.test(token)) {
+      // Collapsed wrap-boundary spaces do not define the next line's position.
+      space += token;
+    } else {
+      range.setStart(source, offset);
+      range.setEnd(source, offset + token.length);
+      const rects = Array.from(range.getClientRects()).filter(rect => rect.height > 0 && rect.width > 0);
+      const rows = new Set(rects.map(rect => Math.round(rect.top)));
+      if (rows.size <= 1) {
+        add(token, rects[0]?.top ?? top ?? 0);
+      } else {
+        // Only a genuinely oversized word is measured character by character.
+        let start = offset;
+        for (const character of Array.from(token)) {
+          range.setStart(source, start); start += character.length; range.setEnd(source, start);
+          const rect = range.getBoundingClientRect();
+          add(character, rect.top);
+        }
+      }
+    }
+    offset += token.length;
+  }
+  lines.push(line.trimEnd());
   return lines;
 }
 function installPageEntrance(hero, header, stripe = null, {animateHeader = true} = {}) {
