@@ -291,19 +291,56 @@ async function startApp() {
     const words = skills.title.split(' ');
     title.append(words.slice(0,-1).join(' ')+' ', element('span',words.at(-1)+'.'));
     heading.append(element('p',skills.eyebrow,'skills-label'),title,element('p',skills.description,'skills-intro'));
+    if (skills.overview?.length) {
+      const tools = new Map();
+      for (const group of skills.groups) {
+        const items = group.items || group.badgeRows.flatMap(row => row.items);
+        for (const item of items) if (!tools.has(item.label)) tools.set(item.label,item);
+      }
+      const overview = element('ul',undefined,'skills-overview');
+      overview.setAttribute('aria-label',skills.overviewLabel);
+      for (const name of skills.overview) {
+        const tool = tools.get(name);
+        if (!tool?.icon || !tool.url) continue;
+        const item = element('li');
+        const action = link('',tool.url,'skills-overview-link');
+        action.setAttribute('aria-label',`${name} (opens in a new tab)`);
+        action.title = name;
+        const image = element('img');
+        image.src = tool.icon; image.alt = ''; image.width = 24; image.height = 24;
+        action.append(image); item.append(action); overview.append(item);
+      }
+      heading.append(overview);
+    }
     section.append(heading);
     for (const [index, group] of skills.groups.entries()) {
       const row = element('article',undefined,'skills-group');
       row.dataset.cursorTarget = '';
+      if (group.title === 'AI Research') row.dataset.marqueeReference = 'true';
       const heading = element('h3',undefined,'skills-group-heading');
       const toggle = element('button',undefined,'skills-toggle');
       toggle.type = 'button';
       toggle.id = `skill-toggle-${index}`;
       toggle.setAttribute('aria-expanded','false');
       toggle.setAttribute('aria-controls',`skill-panel-${index}`);
-      const icon = element('span','+','skills-toggle-icon');
+      const icon = element('span',undefined,'skills-toggle-icon');
       icon.setAttribute('aria-hidden','true');
       toggle.append(element('span',String(index+1).padStart(2,'0'),'skills-number'),element('span',group.title,'skills-name'),icon);
+      const hoverBand = element('span',undefined,'skills-hover-band');
+      hoverBand.setAttribute('aria-hidden','true');
+      const hoverTrack = element('span',undefined,'skills-hover-track');
+      for (let copy = 0; copy < 2; copy++) {
+        const run = element('span',undefined,'skills-hover-run');
+        for (let repeat = 0; repeat < design.effects.skillsMarqueeRepeats; repeat++) {
+          run.append(element('span',group.title,'skills-hover-title'));
+          run.append(element('span',undefined,'skills-hover-dot'));
+        }
+        hoverTrack.append(run);
+      }
+      const hoverWindow = element('span',undefined,'skills-hover-window');
+      hoverWindow.append(hoverTrack);
+      hoverBand.append(hoverWindow);
+      toggle.append(hoverBand);
       heading.append(toggle);
       const panel = element('div',undefined,'skills-panel');
       panel.id = `skill-panel-${index}`;
@@ -315,19 +352,37 @@ async function startApp() {
       const copy = element('div',undefined,'skills-copy');
       copy.append(element('p',group.description));
       const toolkit = element('div',undefined,'skills-toolkit');
-      const list = element('ul',undefined,'skills-items');
-      for (const skill of group.items) {
-        const item = element('li');
-        const action = link('',skill.url,'skill-link');
-        action.setAttribute('aria-label',`${skill.label} (opens in a new tab)`);
-        const icon = element('img',undefined,'skill-icon');
-        icon.src = skill.icon;
-        icon.alt = '';
-        icon.width = 32; icon.height = 32;
-        action.append(icon,element('span',skill.label));
-        item.append(action); list.append(item);
+      const badgeRows = group.badgeRows || [{items:group.items}];
+      for (const [rowIndex, badgeRow] of badgeRows.entries()) {
+        const badgeGroup = element('div',undefined,'skills-badge-row');
+        const list = element('ul',undefined,'skills-items');
+        if (badgeRow.label) {
+          badgeGroup.classList.add('skills-badge-row-labeled');
+          const label = element('h4',badgeRow.label,'skills-row-label');
+          label.id = `skill-row-${index}-${rowIndex}`;
+          list.setAttribute('aria-labelledby',label.id);
+          badgeGroup.append(label);
+        }
+        for (const skill of badgeRow.items) {
+          const item = element('li');
+          const action = skill.url ? link('',skill.url,'skill-link') : element('span',undefined,'skill-link');
+          if (skill.url) action.setAttribute('aria-label',`${skill.label} (opens in a new tab)`);
+          const iconSource = skill.icon || (skill.url && new URL(skill.url, location.href).hostname === 'github.com' ? '/materials/data/skill-icons/github.svg' : null);
+          if (iconSource) {
+            const icon = element('img',undefined,'skill-icon');
+            icon.src = iconSource;
+            icon.alt = '';
+            icon.width = 20; icon.height = 20;
+            const tile = element('span',undefined,'skill-icon-tile');
+            tile.append(icon);
+            action.append(tile);
+          }
+          action.append(element('span',skill.label));
+          item.append(action); list.append(item);
+        }
+        badgeGroup.append(list);
+        toolkit.append(badgeGroup);
       }
-      toolkit.append(list);
       inner.append(copy,toolkit); panel.append(inner);
       row.append(heading,panel); section.append(row);
     }
@@ -361,7 +416,12 @@ async function startApp() {
     if (old) old.replaceWith(main); else app.append(main);
     const stopEntrance = installLandingEntrance(landing, header, {animateHeader:initial});
     const stopPointer = installPointerEffects(landing.hero);
-    const stopSkills = installSkillsAccordion(main);
+    const stopSkills = installSkillsAccordion(main, {setScrollPosition:position => {
+      if (smoothScroll) {
+        smoothScroll.resize();
+        smoothScroll.scrollTo(position.top, {immediate:true, force:true});
+      } else window.scrollTo({...position, behavior:'instant'});
+    }});
     const stopScrollMotion = installScrollMotion(main);
     cleanup = () => { stopSkills(); stopScrollMotion(); stopEntrance?.(); stopPointer?.(); landing.destroy(); };
     currentRoute = route;

@@ -87,6 +87,10 @@ section, article { scroll-margin-top: {{SectionArticleScrollMarginTop}}; }
  .project-index { flex-direction:row; justify-content:space-between; }
 }
 
+/* Shared title color; accent spans and interactive states retain their own colors. */
+h1, h2, h3, h4, h5, h6 { color:{{HeadingColor}}; }
+.brand-name { color:{{HeadingColor}}; }
+
 /* Public portfolio: top-right navigation and a low-set opening composition. */
 .portfolio-shell > header, .portfolio-shell > header[data-expanded=false] { inset:0 0 auto; width:100%; height:{{TopbarHeight}}; padding:{{TopbarPadding}}; display:flex; align-items:center; justify-content:space-between; border:0; background:{{TopbarBackground}}; overflow:visible; transform:none; }
 .portfolio-shell .navigation-brand { color:var(--accent); font-size:{{TopbarBrandSize}}; white-space:nowrap; }
@@ -96,6 +100,8 @@ section, article { scroll-margin-top: {{SectionArticleScrollMarginTop}}; }
 .portfolio-shell .return-main-page::before { display:none; }
 .portfolio-shell > .navigation-toggle { display:none; }
 .portfolio-shell > main, .portfolio-shell > header[data-expanded=false] ~ main { width:{{PortfolioCanvasWidth}}; margin-inline:auto; padding:0; }
+/* Accordion growth pushes following content down without viewport anchoring. */
+.portfolio-shell > main { overflow-anchor:none; }
 .portfolio-shell .hero { min-height:{{HeroOpeningMinHeight}}; padding-top:{{HeroTopSpace}}; padding-bottom:{{HeroBottomSpace}}; }
 .portfolio-shell h1 { font-size:{{HeroSingleLineSize}}; margin:0; }
 .portfolio-shell h1 span:last-child { color:inherit; }
@@ -136,6 +142,7 @@ body:has(.portfolio-shell) { overflow-x:clip; }
 .portfolio-shell header nav a:hover, .portfolio-shell header nav a:focus-visible { background:{{NavHoverBackground}}; color:{{NavHoverText}}; }
 .cursor-frame { position:absolute; width:{{CursorFrameSize}}; height:{{CursorFrameSize}}; transform:translate(-50%, -50%); color:{{CursorIdleColor}}; transition:none; }
 .pointer-diamond[data-link=true] .cursor-frame { color:var(--accent); }
+.pointer-diamond[data-link=true][data-nav-inactive=true] .cursor-frame { color:{{CursorInactiveNavColor}}; }
 .cursor-frame i { position:absolute; width:{{CursorCornerLength}}; height:{{CursorCornerLength}}; border:0 solid currentColor; }
 .cursor-frame i:nth-child(1) { top:0; left:0; border-top-width:{{CursorStroke}}; border-left-width:{{CursorStroke}}; }
 .cursor-frame i:nth-child(2) { top:0; right:0; border-top-width:{{CursorStroke}}; border-right-width:{{CursorStroke}}; }
@@ -580,37 +587,88 @@ html.custom-page-scrollbar::-webkit-scrollbar { display:none; }
 .portfolio-shell .skills-heading h2 { font-size:{{ExperienceTitleSize}}; line-height:1.08; margin:0 0 24px; }
 .skills-heading h2 span { color:var(--accent); }
 .skills-intro { color:var(--muted); line-height:1.7; }
+.skills-overview { display:flex; align-items:center; flex-wrap:nowrap; gap:{{SkillsOverviewGap}}; list-style:none; margin:{{SkillsOverviewMargin}}; padding:4px; max-width:100%; overflow-x:auto; overscroll-behavior-x:contain; scrollbar-width:thin; scrollbar-color:var(--border) transparent; }
+.skills-overview li { flex:0 0 auto; }
+.portfolio-shell .skills-overview-link { display:grid; place-items:center; width:{{SkillsOverviewItemSize}}; height:{{SkillsOverviewItemSize}}; margin:0; padding:0; border:1px solid var(--border); border-radius:{{SkillsOverviewRadius}}; background:{{SkillsTileBackground}}; transition:border-color 200ms ease; }
+.portfolio-shell .skills-overview-link:hover, .portfolio-shell .skills-overview-link:focus-visible { background:{{SkillsTileBackground}}; border-color:var(--accent); }
+.skills-overview-link:focus-visible { outline-offset:1px; }
+.skills-overview-link img { display:block; width:{{SkillsOverviewIconSize}}; height:{{SkillsOverviewIconSize}}; object-fit:contain; }
+
 .skills-group { border-top:1px solid var(--border); background:transparent; transition:background {{SkillsPanelDuration}} ease, border-color {{SkillsPanelDuration}} ease; }
 .skills-group:last-child { border-bottom:1px solid var(--border); }
-.skills-group.is-open { background:{{SkillsActiveBackground}}; border-color:var(--accent); }
+.skills-group.is-open, .skills-group.is-hovered { background:{{SkillsActiveBackground}}; }
 .portfolio-shell .skills-group-heading { margin:0; font-size:{{SkillsRowTitleSize}}; line-height:1.25; }
-.skills-toggle { display:flex; align-items:center; gap:24px; width:100%; padding:{{SkillsRowPadding}}; border:0; border-radius:0; background:transparent; color:inherit; text-align:left; font:inherit; cursor:pointer; }
+.skills-toggle { position:relative; isolation:isolate; overflow:hidden; display:flex; align-items:center; gap:24px; width:100%; padding:{{SkillsHeaderPadding}}; border:0; border-radius:0; background:transparent; color:inherit; text-align:left; font:inherit; cursor:pointer; }
 .skills-toggle:hover, .skills-toggle:active { background:transparent; color:inherit; }
 .skills-toggle:focus-visible { outline:2px solid var(--accent); outline-offset:-4px; }
-.skills-number { font-family:{{MonoFontFamily}}; font-size:.8rem; color:var(--muted); align-self:flex-start; padding-top:.55em; }
-.skills-name { transition:color {{SkillsPanelDuration}} ease; }
-.skills-group.is-open .skills-name, .skills-group.is-open .skills-number { color:var(--accent); }
-.skills-toggle-icon { margin-left:auto; flex-shrink:0; display:grid; place-items:center; width:34px; height:34px; border:1px solid var(--border); border-radius:50%; font:300 25px/1 {{RootFontFamily}}; transition:transform {{SkillsPanelDuration}} ease, color {{SkillsPanelDuration}} ease, border-color {{SkillsPanelDuration}} ease; }
+.skills-number { position:absolute; top:50%; transform:translateY(-50%); left:{{SkillsRowPadding}}; z-index:1; font-family:{{MonoFontFamily}}; font-size:.8rem; line-height:1.5; color:var(--muted); }
+.skills-name { min-width:0; padding-left:calc({{SkillsNumberAreaWidth}} - {{SkillsRowPadding}}); transition:color {{SkillsPanelDuration}} ease; }
+.skills-group.is-open .skills-name, .skills-group.is-open .skills-number, .skills-group.is-hovered .skills-name, .skills-group.is-hovered .skills-number { color:var(--accent); }
+.skills-toggle-icon { position:relative; margin-left:auto; flex-shrink:0; display:block; width:{{SkillsToggleIconSize}}; height:{{SkillsToggleIconSize}}; border:1px solid var(--border); border-radius:50%; background:{{SkillsToggleBackground}}; -webkit-backdrop-filter:blur({{SkillsToggleBlur}}); backdrop-filter:blur({{SkillsToggleBlur}}); transform-origin:center; transition:transform {{SkillsPanelDuration}} ease, color {{SkillsPanelDuration}} ease, border-color {{SkillsPanelDuration}} ease; }
+.skills-toggle-icon::before, .skills-toggle-icon::after { content:''; position:absolute; top:50%; left:50%; width:{{SkillsToggleLineLength}}; height:{{SkillsToggleLineWidth}}; background:currentColor; border-radius:999px; transform:translate(-50%, -50%); }
+.skills-toggle-icon::after { transform:translate(-50%, -50%) rotate(90deg); }
+.skills-group.is-hovered .skills-toggle-icon { color:var(--accent); border-color:var(--accent); }
 .skills-group.is-open .skills-toggle-icon { transform:rotate(45deg); color:var(--accent); border-color:var(--accent); }
 .skills-panel { display:grid; grid-template-rows:0fr; visibility:hidden; transition:grid-template-rows {{SkillsPanelDuration}} cubic-bezier(.22,.61,.36,1), visibility {{SkillsPanelDuration}}; }
 .skills-group.is-open .skills-panel { grid-template-rows:1fr; visibility:visible; }
-.skills-panel-inner { min-height:0; overflow:hidden; display:grid; grid-template-columns:minmax(0, 1fr) minmax(0, 1fr); gap:{{SkillsPanelGap}}; opacity:0; transition:opacity {{SkillsPanelDuration}} ease; }
+.skills-panel-inner { min-height:0; overflow:hidden; display:grid; align-content:start; grid-template-columns:minmax(0, 1fr); gap:0; opacity:0; transition:opacity {{SkillsPanelDuration}} ease; }
 .skills-group.is-open .skills-panel-inner { opacity:1; }
-.skills-copy, .skills-toolkit { padding:{{SkillsPanelPadding}}; min-width:0; }
-.skills-copy p { margin:0; color:var(--muted); line-height:1.7; }
+.skills-copy, .skills-toolkit { padding:{{SkillsPanelPadding}}; padding-left:{{SkillsNumberAreaWidth}}; min-width:0; }
+.skills-copy { padding-bottom:{{SkillsDescriptionBadgeGap}}; max-width:{{SkillsDescriptionWidth}}; }
+.skills-toolkit { padding-top:0; }
+.skills-copy p { margin:0; color:{{SkillsDescriptionColor}}; line-height:1.7; }
 .skills-items { list-style:none; display:flex; flex-wrap:wrap; align-items:flex-start; gap:{{SkillsIconGap}}; padding:0; margin:0; }
-.skills-items li { min-width:0; }
-.portfolio-shell .skill-link { display:flex; flex-direction:column; align-items:center; justify-content:flex-start; gap:10px; width:{{SkillsIconItemWidth}}; padding:12px 6px; border:1px solid transparent; border-radius:12px; color:var(--muted); text-decoration:none; font-size:{{SkillsIconLabelSize}}; line-height:1.4; text-align:center; transition:color 200ms ease, background 200ms ease, border-color 200ms ease; }
-.portfolio-shell .skill-link:hover, .portfolio-shell .skill-link:focus-visible { color:var(--accent); background:{{SkillsActiveBackground}}; border-color:var(--accent); }
+.skills-badge-row-labeled { display:grid; grid-template-columns:{{SkillsRowLabelWidth}} minmax(0, 1fr); align-items:center; column-gap:{{SkillsRowColumnGap}}; }
+.skills-badge-row + .skills-badge-row { margin-top:{{SkillsBadgeRowGap}}; }
+.portfolio-shell .skills-row-label { margin:0; padding:0; font-family:{{MonoFontFamily}}; font-size:{{SkillsRowLabelSize}}; font-weight:500; line-height:1.5; letter-spacing:.06em; }
+.skills-items li { display:flex; min-width:0; max-width:100%; }
+.portfolio-shell .skill-link { margin:0; display:inline-flex; align-items:center; gap:{{SkillsBadgeGap}}; min-height:{{SkillsBadgeHeight}}; max-width:100%; box-sizing:border-box; padding:{{SkillsBadgePadding}}; border:1px solid {{SkillsBadgeBorder}}; border-radius:{{SkillsBadgeRadius}}; background:{{SkillsBadgeBackground}}; color:{{RootColor}}; text-decoration:none; font-size:{{SkillsIconLabelSize}}; line-height:1.4; text-align:left; transition:color 200ms ease, background 200ms ease, border-color 200ms ease; }
+.portfolio-shell a.skill-link:hover, .portfolio-shell a.skill-link:focus-visible { color:var(--accent); background:{{SkillsActiveBackground}}; border-color:var(--accent); }
 .skill-link:focus-visible { outline:2px solid var(--accent); outline-offset:3px; }
-.skill-icon { display:block; width:{{SkillsIconSize}}; height:{{SkillsIconSize}}; object-fit:contain; flex-shrink:0; }
+.skill-icon-tile { display:grid; place-items:center; flex-shrink:0; width:{{SkillsTileSize}}; height:{{SkillsTileSize}}; border-radius:{{SkillsTileRadius}}; background:{{SkillsTileBackground}}; }
+.skill-icon { display:block; width:{{SkillsIconSize}}; height:{{SkillsIconSize}}; object-fit:contain; }
 @media (max-width:{{mobileBreakpoint}}) {
  .portfolio-shell .skills-group-heading { font-size:{{SkillsMobileTitleSize}}; }
- .skills-toggle { padding:24px 12px; gap:14px; }
+ .skills-toggle { padding:{{SkillsMobileHeaderPadding}}; gap:14px; }
+ .skills-number { left:12px; }
+ .skills-name { padding-left:calc({{SkillsMobileNumberAreaWidth}} - 12px); }
  .skills-panel-inner { grid-template-columns:minmax(0, 1fr); gap:0; }
- .skills-copy, .skills-toolkit { padding:8px 12px 24px; }
- .skills-items { gap:12px; }
+ .skills-copy, .skills-toolkit { padding:8px 12px 24px; padding-left:{{SkillsMobileNumberAreaWidth}}; }
+ .skills-copy { padding-bottom:{{SkillsMobileDescriptionBadgeGap}}; }
+ .skills-toolkit { padding-top:0; }
+ .skills-items { gap:{{SkillsIconGap}}; }
+ .skills-badge-row-labeled { grid-template-columns:{{SkillsMobileRowLabelWidth}} minmax(0, 1fr); column-gap:{{SkillsMobileRowColumnGap}}; }
 }
 @media (prefers-reduced-motion:reduce) {
- .skills-group, .skills-name, .skills-toggle-icon, .skills-panel, .skills-panel-inner { transition:none; }
+ .skills-group, .skills-name, .skills-toggle-icon, .skills-panel, .skills-panel-inner, .skill-icon-tile { transition:none; }
 }
+
+/* The marquee appears only with expanded content, without changing row geometry. */
+.skills-hover-band { position:absolute; inset:0; z-index:-1; display:flex; align-items:center; overflow:hidden; pointer-events:none; background:var(--accent); color:var(--button-text); clip-path:inset(100% 0 0); transition:clip-path {{SkillsHoverRevealDuration}} cubic-bezier(.22,.61,.36,1); }
+.skills-hover-window { display:flex; align-items:center; width:calc(100% - {{SkillsNumberAreaWidth}}); height:100%; margin-left:{{SkillsNumberAreaWidth}}; overflow:hidden; }
+.skills-hover-track { display:flex; width:max-content; flex-shrink:0; animation:skills-hover-marquee var(--skills-marquee-duration, {{SkillsHoverMarqueeDuration}}) linear infinite; animation-play-state:paused; }
+.skills-hover-run { display:flex; flex-shrink:0; align-items:center; gap:{{SkillsHoverMarqueeGap}}; padding-right:{{SkillsHoverMarqueeGap}}; white-space:nowrap; }
+.skills-hover-title { flex-shrink:0; font:inherit; color:var(--button-text); }
+.skills-hover-dot { display:block; flex-shrink:0; width:{{SkillsHoverDotSize}}; height:{{SkillsHoverDotSize}}; border-radius:50%; background:currentColor; }
+.skills-group.is-open .skills-hover-band { clip-path:inset(0); }
+.skills-group.is-open .skills-hover-track { animation-play-state:running; }
+.skills-group.is-open .skills-name { opacity:0; }
+.skills-group.is-open .skills-number, .skills-group.is-open .skills-toggle-icon { color:var(--button-text); }
+.skills-group.is-open .skills-toggle-icon { border-color:currentColor; background:{{SkillsToggleBackground}}; }
+
+.skills-name { transition:color {{SkillsPanelDuration}} ease, opacity {{SkillsHoverRevealDuration}} ease; }
+@keyframes skills-hover-marquee { to { transform:translateX(-50%); } }
+@media (prefers-reduced-motion:reduce) {
+ .skills-hover-track { animation:none; }
+ .skills-hover-band, .skills-name { transition:none; }
+}
+
+@media (max-width:{{mobileBreakpoint}}) {
+ .skills-hover-window { width:calc(100% - {{SkillsMobileNumberAreaWidth}}); margin-left:{{SkillsMobileNumberAreaWidth}}; }
+}
+
+/* Keep hover colors while hiding the decorative cursor during skill cooldown. */
+:root[data-skills-cooldown=true] .pointer-diamond { visibility:hidden; }
+
+/* Opening panels reveal downward; explicit user scrolling releases the hold. */
+html[data-skills-expanding=true] { overflow-anchor:none; scroll-behavior:auto; }

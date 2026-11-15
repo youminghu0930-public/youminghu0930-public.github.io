@@ -196,92 +196,444 @@
   "skills": {
     "eyebrow": "Capabilities",
     "title": "My skills",
-    "description": "An initial overview of my focus areas. More details will be added as the portfolio develops.",
+    "description": "I build AI-powered applications, from model training and evaluation to optimized deployment on iOS and Linux. My work combines PyTorch with data pipelines, backend services, and visualization to turn research ideas into working systems.",
     "groups": [
       {
-        "title": "AI & perception",
-        "items": [
+        "title": "AI Research",
+        "description": "Building and training AI models with PyTorch and TensorFlow, using packages such as Ultralytics and timm, and applying ideas from research I've explored over the past few years.",
+        "badgeRows": [
           {
-            "label": "Pose estimation",
-            "icon": "/materials/data/skill-icons/pose.svg",
-            "url": "https://docs.opencv.org/4.x/"
+            "label": "Frameworks",
+            "items": [
+              {
+                "label": "PyTorch",
+                "icon": "/materials/data/skill-icons/pytorch.svg",
+                "url": "https://docs.pytorch.org/docs/stable/"
+              },
+              {
+                "label": "TensorFlow",
+                "icon": "/materials/data/skill-icons/tensorflow.svg",
+                "url": "https://www.tensorflow.org/api_docs"
+              }
+            ]
           },
           {
-            "label": "Object detection",
-            "icon": "/materials/data/skill-icons/scan.svg",
-            "url": "https://docs.opencv.org/4.x/"
+            "label": "Packages",
+            "items": [
+              {
+                "label": "Ultralytics",
+                "icon": "/materials/data/skill-icons/ultralytics.svg",
+                "url": "https://docs.ultralytics.com/"
+              },
+              {
+                "label": "timm",
+                "icon": "/materials/data/skill-icons/github.svg",
+                "url": "https://github.com/huggingface/pytorch-image-models"
+              }
+            ]
           },
           {
-            "label": "Data augmentation",
-            "icon": "/materials/data/skill-icons/layers.svg",
-            "url": "https://docs.opencv.org/4.x/"
-          }
-        ],
-        "description": "Turning visual data into useful signals about people, objects, and movement."
-      },
-      {
-        "title": "Edge Computation",
-        "description": "Quantizing and optimizing models to run efficiently on local devices.",
-        "items": [
-          {
-            "label": "Core ML",
-            "icon": "/materials/data/skill-icons/chip.svg",
-            "url": "https://developer.apple.com/documentation/coreml"
-          },
-          {
-            "label": "ONNX",
-            "icon": "/materials/data/skill-icons/network.svg",
-            "url": "https://onnx.ai/"
-          },
-          {
-            "label": "Torch Lite",
-            "icon": "/materials/data/skill-icons/flame.svg",
-            "url": "https://docs.pytorch.org/docs/stable/mobile_optimizer.html"
+            "label": "Research",
+            "items": [
+              {
+                "label": "SAM",
+                "icon": "/materials/data/skill-icons/github.svg",
+                "url": "https://github.com/facebookresearch/segment-anything"
+              },
+              {
+                "label": "TrackNetV2",
+                "icon": "/materials/data/skill-icons/github.svg",
+                "url": "https://github.com/cyt228/TrackNetV2"
+              },
+              {
+                "label": "VGGT",
+                "icon": "/materials/data/skill-icons/github.svg",
+                "url": "https://github.com/facebookresearch/vggt"
+              },
+              {
+                "label": "MotionBERT",
+                "icon": "/materials/data/skill-icons/github.svg",
+                "url": "https://github.com/Walter0807/MotionBERT"
+              },
+              {
+                "label": "3D Pose Baseline",
+                "icon": "/materials/data/skill-icons/github.svg",
+                "url": "https://github.com/una-dinosauria/3d-pose-baseline"
+              },
+              {
+                "label": "MeTRAbs",
+                "icon": "/materials/data/skill-icons/github.svg",
+                "url": "https://github.com/isarandi/metrabs"
+              },
+              {
+                "label": "U-Net",
+                "icon": "/materials/data/skill-icons/arxiv.svg",
+                "url": "https://arxiv.org/abs/1505.04597"
+              },
+              {
+                "label": "HRNet",
+                "icon": "/materials/data/skill-icons/github.svg",
+                "url": "https://github.com/HRNet/HRNet-Human-Pose-Estimation"
+              }
+            ]
           }
         ]
       },
       {
-        "title": "3D & motion",
-        "items": [
+        "title": "Edge Computation",
+        "description": "Quantizing and compiling models for efficient inference on target devices, including iOS devices and Linux machines.",
+        "badgeRows": [
           {
-            "label": "Multi-view geometry",
-            "icon": "/materials/data/skill-icons/cube.svg",
-            "url": "https://docs.opencv.org/4.x/"
+            "label": "Model Format",
+            "items": [
+              {
+                "label": "ONNX",
+                "icon": "/materials/data/skill-icons/onnx.svg",
+                "url": "https://onnx.ai/"
+              }
+            ]
           },
           {
-            "label": "3D reconstruction",
-            "icon": "/materials/data/skill-icons/cube.svg",
-            "url": "https://docs.opencv.org/4.x/"
-          },
-          {
-            "label": "Trajectory analysis",
-            "icon": "/materials/data/skill-icons/chart.svg",
-            "url": "https://numpy.org/doc/"
+            "label": "Runtimes",
+            "items": [
+              {
+                "label": "Core ML",
+                "icon": "/materials/data/skill-icons/apple.svg",
+                "url": "https://developer.apple.com/documentation/coreml"
+              },
+              {
+                "label": "Torch Lite",
+                "icon": "/materials/data/skill-icons/pytorch.svg",
+                "url": "https://docs.pytorch.org/docs/stable/mobile_optimizer.html"
+              }
+            ]
           }
-        ],
-        "description": "Connecting perspectives to understand movement in three dimensions."
+        ]
       },
       {
-        "title": "Project workflow",
-        "items": [
+        "title": "Software Development",
+        "description": "Building Python tools, iOS applications, and web services, and using AI assistants to turn ideas into working demos quickly.",
+        "badgeRows": [
           {
-            "label": "Data preparation",
-            "icon": "/materials/data/skill-icons/data.svg",
-            "url": "https://numpy.org/doc/"
+            "label": "Python",
+            "items": [
+              {
+                "label": "Python",
+                "icon": "/materials/data/skill-icons/python.svg",
+                "url": "https://docs.python.org/3/"
+              },
+              {
+                "label": "uv",
+                "url": "https://docs.astral.sh/uv/",
+                "icon": "/materials/data/skill-icons/uv.svg"
+              },
+              {
+                "label": "Anaconda",
+                "icon": "/materials/data/skill-icons/anaconda.svg",
+                "url": "https://www.anaconda.com/docs/main"
+              },
+              {
+                "label": "VS Code",
+                "icon": "/materials/data/skill-icons/vscode.svg",
+                "url": "https://code.visualstudio.com/"
+              },
+              {
+                "label": "Jupyter Notebook",
+                "icon": "/materials/data/skill-icons/jupyter.svg",
+                "url": "https://jupyter.org/"
+              }
+            ]
           },
           {
-            "label": "Model evaluation",
-            "icon": "/materials/data/skill-icons/check.svg",
-            "url": "https://docs.pytorch.org/docs/stable/"
+            "label": "iOS",
+            "items": [
+              {
+                "label": "Swift",
+                "icon": "/materials/data/skill-icons/swift.svg",
+                "url": "https://www.swift.org/documentation/"
+              },
+              {
+                "label": "Xcode",
+                "icon": "/materials/data/skill-icons/xcode.svg",
+                "url": "https://developer.apple.com/xcode/"
+              }
+            ]
           },
           {
-            "label": "Result visualization",
-            "icon": "/materials/data/skill-icons/chart.svg",
-            "url": "https://matplotlib.org/stable/"
+            "label": "Web Stack",
+            "items": [
+              {
+                "label": "HTML",
+                "icon": "/materials/data/skill-icons/html5.svg",
+                "url": "https://developer.mozilla.org/en-US/docs/Web/HTML"
+              },
+              {
+                "label": "CSS",
+                "icon": "/materials/data/skill-icons/css3.svg",
+                "url": "https://developer.mozilla.org/en-US/docs/Web/CSS"
+              },
+              {
+                "label": "JavaScript",
+                "icon": "/materials/data/skill-icons/javascript.svg",
+                "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript"
+              },
+              {
+                "label": "GitHub Actions",
+                "icon": "/materials/data/skill-icons/githubactions.svg",
+                "url": "https://docs.github.com/en/actions"
+              },
+              {
+                "label": "GitHub Pages",
+                "icon": "/materials/data/skill-icons/github.svg",
+                "url": "https://docs.github.com/en/pages"
+              }
+            ]
+          },
+          {
+            "label": "Backend",
+            "items": [
+              {
+                "label": "FastAPI",
+                "icon": "/materials/data/skill-icons/fastapi.svg",
+                "url": "https://fastapi.tiangolo.com/"
+              },
+              {
+                "label": "Uvicorn",
+                "url": "https://www.uvicorn.org/"
+              },
+              {
+                "label": "Node.js",
+                "icon": "/materials/data/skill-icons/nodejs.svg",
+                "url": "https://nodejs.org/"
+              }
+            ]
+          },
+          {
+            "label": "AI Assistants",
+            "items": [
+              {
+                "label": "Codex",
+                "icon": "/materials/data/skill-icons/openai.svg",
+                "url": "https://openai.com/codex/"
+              },
+              {
+                "label": "Claude",
+                "icon": "/materials/data/skill-icons/claude.svg",
+                "url": "https://claude.ai/"
+              }
+            ]
           }
-        ],
-        "description": "Bringing structure to the journey from raw data to understandable results."
+        ]
+      },
+      {
+        "title": "Data Management",
+        "description": "Preparing, validating, and transforming data for AI workflows, including numerical computing, image processing, and structured data handling.",
+        "badgeRows": [
+          {
+            "label": "Computing",
+            "items": [
+              {
+                "label": "NumPy",
+                "icon": "/materials/data/skill-icons/numpy.svg",
+                "url": "https://numpy.org/doc/"
+              },
+              {
+                "label": "pandas",
+                "icon": "/materials/data/skill-icons/pandas.svg",
+                "url": "https://pandas.pydata.org/docs/"
+              },
+              {
+                "label": "OpenCV",
+                "icon": "/materials/data/skill-icons/opencv.svg",
+                "url": "https://docs.opencv.org/4.x/"
+              },
+              {
+                "label": "SciPy",
+                "icon": "/materials/data/skill-icons/scipy.svg",
+                "url": "https://docs.scipy.org/doc/scipy/"
+              }
+            ]
+          },
+          {
+            "label": "Data Models",
+            "items": [
+              {
+                "label": "Pydantic",
+                "icon": "/materials/data/skill-icons/pydantic.svg",
+                "url": "https://docs.pydantic.dev/"
+              },
+              {
+                "label": "dataclasses",
+                "icon": "/materials/data/skill-icons/python.svg",
+                "url": "https://docs.python.org/3/library/dataclasses.html"
+              }
+            ]
+          },
+          {
+            "label": "Files",
+            "items": [
+              {
+                "label": "pathlib",
+                "icon": "/materials/data/skill-icons/python.svg",
+                "url": "https://docs.python.org/3/library/pathlib.html"
+              },
+              {
+                "label": "YAML",
+                "icon": "/materials/data/skill-icons/yaml.svg",
+                "url": "https://yaml.org/"
+              },
+              {
+                "label": "JSON",
+                "icon": "/materials/data/skill-icons/json.svg",
+                "url": "https://www.json.org/json-en.html"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "title": "Marker-Based 3D Motion Capture",
+        "description": "Setting up marker-based 3D motion capture with OptiTrack Motive and integrating Bertec force plates, including camera and force-plate calibration, marker-suit preparation, and body-marker placement.",
+        "badgeRows": [
+          {
+            "label": "Capture",
+            "items": [
+              {
+                "label": "OptiTrack",
+                "url": "https://optitrack.com/",
+                "icon": "/materials/data/skill-icons/optitrack.ico"
+              },
+              {
+                "label": "Motive",
+                "url": "https://optitrack.com/software/motive/",
+                "icon": "/materials/data/skill-icons/optitrack.ico"
+              }
+            ]
+          },
+          {
+            "label": "Force Plates",
+            "items": [
+              {
+                "label": "Bertec",
+                "url": "https://www.bertec.com/",
+                "icon": "/materials/data/skill-icons/bertec.ico"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "title": "Visualization",
+        "description": "Turning data and model results into interactive charts, dashboards, and clear visual insights.",
+        "badgeRows": [
+          {
+            "label": "Charts",
+            "items": [
+              {
+                "label": "Plotly",
+                "icon": "/materials/data/skill-icons/plotly.svg",
+                "url": "https://plotly.com/python/"
+              },
+              {
+                "label": "Matplotlib",
+                "icon": "/materials/data/skill-icons/matplotlib.svg",
+                "url": "https://matplotlib.org/stable/"
+              }
+            ]
+          },
+          {
+            "label": "Apps",
+            "items": [
+              {
+                "label": "Streamlit",
+                "icon": "/materials/data/skill-icons/streamlit.svg",
+                "url": "https://docs.streamlit.io/"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "title": "Web Scraping",
+        "description": "Project-based experience collecting website data with HTTP requests, HTML parsing, and browser automation, and storing results in SQLite.",
+        "badgeRows": [
+          {
+            "label": "Collection",
+            "items": [
+              {
+                "label": "Requests",
+                "icon": "/materials/data/skill-icons/github.svg",
+                "url": "https://github.com/psf/requests"
+              },
+              {
+                "label": "Beautiful Soup",
+                "url": "https://www.crummy.com/software/BeautifulSoup/bs4/doc/"
+              },
+              {
+                "label": "lxml",
+                "icon": "/materials/data/skill-icons/github.svg",
+                "url": "https://github.com/lxml/lxml"
+              },
+              {
+                "label": "Playwright",
+                "icon": "/materials/data/skill-icons/playwright.svg",
+                "url": "https://playwright.dev/python/"
+              }
+            ]
+          },
+          {
+            "label": "Storage",
+            "items": [
+              {
+                "label": "SQLite",
+                "icon": "/materials/data/skill-icons/sqlite.svg",
+                "url": "https://www.sqlite.org/docs.html"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "title": "Healthcare & Sports Domain Knowledge",
+        "description": "Additional domain context from my pharmacy background, current golf-related work, and a personal interest in weight training.",
+        "badgeRows": [
+          {
+            "label": "Healthcare",
+            "items": [
+              {
+                "label": "Pharmacy Background"
+              }
+            ]
+          },
+          {
+            "label": "Sports",
+            "items": [
+              {
+                "label": "Golf Domain Knowledge"
+              },
+              {
+                "label": "Human Movement"
+              },
+              {
+                "label": "Weight Training (Personal Interest)"
+              }
+            ]
+          }
+        ]
       }
+    ],
+    "overviewLabel": "Key tools at a glance",
+    "overview": [
+      "Python",
+      "PyTorch",
+      "TensorFlow",
+      "OpenCV",
+      "NumPy",
+      "ONNX",
+      "Core ML",
+      "Swift",
+      "FastAPI",
+      "Plotly"
     ]
   }
 }

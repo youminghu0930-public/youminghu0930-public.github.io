@@ -132,24 +132,41 @@ export function installPointerEffects(hero) {
     frame.style.height = rect ? `${rect.height + padding * 2}px` : '';
     frame.style.transform = 'translate(-50%, -50%)';
     cursor.dataset.link = String(Boolean(rect));
+    cursor.dataset.navInactive = String(Boolean(target?.matches('#section-navigation > a:not([aria-current="page"])')));
   }
-  function hide() { cancelAnimationFrame(touchFrame); touchStrength = 0; resetMagnets(); clearTimeout(releaseTimer); touchId = null; stopFlights(); cursor.hidden = true; pointer = null; target = null; draw(); }
+  function resolveTarget(node) {
+    if (!(node instanceof Element)) return null;
+    const next = node.closest('[data-cursor-target]') || node.closest('a[href], button, [role="button"]');
+    return next?.matches(':disabled, [aria-disabled="true"]') ? null : next;
+  }
+  function setTarget(next) {
+    if (next === target) return;
+    targetObserver.disconnect();
+    target = next;
+    if (target) targetObserver.observe(target);
+  }
+  function refreshTarget() {
+    if (pointer && !pointer.touch && !cursor.hidden && fine.matches && !reduced.matches) {
+      setTarget(resolveTarget(document.elementFromPoint(pointer.x, pointer.y)));
+    }
+    position();
+    draw();
+  }
+  function hide() { cancelAnimationFrame(touchFrame); touchStrength = 0; resetMagnets(); clearTimeout(releaseTimer); touchId = null; stopFlights(); cursor.hidden = true; pointer = null; setTarget(null); draw(); }
   function move(event) {
     // Native touch events continue during scrolling after pointercancel.
     if (event.pointerType === 'touch') return;
     if (!fine.matches || reduced.matches) { hide(); return; }
     pointer = {x:event.clientX, y:event.clientY};
     updateMagnets(event.clientX, event.clientY);
-    let next = event.target instanceof Element ? (event.target.closest('[data-cursor-target]') || event.target.closest('a[href], button, [role="button"]')) : null;
-    if (next?.matches(':disabled, [aria-disabled="true"]')) next = null;
+    const next = resolveTarget(event.target);
     const changed = next !== target;
     const previous = changed && !cursor.hidden ? corners.map(corner => {
       const rect = corner.getBoundingClientRect();
       return {x:rect.left + rect.width / 2, y:rect.top + rect.height / 2};
     }) : [];
     if (changed) stopFlights();
-    if (changed) { targetObserver.disconnect(); if (next) targetObserver.observe(next); }
-    target = next;
+    setTarget(next);
     cursor.hidden = false;
     position();
     if (changed && target) flyToTarget(previous);
@@ -165,7 +182,7 @@ export function installPointerEffects(hero) {
     clearTimeout(releaseTimer);
     stopFlights();
     cursor.hidden = true;
-    target = null;
+    setTarget(null);
     pointer = {x:touch.clientX, y:touch.clientY, touch:true};
     if (beginning) fadeTouch(1);
     draw();
@@ -181,7 +198,9 @@ export function installPointerEffects(hero) {
   window.addEventListener('touchend', endTouch, {passive:true, signal});
   window.addEventListener('touchcancel', () => { touchId = null; fadeTouch(0); }, {passive:true, signal});
   window.addEventListener('pointermove', move, {passive:true, signal});
-  window.addEventListener('scroll', () => { resetMagnets(); stopFlights(); target = null; position(); draw(); }, {passive:true, signal});
+  window.addEventListener('scroll', () => { resetMagnets(); stopFlights(); refreshTarget(); }, {passive:true, signal});
+  window.addEventListener('resize', refreshTarget, {passive:true, signal});
+  window.addEventListener('skills-cooldownchange', () => { stopFlights(); refreshTarget(); }, {signal});
   window.addEventListener('blur', hide, {signal});
   document.documentElement.addEventListener('pointerleave', event => { if (event.pointerType !== 'touch') hide(); }, {signal});
   fine.addEventListener('change', hide, {signal});
