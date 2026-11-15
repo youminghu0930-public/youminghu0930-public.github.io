@@ -207,7 +207,7 @@ function createTitle(config) {
     const last = wordIndex === words.length - 1;
     const word = element('span', undefined, config.accentLastWord && last ? 'title-word title-accent' : 'title-word');
     for (const character of Array.from(text)) {
-      const letter = element('span', character, 'name-letter');
+      const letter = element('span', character, character === '.' ? 'name-letter title-dot' : 'name-letter');
       letter.style.setProperty('--letter-index', letterIndex++);
       word.append(letter);
     }

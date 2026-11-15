@@ -75,7 +75,7 @@ section, article { scroll-margin-top: {{SectionArticleScrollMarginTop}}; }
 .portfolio-page h3 { font-size:{{PortfolioProjectTitleSize}}; font-weight:{{H2FontWeight}}; letter-spacing:{{H2LetterSpacing}}; }
 .project-tags { gap:{{PortfolioActionGap}}; }
 .project-tags li { border:{{ProjectBorder}}; border-radius:{{PortfolioTagRadius}}; padding:{{PortfolioTagPadding}}; font-size:{{PortfolioTagFontSize}}; color:var(--muted); }
-.portfolio-footer { display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:{{PortfolioActionGap}}; border-top:{{ProjectBorder}}; margin-top:{{PortfolioHeroGap}}; padding:{{PortfolioFooterPadding}}; color:var(--muted); }
+.portfolio-footer { display:flex; justify-content:flex-end; align-items:center; flex-wrap:wrap; gap:{{PortfolioActionGap}}; border-top:{{ProjectBorder}}; margin-top:{{PortfolioHeroGap}}; padding:{{PortfolioFooterPadding}}; color:var(--muted); }
 .portfolio-page .text-action { padding:0; margin:0; background:transparent; color:var(--accent); }
 @media (max-width:{{mobileBreakpoint}}) {
  .portfolio-page h1 { font-size:{{PortfolioMobileNameSize}}; }
@@ -290,7 +290,7 @@ body:has(.portfolio-shell) { overflow-x:clip; }
  .portfolio-shell .landing .hero { padding-top:{{MobileLandingTopSpace}}; padding-bottom:{{MobileLandingBottomSpace}}; }
  .portfolio-shell .landing h1, .portfolio-shell .inner-page .landing h1 { font-size:{{MobileTitleSize}}; }
  .portfolio-shell .eyebrow { font-size:{{MobileRoleSize}}; }
- .portfolio-shell .intro { font-size:{{MobileIntroSize}}; }
+ .portfolio-shell .intro { font-size:{{IntroTextMobileSize}}; }
  .portfolio-shell .hero > .hero-status, .portfolio-shell .landing .breadcrumbs { top:{{MobileStatusTop}}; }
  .hero-status { flex-direction:column; align-items:flex-start; gap:{{MobileStatusGap}}; }
  .brand-name { font-size:{{MobileBrandSize}}; }
@@ -327,7 +327,6 @@ body:has(.portfolio-shell) { overflow-x:clip; }
  .portfolio-shell .home-page .landing .hero { padding-top:{{HomeMobileHeroTop}}; }
  .portfolio-shell .home-page .landing .hero > .hero-status { position:relative; top:auto; left:auto; right:auto; margin:0 0 {{HomeMobileStatusGap}}; }
  .home-page .hero-status .current-work { width:100%; }
- .portfolio-shell .home-page .intro { font-size:{{IntroTextMobileSize}}; }
  .home-page .landing-actions { display:grid; grid-template-columns:{{HomeMobileActionColumns}}; }
  .portfolio-shell .home-page .landing-actions .landing-action { padding:{{HomeMobileActionPadding}}; font-size:{{HomeMobileActionFontSize}}; }
  .home-page .landing-actions .action-text { grid-column:1 / -1; justify-self:start; }
@@ -700,10 +699,75 @@ html[data-skills-expanding=true] { overflow-anchor:none; scroll-behavior:auto; }
 .portfolio-shell .experience-recognition-link { display:inline-block; margin:10px 0 0; padding:0; background:transparent; color:var(--accent); font-size:{{ExperiencePositionPeriodSize}}; font-weight:500; text-decoration:underline; text-underline-offset:4px; }
 .portfolio-shell .experience-recognition-link:hover { background:transparent; color:{{RootColor}}; }
 
-.portfolio-shell .home-page .intro { max-width:{{HomeIntroMaxWidth}}; }
+.portfolio-shell .landing .intro { width:100%; max-width:{{LandingIntroMaxWidth}}; font-size:{{IntroTextSize}}; }
+@media (max-width:{{mobileBreakpoint}}) {
+ .portfolio-shell .landing .intro { font-size:{{IntroTextMobileSize}}; }
+}
 
 /* Section introductions share the Home landing paragraph's type scale. */
 .portfolio-shell .experience-intro, .portfolio-shell .skills-intro { font-size:{{IntroTextSize}}; line-height:{{IntroTextLineHeight}}; }
 @media (max-width:{{mobileBreakpoint}}) {
  .portfolio-shell .experience-intro, .portfolio-shell .skills-intro { font-size:{{IntroTextMobileSize}}; }
 }
+
+.portfolio-shell .landing h1 .title-dot, .portfolio-shell .experience-heading h2 .title-dot, .portfolio-shell .skills-heading h2 .title-dot { color:{{TitleDotColor}}; }
+
+.project-filters { margin-bottom:28px; }
+.project-filter-bar { display:flex; flex-wrap:wrap; gap:{{ProjectFilterGap}}; padding:5px; border:1px solid var(--border); border-radius:{{ProjectFilterRadius}}; }
+.project-filter-button { display:inline-flex; align-items:center; justify-content:center; gap:8px; padding:{{ProjectFilterPadding}}; border:1px solid transparent; border-radius:{{ProjectFilterRadius}}; background:transparent; color:var(--muted); font:inherit; font-size:{{ProjectFilterFontSize}}; cursor:pointer; transition:color 180ms ease, background 180ms ease, border-color 180ms ease; }
+.project-filter-button:hover { color:{{RootColor}}; background:var(--surface); }
+.project-filter-button[aria-pressed=true] { color:var(--accent); border-color:var(--border); background:var(--surface); }
+.project-filter-button:focus-visible { outline:2px solid var(--accent); outline-offset:2px; }
+.project-filter-count { border:1px solid var(--border); border-radius:5px; padding:1px 5px; font-family:{{MonoFontFamily}}; font-size:11px; line-height:1.5; }
+.project-filter-status { margin:12px 0 0; color:var(--muted); font-family:{{MonoFontFamily}}; font-size:12px; }
+.portfolio-shell .project[hidden] { display:none; }
+@media (max-width:{{mobileBreakpoint}}) {
+ .project-filter-bar { flex-wrap:nowrap; overflow-x:auto; max-width:100%; overscroll-behavior-x:contain; }
+ .project-filter-button { flex:0 0 auto; }
+}
+
+.landing-content > .project-filters { margin:28px 0 0; width:100%; min-width:0; }
+
+
+/* Compact project rows: company, technologies, and topic labels. */
+.portfolio-shell .works-page .project { display:block; padding:0; border-top:1px solid var(--border); }
+.portfolio-shell .project-row-link { display:grid; grid-template-columns:minmax(0,1fr) 24px minmax(0,1fr); gap:24px; align-items:start; margin:0; padding:40px 24px; border-radius:0; background:transparent; color:{{RootColor}}; text-decoration:none; transition:background 240ms ease; }
+.portfolio-shell .project-row-link:hover { background:{{ProjectHoverBackground}}; color:{{RootColor}}; text-decoration:none; }
+.portfolio-shell .project-heading h2 { margin:0 0 12px; font-size:{{ProjectListTitleSize}}; line-height:1.1; transition:color 240ms ease; }
+.project-row-link:hover .project-heading h2 { color:var(--accent); }
+.project-company { margin:0; color:var(--muted); font-size:{{ProjectListCompanySize}}; font-weight:400; }
+.project-row-arrow { color:var(--muted); }
+.project-summary { margin:0 0 24px; color:{{RootColor}}; font-size:{{ProjectSummarySize}}; font-weight:400; line-height:1.75; }
+.works-page .project-tags { margin:0 0 20px; gap:8px; }
+.works-page .project-tags li { padding:4px 9px; border-radius:6px; font-size:{{ProjectTechnologySize}}; color:var(--accent); font-weight:400; }
+.project-labels { display:flex; flex-wrap:wrap; gap:6px 12px; list-style:none; padding:0; margin:0; color:var(--muted); font-family:{{MonoFontFamily}}; font-size:{{ProjectTopicLabelSize}}; font-weight:400; text-transform:uppercase; letter-spacing:.06em; }
+.project-labels li+li::before { content:'·'; margin-right:12px; color:var(--accent); }
+.project-hover-preview { position:fixed; z-index:35; pointer-events:none; padding:8px; border:1px solid var(--border); border-radius:12px; background:var(--surface); opacity:0; transform:translateY(8px) scale(.97); transition:opacity 180ms ease, transform 180ms ease; }
+.project-hover-preview.is-visible { opacity:1; transform:translateY(0) scale(1); }
+.project-hover-preview img { display:block; width:100%; border-radius:7px; }
+@media(max-width:{{mobileBreakpoint}}) {
+ .portfolio-shell .project-row-link { grid-template-columns:minmax(0,1fr) 24px; gap:16px; padding:28px 8px; }
+ .project-row-link .project-copy { grid-column:1 / -1; }
+ .project-hover-preview { display:none; }
+}
+@media(prefers-reduced-motion:reduce) { .project-hover-preview { transition:none; } }
+
+.portfolio-shell .project-row-link { position:relative; }
+.project-row-link:hover .project-row-arrow { color:var(--accent); transform:translate(3px,-3px); }
+.project-row-arrow { transition:color 240ms ease, transform 240ms ease; }
+.project-hover-preview { box-shadow:0 16px 50px rgb(0 0 0 / 45%); }
+.project-hover-preview img { height:auto; aspect-ratio:var(--project-preview-aspect, 4 / 3); object-fit:contain; background:{{RootBackground}}; }
+
+.project-hover-preview { transform:scale(.97); transform-origin:center; }
+.project-hover-preview.is-visible { transform:scale(1); }
+
+/* Center the project name itself; the company caption does not shift its center. */
+.project-row-link .project-heading { position:relative; align-self:center; }
+.portfolio-shell .project-row-link .project-heading h2 { margin:0; }
+.project-row-link .project-company { position:absolute; top:100%; left:0; margin-top:12px; }
+@media(max-width:{{mobileBreakpoint}}) {
+ .project-row-link .project-company { position:static; margin-top:12px; }
+}
+
+.project-preview-canvas { position:absolute; top:8px; left:8px; width:calc(100% - 16px); height:auto; aspect-ratio:var(--project-preview-aspect, 4 / 3); border-radius:7px; background:{{RootBackground}}; }
+.project-preview-canvas[hidden] { display:none; }

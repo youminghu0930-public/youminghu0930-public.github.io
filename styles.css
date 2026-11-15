@@ -76,7 +76,7 @@ section, article { scroll-margin-top: 76px; }
 .portfolio-page h3 { font-size:clamp(1.5rem, 3vw, 2.5rem); font-weight:600; letter-spacing:-.04em; }
 .project-tags { gap:12px; }
 .project-tags li { border:1px solid var(--border); border-radius:100px; padding:6px 12px; font-size:.75rem; color:var(--muted); }
-.portfolio-footer { display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px; border-top:1px solid var(--border); margin-top:36px; padding:56px 0 0; color:var(--muted); }
+.portfolio-footer { display:flex; justify-content:flex-end; align-items:center; flex-wrap:wrap; gap:12px; border-top:1px solid var(--border); margin-top:36px; padding:56px 0 0; color:var(--muted); }
 .portfolio-page .text-action { padding:0; margin:0; background:transparent; color:var(--accent); }
 @media (max-width:1000px) {
  .portfolio-page h1 { font-size:clamp(4.5rem, 19vw, 9rem); }
@@ -291,7 +291,7 @@ body:has(.portfolio-shell) { overflow-x:clip; }
  .portfolio-shell .landing .hero { padding-top:clamp(200px, 40svh, 360px); padding-bottom:32px; }
  .portfolio-shell .landing h1, .portfolio-shell .inner-page .landing h1 { font-size:clamp(2.75rem, 9.5vw, 9.5rem); }
  .portfolio-shell .eyebrow { font-size:clamp(1.15rem, 5vw, 1.65rem); }
- .portfolio-shell .intro { font-size:1rem; }
+ .portfolio-shell .intro { font-size:1.05rem; }
  .portfolio-shell .hero > .hero-status, .portfolio-shell .landing .breadcrumbs { top:100px; }
  .hero-status { flex-direction:column; align-items:flex-start; gap:12px; }
  .brand-name { font-size:.82rem; }
@@ -328,7 +328,6 @@ body:has(.portfolio-shell) { overflow-x:clip; }
  .portfolio-shell .home-page .landing .hero { padding-top:120px; }
  .portfolio-shell .home-page .landing .hero > .hero-status { position:relative; top:auto; left:auto; right:auto; margin:0 0 56px; }
  .home-page .hero-status .current-work { width:100%; }
- .portfolio-shell .home-page .intro { font-size:1.05rem; }
  .home-page .landing-actions { display:grid; grid-template-columns:minmax(0, 1.2fr) minmax(0, 1fr); }
  .portfolio-shell .home-page .landing-actions .landing-action { padding:12px; font-size:1rem; }
  .home-page .landing-actions .action-text { grid-column:1 / -1; justify-self:start; }
@@ -701,10 +700,75 @@ html[data-skills-expanding=true] { overflow-anchor:none; scroll-behavior:auto; }
 .portfolio-shell .experience-recognition-link { display:inline-block; margin:10px 0 0; padding:0; background:transparent; color:var(--accent); font-size:13px; font-weight:500; text-decoration:underline; text-underline-offset:4px; }
 .portfolio-shell .experience-recognition-link:hover { background:transparent; color:hsl(0 0% 87%); }
 
-.portfolio-shell .home-page .intro { max-width:680px; }
+.portfolio-shell .landing .intro { width:100%; max-width:680px; font-size:clamp(1rem, 1.4vw, 1.2rem); }
+@media (max-width:1000px) {
+ .portfolio-shell .landing .intro { font-size:1.05rem; }
+}
 
 /* Section introductions share the Home landing paragraph's type scale. */
 .portfolio-shell .experience-intro, .portfolio-shell .skills-intro { font-size:clamp(1rem, 1.4vw, 1.2rem); line-height:1.8; }
 @media (max-width:1000px) {
  .portfolio-shell .experience-intro, .portfolio-shell .skills-intro { font-size:1.05rem; }
 }
+
+.portfolio-shell .landing h1 .title-dot, .portfolio-shell .experience-heading h2 .title-dot, .portfolio-shell .skills-heading h2 .title-dot { color:#ffffff; }
+
+.project-filters { margin-bottom:28px; }
+.project-filter-bar { display:flex; flex-wrap:wrap; gap:6px; padding:5px; border:1px solid var(--border); border-radius:9px; }
+.project-filter-button { display:inline-flex; align-items:center; justify-content:center; gap:8px; padding:10px 14px; border:1px solid transparent; border-radius:9px; background:transparent; color:var(--muted); font:inherit; font-size:14px; cursor:pointer; transition:color 180ms ease, background 180ms ease, border-color 180ms ease; }
+.project-filter-button:hover { color:hsl(0 0% 87%); background:var(--surface); }
+.project-filter-button[aria-pressed=true] { color:var(--accent); border-color:var(--border); background:var(--surface); }
+.project-filter-button:focus-visible { outline:2px solid var(--accent); outline-offset:2px; }
+.project-filter-count { border:1px solid var(--border); border-radius:5px; padding:1px 5px; font-family:"Geist Mono", ui-monospace, monospace; font-size:11px; line-height:1.5; }
+.project-filter-status { margin:12px 0 0; color:var(--muted); font-family:"Geist Mono", ui-monospace, monospace; font-size:12px; }
+.portfolio-shell .project[hidden] { display:none; }
+@media (max-width:1000px) {
+ .project-filter-bar { flex-wrap:nowrap; overflow-x:auto; max-width:100%; overscroll-behavior-x:contain; }
+ .project-filter-button { flex:0 0 auto; }
+}
+
+.landing-content > .project-filters { margin:28px 0 0; width:100%; min-width:0; }
+
+
+/* Compact project rows: company, technologies, and topic labels. */
+.portfolio-shell .works-page .project { display:block; padding:0; border-top:1px solid var(--border); }
+.portfolio-shell .project-row-link { display:grid; grid-template-columns:minmax(0,1fr) 24px minmax(0,1fr); gap:24px; align-items:start; margin:0; padding:40px 24px; border-radius:0; background:transparent; color:hsl(0 0% 87%); text-decoration:none; transition:background 240ms ease; }
+.portfolio-shell .project-row-link:hover { background:rgb(255 255 255 / 3%); color:hsl(0 0% 87%); text-decoration:none; }
+.portfolio-shell .project-heading h2 { margin:0 0 12px; font-size:clamp(2.4rem, 4.5vw, 4.5rem); line-height:1.1; transition:color 240ms ease; }
+.project-row-link:hover .project-heading h2 { color:var(--accent); }
+.project-company { margin:0; color:var(--muted); font-size:14px; font-weight:400; }
+.project-row-arrow { color:var(--muted); }
+.project-summary { margin:0 0 24px; color:hsl(0 0% 87%); font-size:clamp(1rem, 1.4vw, 1.15rem); font-weight:400; line-height:1.75; }
+.works-page .project-tags { margin:0 0 20px; gap:8px; }
+.works-page .project-tags li { padding:4px 9px; border-radius:6px; font-size:12px; color:var(--accent); font-weight:400; }
+.project-labels { display:flex; flex-wrap:wrap; gap:6px 12px; list-style:none; padding:0; margin:0; color:var(--muted); font-family:"Geist Mono", ui-monospace, monospace; font-size:10px; font-weight:400; text-transform:uppercase; letter-spacing:.06em; }
+.project-labels li+li::before { content:'·'; margin-right:12px; color:var(--accent); }
+.project-hover-preview { position:fixed; z-index:35; pointer-events:none; padding:8px; border:1px solid var(--border); border-radius:12px; background:var(--surface); opacity:0; transform:translateY(8px) scale(.97); transition:opacity 180ms ease, transform 180ms ease; }
+.project-hover-preview.is-visible { opacity:1; transform:translateY(0) scale(1); }
+.project-hover-preview img { display:block; width:100%; border-radius:7px; }
+@media(max-width:1000px) {
+ .portfolio-shell .project-row-link { grid-template-columns:minmax(0,1fr) 24px; gap:16px; padding:28px 8px; }
+ .project-row-link .project-copy { grid-column:1 / -1; }
+ .project-hover-preview { display:none; }
+}
+@media(prefers-reduced-motion:reduce) { .project-hover-preview { transition:none; } }
+
+.portfolio-shell .project-row-link { position:relative; }
+.project-row-link:hover .project-row-arrow { color:var(--accent); transform:translate(3px,-3px); }
+.project-row-arrow { transition:color 240ms ease, transform 240ms ease; }
+.project-hover-preview { box-shadow:0 16px 50px rgb(0 0 0 / 45%); }
+.project-hover-preview img { height:auto; aspect-ratio:var(--project-preview-aspect, 4 / 3); object-fit:contain; background:#080808; }
+
+.project-hover-preview { transform:scale(.97); transform-origin:center; }
+.project-hover-preview.is-visible { transform:scale(1); }
+
+/* Center the project name itself; the company caption does not shift its center. */
+.project-row-link .project-heading { position:relative; align-self:center; }
+.portfolio-shell .project-row-link .project-heading h2 { margin:0; }
+.project-row-link .project-company { position:absolute; top:100%; left:0; margin-top:12px; }
+@media(max-width:1000px) {
+ .project-row-link .project-company { position:static; margin-top:12px; }
+}
+
+.project-preview-canvas { position:absolute; top:8px; left:8px; width:calc(100% - 16px); height:auto; aspect-ratio:var(--project-preview-aspect, 4 / 3); border-radius:7px; background:#080808; }
+.project-preview-canvas[hidden] { display:none; }

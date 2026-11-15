@@ -4,6 +4,8 @@ import { createLanding, installLandingEntrance } from './landing.js';
 import { installPointerEffects } from './pointer-effects.js';
 import { installSkillsAccordion } from './materials/data/skills-accordion.js';
 import { installNavigation } from './navigation.js';
+import { installProjectPreviews } from './materials/data/project-previews.js';
+import { createProjectFilters } from './materials/data/project-filters.js';
 
 function element(tag, text, className) {
   const node = document.createElement(tag);
@@ -24,7 +26,7 @@ function link(label, url, className) {
 function installScrollMotion(main) {
   const media = matchMedia('(prefers-reduced-motion: reduce)');
   const settings = design.effects;
-  const items = Array.from(main.querySelectorAll('.landing-content, .project-index, .project-copy > *, .experience-heading > *, .experience-period, .experience-copy > *, .skills-heading > *')).map(node => ({node, offset:0, opacity:1, initialized:false, order:node.matches('.experience-copy > *, .experience-heading > *, .project-copy > *') ? Array.from(node.parentElement.children).indexOf(node) : 0}));
+  const items = Array.from(main.querySelectorAll('.landing-content, .project-index, .project-copy > *, .project-heading > *, .project-visual > *, .project-detail > *, .experience-heading > *, .experience-period, .experience-copy > *, .skills-heading > *')).map(node => ({node, offset:0, opacity:1, initialized:false, order:node.matches('.experience-copy > *, .experience-heading > *, .project-copy > *') ? Array.from(node.parentElement.children).indexOf(node) : 0}));
   const timelineRails = Array.from(main.querySelectorAll('.experience-rail'));
   const markers = Array.from(main.querySelectorAll('.experience-marker'));
   let frame = 0;
@@ -253,7 +255,7 @@ async function startApp() {
     }
   const main = element('main');
   main.id = 'about';
-  main.className = `portfolio-page ${route === 'home' ? 'home-page' : 'inner-page'}`;
+  main.className = `portfolio-page ${route}-page ${route === 'home' ? '' : 'inner-page'}`;
   const landing = createLanding(landings[route], {page, navigation});
   main.append(landing.root);
   if (route === 'home' && experience?.items?.length) {
@@ -264,7 +266,7 @@ async function startApp() {
     const title = element('h2', undefined);
     title.id = 'experience-title';
     const words = experience.title.split(' ');
-    title.append(words.slice(0, -1).join(' ') + ' ', element('span', words.at(-1) + '.'));
+    title.append(words.slice(0, -1).join(' ') + ' ', element('span', words.at(-1)), element('span', '.', 'title-dot'));
     heading.append(element('p', experience.eyebrow, 'experience-label'), title, element('p', experience.description, 'experience-intro'));
     const timeline = element('div', undefined, 'experience-timeline');
     const list = element('ol', undefined, 'experience-list');
@@ -335,7 +337,7 @@ async function startApp() {
     const title = element('h2');
     title.id = 'skills-title';
     const words = skills.title.split(' ');
-    title.append(words.slice(0,-1).join(' ')+' ', element('span',words.at(-1)+'.'));
+    title.append(words.slice(0,-1).join(' ')+' ', element('span',words.at(-1)), element('span', '.', 'title-dot'));
     heading.append(element('p',skills.eyebrow,'skills-label'),title,element('p',skills.description,'skills-intro'));
     if (skills.overview?.length) {
       const tools = new Map();
@@ -442,20 +444,36 @@ async function startApp() {
     for (const project of projects) {
       const card = element('article', undefined, 'project');
       card.id = project.id;
-      const index = element('div', undefined, 'project-index');
-      index.append(element('span', project.number), element('span', project.category));
+      const action = link('', project.url, 'project-row-link');
+      action.setAttribute('data-cursor-target', '');
+      const heading = element('div', undefined, 'project-heading');
+      heading.append(element('h2', project.title), element('p', project.company, 'project-company'));
       const copy = element('div', undefined, 'project-copy');
+      copy.append(element('p', project.summary, 'project-summary'));
       const tags = element('ul', undefined, 'project-tags');
+      tags.setAttribute('aria-label', 'Technologies');
       for (const tag of project.tags) tags.append(element('li', tag));
-      copy.append(element('h3', project.title), element('p', project.summary), tags, link(project.linkLabel, project.url));
-      card.append(index, copy);
+      const labels = element('ul', undefined, 'project-labels');
+      labels.setAttribute('aria-label', 'Project topics');
+      for (const label of project.labels || []) labels.append(element('li', label));
+      copy.append(tags, labels);
+      const arrow = element('span', '↗', 'project-row-arrow');
+      arrow.setAttribute('aria-hidden', 'true');
+      action.append(heading, arrow, copy);
+      card.append(action);
       cards.append(card);
     }
+    const filters = createProjectFilters(projects, cards, () => {
+      smoothScroll?.resize();
+      window.dispatchEvent(new Event('resize'));
+    });
+    landing.hero.querySelector('.landing-content').append(filters);
     section.append(cards);
     main.append(section);
   }
+
   const footer = element('div', undefined, 'portfolio-footer');
-  footer.append(element('p', page.footerLabel), link(page.footerLinkLabel, '#about', 'text-action'));
+  footer.append(link(page.footerLinkLabel, '#about', 'text-action'));
   main.append(footer);
 
     const old = app.querySelector('main');
@@ -469,8 +487,10 @@ async function startApp() {
       } else window.scrollTo({...position, behavior:'instant'});
     }});
     const stopScrollMotion = installScrollMotion(main);
-    cleanup = () => { stopSkills(); stopScrollMotion(); stopEntrance?.(); stopPointer?.(); landing.destroy(); };
+    const stopProjectPreviews = route === 'works' ? installProjectPreviews(main, projects) : () => {};
+    cleanup = () => { stopProjectPreviews(); stopSkills(); stopScrollMotion(); stopEntrance?.(); stopPointer?.(); landing.destroy(); };
     currentRoute = route;
+    updateScrollbar();
     menu.close();
     if (!initial) {
       smoothScroll?.resize();

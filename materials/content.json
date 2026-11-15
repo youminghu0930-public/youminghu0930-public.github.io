@@ -40,33 +40,98 @@
   "projects": [
     {
       "id": "golf-2d",
-      "navigationTitle": "Golf Swing Analysis",
-      "title": "Golf Swing Analysis with RGB Video",
-      "summary": "Explore 2D pose estimation, golfer and club detection, data augmentation, and trajectory reconstruction.",
+      "navigationTitle": "Golf-Swing-Analysis",
+      "title": "Smooth-Swing-Tracking",
+      "summary": "Built for real-world golf analysis, our pipeline brings multiple models and processing techniques together for smooth, accurate tracking that looks as good as it performs.",
       "url": "https://youminghu0930-public.github.io/golf-swing-analysis-poc/",
       "linkLabel": "Explore 2D analysis →",
       "number": "01",
-      "category": "2D perception",
+      "category": "Sports-specific pose estimation & smoothness",
       "tags": [
         "Pose estimation",
-        "Golfer & club detection",
-        "Trajectory reconstruction"
-      ]
+        "Signal processing",
+        "Unified model training",
+        "Blurry object detection"
+      ],
+      "sections": [
+        {
+          "id": "section-1",
+          "title": "Overview",
+          "description": "Explore golf-swing analysis using ordinary RGB video."
+        },
+        {
+          "id": "section-2",
+          "title": "Sports-specific pose estimation & smoothness",
+          "description": "See how body joints and the golf club are tracked through a swing, with a focus on smooth, consistent motion."
+        },
+        {
+          "id": "section-3",
+          "title": "Trajectory reconstruction",
+          "description": "Explore how detected movement becomes a reconstructed trajectory."
+        }
+      ],
+      "image": "/materials/data/project-previews/golf-2d-banner-0026-4.webp",
+      "imageAlt": "Golf swing 0026-4 with joint and club tracking",
+      "demoLabel": "Explore the demo ↗",
+      "company": "Ideas Lab Formosa",
+      "labels": [
+        "Sports-specific pose estimation",
+        "Trajectory smoothing"
+      ],
+      "banner": {
+        "video": "/materials/data/project-previews/golf-2d-banner-0026-4.mp4",
+        "pose": "/materials/data/project-previews/golf-2d-banner-0026-4.json",
+        "poster": "/materials/data/project-previews/golf-2d-banner-0026-4.webp",
+        "timing": "/materials/data/project-previews/golf-2d-banner-0026-4-timing.json",
+        "aspectRatio": 0.5625
+      },
+      "previewAspectRatio": 0.5625
     },
     {
       "id": "golf-3d",
-      "navigationTitle": "Golf True 3D",
-      "title": "Golf True 3D",
-      "summary": "Explore 3D reconstruction, synchronization across camera views, and movement information extracted from golf swings.",
+      "navigationTitle": "Golf-True-3D",
+      "title": "Golf-True-3D",
+      "summary": "Turn a single swing into a clear, visually engaging 3D reconstruction you can inspect from every angle. Our single-shot approach lets you visually check the results without a separate, complicated camera-calibration process.",
       "url": "https://youminghu0930-public.github.io/golf-true-3d-product/",
       "linkLabel": "Explore True 3D →",
       "number": "02",
       "category": "3D movement",
       "tags": [
-        "Multi-view geometry",
-        "Time synchronization",
+        "Pose estimation",
+        "3D reconstruction",
+        "Multi-view geometry"
+      ],
+      "sections": [
+        {
+          "id": "section-1",
+          "title": "Overview",
+          "description": "Explore golf swings reconstructed in three dimensions."
+        },
+        {
+          "id": "section-2",
+          "title": "Multi-view geometry",
+          "description": "See how multiple camera views contribute to 3D reconstruction."
+        },
+        {
+          "id": "section-3",
+          "title": "Synchronization & measurements",
+          "description": "Explore synchronized views and movement measurements extracted from a swing."
+        }
+      ],
+      "image": "/materials/data/project-previews/golf-3d-banner-start.png",
+      "imageAlt": "True 3D golf banner with the reconstructed golfer, club motion, and two camera views",
+      "demoLabel": "Explore the demo ↗",
+      "company": "Ideas Lab Formosa",
+      "labels": [
+        "Camera synchronization",
+        "3D swing analysis",
         "Movement measurements"
-      ]
+      ],
+      "banner": {
+        "rendered": true,
+        "video": "/materials/data/project-previews/golf-3d-banner-full.mp4",
+        "poster": "/materials/data/project-previews/golf-3d-banner-start.png"
+      }
     }
   ],
   "navigation": [
@@ -131,15 +196,15 @@
     },
     "works": {
       "label": "Works",
-      "title": "Selected projects",
+      "title": "Explore the projects that interest you",
       "role": "",
-      "description": "Two connected projects exploring how ordinary video becomes reliable, interpretable movement information.",
+      "description": "These visual showcases and interactive demos offer a glimpse into my projects, highlighting their ideas, features, and results. Explore them to see how each concept comes to life.",
       "stripeItems": [
         "Works"
       ],
       "accentLastWord": true,
       "terminalDot": true,
-      "showBreadcrumb": true,
+      "showBreadcrumb": false,
       "showCurrentWork": false
     },
     "contact": {
@@ -152,7 +217,7 @@
       ],
       "accentLastWord": true,
       "terminalDot": true,
-      "showBreadcrumb": true,
+      "showBreadcrumb": false,
       "showCurrentWork": false
     }
   },
