@@ -128,6 +128,10 @@
           "style": "text",
           "url": "https://youminghu0930.github.io/"
         }
+      ],
+      "ornaments": [
+        "star",
+        "bolt"
       ]
     },
     "works": {
@@ -169,5 +173,42 @@
       "showBreadcrumb": true,
       "showCurrentWork": false
     }
+  },
+  "experience": {
+    "eyebrow": "Experience",
+    "title": "My experience",
+    "description": "A first look at my professional journey. Details will be added here.",
+    "items": [
+      {
+        "period": "Dates to be added",
+        "role": "Role title placeholder",
+        "company": "Company or organization",
+        "summary": "A short overview of this role, the problems I worked on, and the contribution I made.",
+        "highlights": [
+          "Key responsibility or focus area",
+          "A project, outcome, or achievement"
+        ]
+      },
+      {
+        "period": "Dates to be added",
+        "role": "Earlier role placeholder",
+        "company": "Company or organization",
+        "summary": "A brief introduction to this chapter of my experience. More context and details will follow.",
+        "highlights": [
+          "Main area of work",
+          "A useful result or lesson learned"
+        ]
+      },
+      {
+        "period": "Dates to be added",
+        "role": "Another experience placeholder",
+        "company": "Company or organization",
+        "summary": "Space for an earlier role, research experience, or another meaningful part of my journey.",
+        "highlights": [
+          "What I explored or built",
+          "The skills and perspective I developed"
+        ]
+      }
+    ]
   }
 }

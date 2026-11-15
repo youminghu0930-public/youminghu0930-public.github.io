@@ -500,3 +500,66 @@ html.custom-page-scrollbar::-webkit-scrollbar { display:none; }
 .page-scrollbar[hidden] { display:none; }
 .page-scrollbar-thumb { width:100%; height:100%; transform-origin:top; border-radius:inherit; background:var(--accent); pointer-events:none; }
 .page-scrollbar:focus-visible { outline:2px solid var(--accent); outline-offset:4px; }
+
+/* Homepage experience: a stable spine with a scroll-linked green progression. */
+.experience-section { padding-top:{{ExperienceSectionSpace}}; }
+.experience-heading { margin-bottom:{{ExperienceHeadingGap}}; max-width:{{ExperienceCopyWidth}}; }
+.experience-label, .experience-period { font-family:{{MonoFontFamily}}; font-size:.8rem; color:var(--muted); }
+.experience-label { color:var(--accent); letter-spacing:.12em; text-transform:uppercase; margin:0 0 16px; }
+.portfolio-shell .experience-heading h2 { font-size:{{ExperienceTitleSize}}; line-height:1.08; margin:0 0 24px; }
+.experience-heading h2 span { color:var(--accent); }
+.experience-intro { color:var(--muted); line-height:1.7; }
+.experience-timeline { position:relative; }
+.experience-list { list-style:none; padding:0; margin:0; }
+.experience-entry { position:relative; display:grid; grid-template-columns:{{ExperienceDateWidth}} minmax(0, 1fr); gap:{{ExperienceColumnGap}}; padding-bottom:{{ExperienceRowSpace}}; }
+.experience-entry:last-child { padding-bottom:24px; }
+.experience-period { margin:5px 0 0; line-height:1.6; }
+.experience-rail { position:absolute; left:calc({{ExperienceDateWidth}} + {{ExperienceColumnGap}} / 2); top:10px; bottom:0; width:{{ExperienceRailWidth}}; background:var(--border); pointer-events:none; overflow:hidden; }
+.experience-rail-fill { height:100%; width:100%; transform:scaleY(var(--timeline-progress, 0)); transform-origin:top; background:linear-gradient(to bottom, transparent, var(--accent) 18%, var(--accent) 90%, transparent); box-shadow:{{ExperienceRailGlow}}; }
+.experience-marker { position:absolute; top:10px; left:calc({{ExperienceDateWidth}} + {{ExperienceColumnGap}} / 2 + {{ExperienceRailWidth}} / 2); translate:-50% 0; width:{{ExperienceMarkerSize}}; height:{{ExperienceMarkerSize}}; border-radius:50%; border:2px solid var(--border); background:var(--surface); transition:background 180ms ease, border-color 180ms ease; }
+.experience-marker[data-reached=true] { border-color:var(--accent); background:var(--accent); box-shadow:{{ExperienceRailGlow}}; }
+.experience-copy { min-width:0; max-width:{{ExperienceCopyWidth}}; }
+.portfolio-shell .experience-copy h3 { font-size:{{ExperienceRoleSize}}; line-height:1.25; margin:0 0 10px; }
+.experience-company { margin:0 0 24px; color:var(--accent); }
+.experience-summary, .experience-highlights { color:var(--muted); font-size:{{ExperienceBodySize}}; line-height:1.75; }
+.experience-summary { margin:0 0 16px; }
+.experience-highlights { padding-left:1.2em; margin:0; }
+.experience-highlights li { margin-top:6px; padding-left:4px; }
+.experience-highlights li::marker { color:var(--accent); }
+@media (max-width:{{mobileBreakpoint}}) {
+ .experience-entry { grid-template-columns:minmax(0, 1fr); gap:12px; padding-left:32px; }
+ .experience-rail { left:5px; }
+ .experience-marker { left:6px; top:8px; }
+ .experience-period { margin:0; }
+ .experience-company { margin-bottom:16px; }
+}
+@media (prefers-reduced-motion:reduce) {
+ .experience-marker { transition:none; }
+}
+
+/* Small sculptural accents around the Home title. */
+.landing-title-composition { position:relative; width:fit-content; max-width:100%; }
+.portfolio-shell .hero-ornament { position:absolute; z-index:2; display:block; width:{{OrnamentSize}}; height:{{OrnamentSize}}; padding:0; border:0; background:transparent; border-radius:8px; cursor:pointer; touch-action:manipulation; }
+.hero-ornament svg { display:block; width:100%; height:100%; overflow:visible; transform-origin:50% 50%; filter:{{OrnamentGlow}}; }
+.hero-ornament .ornament-object { transform-box:fill-box; transform-origin:center; filter:{{OrnamentObjectShadow}}; }
+.ornament-star { left:-40px; top:-55px; rotate:-12deg; }
+.ornament-bolt { right:-44px; bottom:-25px; rotate:12deg; }
+.hero-ornament .ornament-patch { fill:{{OrnamentPatchColor}}; stroke:none; }
+.hero-ornament .metal-white { stop-color:{{OrnamentMetalWhite}}; }
+.hero-ornament .metal-silver { stop-color:{{OrnamentMetalSilver}}; }
+.hero-ornament .metal-dark { stop-color:{{OrnamentMetalDark}}; }
+.hero-ornament .metal-green-dark { stop-color:{{OrnamentGreenShadow}}; }
+.hero-ornament .metal-green-glint { stop-color:{{OrnamentGreenGlint}}; }
+.hero-ornament .metal-green { stop-color:var(--accent); }
+.hero-ornament .metal-face-light { stop-color:{{OrnamentFaceLight}}; }
+.hero-ornament .metal-face-mid { stop-color:{{OrnamentFaceMid}}; }
+.hero-ornament .metal-face-dark { stop-color:{{OrnamentFaceDark}}; }
+@media (max-width:{{mobileBreakpoint}}) {
+ .portfolio-shell .hero-ornament { width:{{OrnamentMobileSize}}; height:{{OrnamentMobileSize}}; }
+ .ornament-star { left:0; top:-42px; }
+ .ornament-bolt { right:0; bottom:-18px; }
+}
+
+/* Reposition within the landing only; the split line is a hard boundary. */
+.portfolio-shell .landing .hero > .landing-ornament-scene { position:absolute; top:0; bottom:0; left:calc(50% - 50vw); right:calc(50% - 50vw); z-index:3; overflow:clip; pointer-events:none; }
+.portfolio-shell .landing-ornament-scene .hero-ornament { position:absolute; top:0; left:0; right:auto; bottom:auto; pointer-events:auto; }

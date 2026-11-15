@@ -23,14 +23,30 @@ function link(label, url, className) {
 function installScrollMotion(main) {
   const media = matchMedia('(prefers-reduced-motion: reduce)');
   const settings = design.effects;
-  const items = Array.from(main.querySelectorAll('.landing-content, .project-index, .project-copy > *, .portfolio-footer')).map(node => ({node, offset:0}));
+  const items = Array.from(main.querySelectorAll('.landing-content, .project-index, .project-copy > *, .experience-heading > *, .experience-period, .experience-copy > *')).map(node => ({node, offset:0, opacity:1, initialized:false, order:node.matches('.experience-copy > *, .experience-heading > *, .project-copy > *') ? Array.from(node.parentElement.children).indexOf(node) : 0}));
+  const timeline = main.querySelector('.experience-rail');
+  const markers = Array.from(main.querySelectorAll('.experience-marker'));
   let frame = 0;
+  let lastTime = 0;
   const clamp = value => Math.max(0, Math.min(1, value));
   const ease = value => value * value * (3 - 2 * value);
-  function draw() {
+  function draw(time) {
     frame = 0;
+    const delta = lastTime ? Math.min(64, Math.max(1, time - lastTime)) : 16.67;
+    lastTime = time;
+    const blend = 1 - Math.exp(-delta / settings.scrollMotionResponseMs);
+    let settling = false;
     const height = innerHeight;
-    const atEnd = scrollY + height >= document.documentElement.scrollHeight - 2;
+    const maxScroll = Math.max(0, document.documentElement.scrollHeight - height);
+    if (timeline) {
+      const rail = timeline.getBoundingClientRect();
+      const readingLine = height * settings.timelineReadingPosition;
+      const progress = media.matches ? 1 : clamp((readingLine - rail.top) / Math.max(1, rail.height));
+      timeline.style.setProperty('--timeline-progress', String(progress));
+      markers.forEach(marker => {
+        marker.dataset.reached = String(media.matches || marker.getBoundingClientRect().top <= readingLine);
+      });
+    }
     // Read all bounds before writing, subtracting our own offset to avoid feedback.
     const bounds = items.map(item => {
       const rect = item.node.getBoundingClientRect();
@@ -41,15 +57,33 @@ function installScrollMotion(main) {
         item.node.style.removeProperty('translate');
         item.node.style.removeProperty('opacity');
         item.offset = 0;
+        item.opacity = 1;
+        item.initialized = false;
         return;
       }
       const rect = bounds[index];
-      const entering = atEnd ? 1 : ease(clamp((height * settings.scrollRevealStart - rect.top) / (height * (settings.scrollRevealStart - settings.scrollRevealEnd))));
+      // Short pages still reveal fully, without an abrupt end-of-page override.
+      const finishTop = Math.max(height * (settings.scrollRevealEnd - item.order * settings.scrollRevealStagger), rect.top + scrollY - maxScroll);
+      const startTop = finishTop + height * (settings.scrollRevealStart - settings.scrollRevealEnd);
+      const entering = ease(clamp((startTop - rect.top) / (startTop - finishTop)));
       const leaving = ease(clamp(rect.bottom / (height * settings.scrollFadeExitRange)));
-      item.offset = (1 - entering) * settings.scrollRevealDistance - (1 - leaving) * settings.scrollExitDistance;
+      const targetOffset = (1 - entering) * settings.scrollRevealDistance - (1 - leaving) * settings.scrollExitDistance;
+      const targetOpacity = settings.scrollMinOpacity + (1 - settings.scrollMinOpacity) * entering * leaving;
+      if (!item.initialized) {
+        item.offset = targetOffset;
+        item.opacity = targetOpacity;
+        item.initialized = true;
+      } else {
+        item.offset += (targetOffset - item.offset) * blend;
+        item.opacity += (targetOpacity - item.opacity) * blend;
+      }
+      if (Math.abs(targetOffset - item.offset) > 0.05 || Math.abs(targetOpacity - item.opacity) > 0.001) settling = true;
+      else { item.offset = targetOffset; item.opacity = targetOpacity; }
       item.node.style.translate = `0 ${item.offset}px`;
-      item.node.style.opacity = String(settings.scrollMinOpacity + (1 - settings.scrollMinOpacity) * entering * leaving);
+      item.node.style.opacity = String(item.opacity);
     });
+    if (settling) schedule();
+    else lastTime = 0;
   }
   function schedule() { if (!frame) frame = requestAnimationFrame(draw); }
   window.addEventListener('scroll', schedule, {passive:true});
@@ -70,7 +104,7 @@ function installScrollMotion(main) {
 async function startApp() {
   const response = await fetch(new URL('./materials/content.json', import.meta.url));
   if (!response.ok) throw new Error(`Content request failed: ${response.status}`);
-  const { page, projects, navigation, landings } = await response.json();
+  const { page, projects, navigation, landings, experience } = await response.json();
   // Measure and animate against the final fonts, avoiding fallback-font line wraps.
   if (document.fonts) await Promise.all([
     document.fonts.load('400 16px "Geist Sans"'),
@@ -214,6 +248,36 @@ async function startApp() {
   main.className = `portfolio-page ${route === 'home' ? 'home-page' : 'inner-page'}`;
   const landing = createLanding(landings[route], {page, navigation});
   main.append(landing.root);
+  if (route === 'home' && experience?.items?.length) {
+    const section = element('section', undefined, 'experience-section');
+    section.id = 'experience';
+    section.setAttribute('aria-labelledby', 'experience-title');
+    const heading = element('div', undefined, 'experience-heading');
+    const title = element('h2', undefined);
+    title.id = 'experience-title';
+    const words = experience.title.split(' ');
+    title.append(words.slice(0, -1).join(' ') + ' ', element('span', words.at(-1) + '.'));
+    heading.append(element('p', experience.eyebrow, 'experience-label'), title, element('p', experience.description, 'experience-intro'));
+    const timeline = element('div', undefined, 'experience-timeline');
+    const rail = element('div', undefined, 'experience-rail');
+    rail.setAttribute('aria-hidden', 'true');
+    rail.append(element('div', undefined, 'experience-rail-fill'));
+    const list = element('ol', undefined, 'experience-list');
+    for (const item of experience.items) {
+      const entry = element('li', undefined, 'experience-entry');
+      const marker = element('span', undefined, 'experience-marker');
+      marker.setAttribute('aria-hidden', 'true');
+      const copy = element('div', undefined, 'experience-copy');
+      const highlights = element('ul', undefined, 'experience-highlights');
+      for (const highlight of item.highlights || []) highlights.append(element('li', highlight));
+      copy.append(element('h3', item.role), element('p', item.company, 'experience-company'), element('p', item.summary, 'experience-summary'), highlights);
+      entry.append(element('p', item.period, 'experience-period'), marker, copy);
+      list.append(entry);
+    }
+    timeline.append(rail, list);
+    section.append(heading, timeline);
+    main.append(section);
+  }
   if (route === 'works') {
     const section = element('section');
     section.id = 'projects';

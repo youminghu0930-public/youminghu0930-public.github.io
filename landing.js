@@ -1,3 +1,5 @@
+import { installOrnamentScene } from './materials/data/ornament-scene.js';
+import ClipperLib from './materials/data/vendor/clipper/clipper.js';
 import { design } from './design-settings.js';
 
 function element(tag, text, className) {
@@ -89,8 +91,19 @@ function installPageEntrance(hero, header, stripe = null, {animateHeader = true}
     tickerObserver.observe(track.firstElementChild);
     document.fonts?.ready.then(() => { if (!disposed) sizeTicker(); });
   }
-  const stopTicker = () => { disposed = true; tickerObserver.disconnect(); visibilityObserver.disconnect(); controller.abort(); };
+  const ornamentEntrances = [];
+  const stopTicker = () => {
+    disposed = true;
+    tickerObserver.disconnect(); visibilityObserver.disconnect(); controller.abort();
+    ornamentEntrances.forEach(animation => animation.cancel());
+  };
   if (motion.matches) return stopTicker;
+  hero.querySelectorAll('.hero-ornament > svg').forEach((svg,index) => {
+    ornamentEntrances.push(svg.animate([
+      {opacity:0,transform:`translateY(${settings.ornamentEntranceDistance}px) scale(.86)`},
+      {opacity:1,transform:'translateY(0) scale(1)'}
+    ],{duration:settings.ornamentEntranceDuration,delay:settings.ornamentEntranceDelay+index*settings.ornamentEntranceStagger,easing:'cubic-bezier(.16,1,.3,1)',fill:'backwards'}));
+  });
   const jobs = [];
   const lineObservers = [];
   function prepare(node, delay, maxDuration = Infinity, fixedDuration = null, parallelLines = false) {
@@ -204,6 +217,209 @@ function createTitle(config) {
   title.append(line);
   return title;
 }
+// Extrude only edges whose outward normal faces the projected depth direction.
+// Bézier segments are split exactly at silhouette tangencies, not sampled.
+function createVisibleSidewall(path, dx, dy) {
+  const segments = [];
+  let point, first;
+  for (const match of path.matchAll(/([MLCQZ])([^MLCQZ]*)/g)) {
+    const command = match[1];
+    const numbers = (match[2].match(/-?\d*\.?\d+/g) || []).map(Number);
+    const points = [];
+    for (let i = 0; i < numbers.length; i += 2) points.push([numbers[i], numbers[i + 1]]);
+    if (command === 'M') { point = points[0]; first = point; }
+    else {
+      const curve = [point, ...(command === 'Z' ? [first] : points)];
+      if (curve.some(p => p[0] !== point[0] || p[1] !== point[1])) segments.push(curve);
+      point = curve.at(-1);
+    }
+  }
+  const winding = Math.sign(segments.reduce((sum, curve) => sum + curve[0][0] * curve.at(-1)[1] - curve.at(-1)[0] * curve[0][1], 0)) || 1;
+  function split(curve, t) {
+    const left = [curve[0]], right = [curve.at(-1)];
+    let row = curve;
+    while (row.length > 1) {
+      row = row.slice(0, -1).map((p, i) => p.map((v, axis) => v * (1 - t) + row[i + 1][axis] * t));
+      left.push(row[0]); right.unshift(row.at(-1));
+    }
+    return [left, right];
+  }
+  const scalar = p => dx * p[1] - dy * p[0];
+  const surfaces = [];
+  for (const curve of segments) {
+    const values = curve.map(scalar);
+    let a = 0, b = 0, c;
+    if (curve.length === 4) {
+      a = 3 * (-values[0] + 3 * values[1] - 3 * values[2] + values[3]);
+      b = 6 * (values[0] - 2 * values[1] + values[2]);
+      c = 3 * (values[1] - values[0]);
+    } else if (curve.length === 3) {
+      b = 2 * (values[0] - 2 * values[1] + values[2]);
+      c = 2 * (values[1] - values[0]);
+    } else c = values[1] - values[0];
+    const roots = [];
+    if (Math.abs(a) < 1e-9) {
+      if (Math.abs(b) > 1e-9) roots.push(-c / b);
+    } else {
+      const discriminant = b * b - 4 * a * c;
+      if (discriminant >= 0) {
+        roots.push((-b - Math.sqrt(discriminant)) / (2 * a), (-b + Math.sqrt(discriminant)) / (2 * a));
+      }
+    }
+    const cuts = [0, ...new Set(roots.filter(t => t > 1e-8 && t < 1 - 1e-8).sort((x,y) => x-y)), 1];
+    for (let i = 0; i < cuts.length - 1; i++) {
+      const start = cuts[i], end = cuts[i + 1], middle = (start + end) / 2;
+      if (winding * (a * middle * middle + b * middle + c) <= 1e-8) continue;
+      let part = end === 1 ? curve : split(curve, end)[0];
+      if (start > 0) part = split(part, start / end)[1];
+      const back = part.map(([x,y]) => [x+dx,y+dy]).reverse();
+      const command = part.length === 4 ? 'C' : part.length === 3 ? 'Q' : 'L';
+      const coords = points => points.map(p => p.map(n => Number(n.toFixed(5))).join(' ')).join(' ');
+      surfaces.push(`M${coords([part[0]])} ${command}${coords(part.slice(1))} L${coords([back[0]])} ${command}${coords(back.slice(1))} Z`);
+    }
+  }
+  return surfaces.join(' ');
+}
+// Flatten smooth curves well below a screen pixel, then union the actual visible
+// surfaces before applying a constant-distance, round-join paper offset.
+function createOrnamentPatch(paths, expansion, cornerRadius = 3) {
+  const precision = 10000;
+  const tolerance = .005;
+  function flatten(curve, polygon, depth = 0) {
+    const first = curve[0], last = curve.at(-1);
+    const length = Math.hypot(last[0]-first[0], last[1]-first[1]);
+    const error = Math.max(0, ...curve.slice(1,-1).map(p => length
+      ? Math.abs((last[0]-first[0])*(first[1]-p[1]) - (first[0]-p[0])*(last[1]-first[1])) / length
+      : Math.hypot(p[0]-first[0],p[1]-first[1])));
+    if (error <= tolerance || depth >= 16) { polygon.push(last); return; }
+    let row = curve;
+    const left = [first], right = [last];
+    while (row.length > 1) {
+      row = row.slice(0,-1).map((p,i) => p.map((v,axis) => (v+row[i+1][axis])/2));
+      left.push(row[0]); right.unshift(row.at(-1));
+    }
+    flatten(left, polygon, depth+1); flatten(right, polygon, depth+1);
+  }
+  const polygons = [];
+  for (const path of paths) {
+    let point, first, polygon;
+    for (const [,command,values] of path.matchAll(/([MLCQZ])([^MLCQZ]*)/g)) {
+      const numbers = (values.match(/-?\d*\.?\d+/g) || []).map(Number);
+      const controls = [];
+      for (let i=0; i<numbers.length; i+=2) controls.push([numbers[i],numbers[i+1]]);
+      if (command === 'M') { point=controls[0];first=point;polygon=[point]; }
+      else if (command === 'Z') {
+        const converted=polygon.map(([x,y])=>({X:Math.round(x*precision),Y:Math.round(y*precision)}));
+        if (!ClipperLib.Clipper.Orientation(converted)) converted.reverse();
+        polygons.push(converted);point=first;
+      } else {
+        flatten([point,...controls],polygon);point=controls.at(-1);
+      }
+    }
+  }
+  const clipper = new ClipperLib.Clipper();
+  clipper.AddPaths(polygons,ClipperLib.PolyType.ptSubject,true);
+  const silhouette = new ClipperLib.Paths();
+  clipper.Execute(ClipperLib.ClipType.ctUnion,silhouette,ClipperLib.PolyFillType.pftNonZero,ClipperLib.PolyFillType.pftNonZero);
+  function offset(paths, distance) {
+    const operation = new ClipperLib.ClipperOffset(2,.01*precision);
+    operation.AddPaths(paths,ClipperLib.JoinType.jtRound,ClipperLib.EndType.etClosedPolygon);
+    const result = new ClipperLib.Paths();
+    operation.Execute(result,distance*precision);
+    return result;
+  }
+  let patch = offset(silhouette,expansion);
+  // Round concave notches too, preserving constant spacing along the other edges.
+  if (cornerRadius > 0) patch = offset(offset(patch,cornerRadius),-cornerRadius);
+  return patch.map(polygon => 'M'+polygon.map(p=>`${p.X/precision} ${p.Y/precision}`).join(' L')+' Z').join(' ');
+}
+export function createOrnament(kind) {
+  const button = element('button', undefined, `hero-ornament ornament-${kind}`);
+  button.type = 'button';
+  button.setAttribute('aria-label', `Animate ${kind === 'star' ? 'star' : 'lightning bolt'}`);
+  const path = kind === 'star'
+    ? 'M48 7 C58 7 57 24 65 31 C73 39 89 38 89 48 C89 58 72 57 65 65 C57 73 58 89 48 89 C38 89 39 72 31 65 C23 57 7 58 7 48 C7 38 24 39 31 31 C39 23 38 7 48 7Z'
+    : 'M62 8 C69 2 74 7 71 15 L60 36 C57 42 59 45 65 47 L76 50 C83 52 83 58 77 63 L34 96 C26 102 20 96 24 87 L34 65 C37 59 35 56 29 54 L20 51 C12 48 14 42 20 37 L62 8Z';
+  const id = `ornament-${kind}`;
+  const sidewall = createVisibleSidewall(path, design.effects.ornamentDepthX, design.effects.ornamentDepthY);
+  const paper = createOrnamentPatch([path], design.effects.ornamentPatchExpansion, design.effects.ornamentPatchCornerRadius);
+  const visibleOutline = createOrnamentPatch([path, sidewall], 0, 0);
+  function outlineCenter(outline) {
+    const coordinates = outline.match(/-?\d*\.?\d+/g).map(Number);
+    const xs = coordinates.filter((_, index) => index % 2 === 0);
+    const ys = coordinates.filter((_, index) => index % 2 === 1);
+    return [(Math.min(...xs) + Math.max(...xs)) / 2, (Math.min(...ys) + Math.max(...ys)) / 2];
+  }
+  const objectCenter = outlineCenter(visibleOutline);
+  const patchCenter = outlineCenter(paper);
+  const patchOffset = objectCenter.map((value, axis) => Number((value - patchCenter[axis]).toFixed(5)));
+  const patchShape = `<path d="${paper}" class="ornament-patch" transform="translate(${patchOffset.join(' ')})"/>`;
+  button.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 104 104" aria-hidden="true" focusable="false" shape-rendering="geometricPrecision">
+    <defs>
+      <linearGradient id="${id}-chrome" gradientUnits="userSpaceOnUse" x1="0" y1="0" x2="104" y2="104">
+        <stop offset="0" class="metal-silver"/>
+        <stop offset=".32" class="metal-dark"/>
+        <stop offset=".48" class="metal-white"/>
+        <stop offset=".57" class="metal-silver"/>
+        <stop offset=".66" class="metal-green-dark"/>
+        <stop offset=".76" class="metal-green"/>
+        <stop offset=".8" class="metal-green-glint"/>
+        <stop offset=".84" class="metal-green"/>
+        <stop offset=".94" class="metal-green-dark"/>
+        <stop offset="1" class="metal-silver"/>
+      </linearGradient>
+      <linearGradient id="${id}-face" x1="0" y1="0" x2=".8" y2="1">
+        <stop offset="0" class="metal-face-mid"/><stop offset=".35" class="metal-face-light"/>
+        <stop offset=".48" class="metal-face-mid"/><stop offset="1" class="metal-face-dark"/>
+      </linearGradient>
+      <linearGradient id="${id}-reflection" x1="0" y1="0" x2="1" y2="1">
+        <stop offset="0" class="metal-white" stop-opacity=".65"/>
+        <stop offset=".35" class="metal-silver" stop-opacity=".25"/>
+        <stop offset=".58" class="metal-green" stop-opacity="0"/>
+        <stop offset=".86" class="metal-green" stop-opacity=".4"/>
+        <stop offset="1" class="metal-white" stop-opacity=".6"/>
+      </linearGradient>
+    </defs>
+    ${patchShape}
+    <g class="ornament-object">
+      <path d="${sidewall}" fill="url(#${id}-chrome)"/>
+      <path d="${path}" fill="url(#${id}-face)" stroke="url(#${id}-reflection)" stroke-width="1.2" stroke-linejoin="round"/>
+    </g>
+  </svg>`;
+  let animation;
+  const motion = matchMedia('(prefers-reduced-motion: reduce)');
+  function shake() {
+    if (motion.matches) return;
+    animation?.cancel();
+    animation = button.querySelector('.ornament-object').animate([
+      {transform:'perspective(260px) rotateY(0deg) rotateZ(0deg)'},
+      {transform:'perspective(260px) rotateY(-28deg) rotateZ(-5deg)', offset:0.22},
+      {transform:'perspective(260px) rotateY(22deg) rotateZ(4deg)', offset:0.46},
+      {transform:'perspective(260px) rotateY(-12deg) rotateZ(-2deg)', offset:0.68},
+      {transform:'perspective(260px) rotateY(6deg) rotateZ(1deg)', offset:0.84},
+      {transform:'perspective(260px) rotateY(0deg) rotateZ(0deg)'}
+    ], {duration:design.effects.ornamentShakeDuration, easing:'ease-in-out'});
+  }
+  button.addEventListener('pointerenter', event => { if (event.pointerType === 'mouse') shake(); });
+  button.addEventListener('click', event => { if (event.pointerType !== 'mouse') shake(); });
+  let visible = false;
+  const observer = new IntersectionObserver(entries => {
+    visible = entries[0].isIntersecting;
+  });
+  observer.observe(button);
+  const timer = setInterval(() => {
+    if (visible && !document.hidden && animation?.playState !== 'running') shake();
+  }, design.effects.ornamentWobbleInterval);
+  const stopMotion = () => { if (motion.matches) animation?.cancel(); };
+  motion.addEventListener('change', stopMotion);
+  button.destroy = () => {
+    clearInterval(timer);
+    observer.disconnect();
+    motion.removeEventListener('change', stopMotion);
+    animation?.cancel();
+  };
+  return button;
+}
 function createStripe(items) {
   const stripe = element('div', undefined, 'landing-stripe');
   const track = element('div', undefined, 'stripe-track');
@@ -270,7 +486,9 @@ export function createLanding(config, {page, navigation}) {
   }
   const content = element('div', undefined, 'landing-content');
   if (config.showBreadcrumb) content.append(element('p', config.label, 'section-number'));
-  content.append(createTitle(config));
+  const composition = element('div', undefined, 'landing-title-composition');
+  composition.append(createTitle(config));
+  content.append(composition);
   const details = element('div', undefined, 'hero-details');
   if (config.role) details.append(element('p', config.role, 'eyebrow'));
   details.append(element('p', config.description, 'intro'));
@@ -292,9 +510,10 @@ export function createLanding(config, {page, navigation}) {
     content.append(actions);
   }
   hero.append(content);
+  const ornamentScene=installOrnamentScene({hero,createOrnament,kinds:config.ornaments || ['star','bolt'],design});
   const stripe = createStripe(config.stripeItems);
   root.append(hero, stripe);
-  return {root, hero, stripe, destroy:() => status?.destroy()};
+  return {root, hero, stripe, destroy:() => { status?.destroy(); ornamentScene.destroy(); }};
 }
 export function installLandingEntrance(landing, header, options) {
   return installPageEntrance(landing.hero, header, landing.stripe, options);
