@@ -43,6 +43,21 @@ export function installOrnamentScene({hero,createOrnament,kinds,design}) {
       if(!exiting) {
         target={x:clamp(item.index?heading.right+radius*.65:heading.left-radius*.6,left,right),
           y:clamp(item.index?heading.bottom+radius*.45:heading.top-radius*.6,bounds.top+radius+8,Math.max(bounds.top+radius+8,bottom))};
+        if(mobile.matches) {
+          const gap=settings.ornamentMobileContentGap;
+          if(item.index) {
+            const beside=heading.right+radius+gap;
+            const details=hero.querySelector('.hero-details')?.getBoundingClientRect();
+            target.x=Math.min(beside,right);
+            target.y=beside<=right
+              ? Math.min(heading.bottom-radius*.15,(details?.top??heading.bottom+16)-radius-gap)
+              : heading.top-radius-gap;
+          } else {
+            target.x=clamp(heading.left,left,right);
+            target.y=heading.top-radius-gap;
+          }
+          target.y=Math.max(bounds.top+radius+8,target.y);
+        }
       } else {
         // Keep the last section-relative position. There are no new lower
         // destinations during exit; scrolling simply carries it upward.

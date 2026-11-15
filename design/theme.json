@@ -325,7 +325,7 @@
     "ExperienceRailGlow": "0 0 12px rgb(0 240 80 / 25%)",
     "ExperienceBodySize": "clamp(1rem, 1.2vw, 1.125rem)",
     "OrnamentSize": "88px",
-    "OrnamentMobileSize": "48px",
+    "OrnamentMobileSize": "32px",
     "OrnamentGlow": "drop-shadow(2px 5px 4px rgb(0 0 0 / 40%))",
     "OrnamentMetalWhite": "#dce5df",
     "OrnamentMetalSilver": "#9cafa4",
@@ -338,7 +338,7 @@
     "OrnamentGreenShadow": "#075b2a",
     "OrnamentGreenGlint": "#a5efbf",
     "FloatingOrnamentSize": "88px",
-    "FloatingOrnamentMobileSize": "48px",
+    "FloatingOrnamentMobileSize": "32px",
     "OrnamentTrailColor": "rgb(0 240 80 / 24%)",
     "OrnamentTrailDash": "5 11",
     "OrnamentTrailWidth": "1.25px",
@@ -411,6 +411,7 @@
     "ornamentTempoBottomFactor": 2.8,
     "ornamentTempoEdgeRange": 180,
     "ornamentTempoEdgeBoost": 0.06,
-    "ornamentTempoCurve": 1.7
+    "ornamentTempoCurve": 1.7,
+    "ornamentMobileContentGap": 6
   }
 }

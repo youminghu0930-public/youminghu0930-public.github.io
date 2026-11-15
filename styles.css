@@ -556,7 +556,7 @@ html.custom-page-scrollbar::-webkit-scrollbar { display:none; }
 .hero-ornament .metal-face-mid { stop-color:#151b18; }
 .hero-ornament .metal-face-dark { stop-color:#070b09; }
 @media (max-width:1000px) {
- .portfolio-shell .hero-ornament { width:48px; height:48px; }
+ .portfolio-shell .hero-ornament { width:32px; height:32px; }
  .ornament-star { left:0; top:-42px; }
  .ornament-bolt { right:0; bottom:-18px; }
 }
