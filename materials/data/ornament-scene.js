@@ -31,7 +31,6 @@ export function installOrnamentScene({hero,createOrnament,kinds,design}) {
       }
     } else if(exiting && heading.bottom>exitThreshold+60) exiting=false;
     const delta=lastTime?Math.min(40,time-lastTime):16;lastTime=time;
-    const blend=reduced.matches?1:1-Math.exp(-delta/settings.ornamentSceneResponseMs);
     let moving=false;
     for(const item of items) {
       const size=item.button.offsetWidth, radius=size*settings.ornamentSceneFootprint;
@@ -51,6 +50,17 @@ export function installOrnamentScene({hero,createOrnament,kinds,design}) {
           y:item.exitY===null?heading.top:bounds.top+item.exitY};
       }
       const x=target.x,y=target.y;
+      // Give higher and lower ornaments different response tempos. Near an
+      // edge, shorten the response slightly so the motion clears it naturally.
+      const visibleTop=Math.max(0,bounds.top);
+      const visibleBottom=Math.max(visibleTop+1,Math.min(innerHeight,bounds.bottom));
+      const level=clamp((y-visibleTop)/(visibleBottom-visibleTop),0,1);
+      const edgeDistance=Math.max(0,Math.min(y-visibleTop-radius,bounds.bottom-y-radius));
+      const edgeProximity=1-clamp(edgeDistance/settings.ornamentTempoEdgeRange,0,1);
+      const tempoLevel=Math.pow(level,settings.ornamentTempoCurve);
+      const verticalFactor=settings.ornamentTempoTopFactor+(settings.ornamentTempoBottomFactor-settings.ornamentTempoTopFactor)*tempoLevel;
+      const response=settings.ornamentSceneResponseMs*verticalFactor*(1-settings.ornamentTempoEdgeBoost*edgeProximity);
+      const blend=reduced.matches?1:1-Math.exp(-delta/response);
       if(item.x===null){item.x=x;item.y=y;}
       else {item.x+=(x-item.x)*blend;item.y+=(y-item.y)*blend;}
       if(Math.hypot(x-item.x,y-item.y)>.25)moving=true;

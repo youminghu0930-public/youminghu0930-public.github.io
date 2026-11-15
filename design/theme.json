@@ -406,6 +406,11 @@
     "ornamentSpringStiffness": 65,
     "ornamentSpringDamping": 9,
     "ornamentSpringMaxOffset": 64,
-    "ornamentExitSoftness": 24
+    "ornamentExitSoftness": 24,
+    "ornamentTempoTopFactor": 0.28,
+    "ornamentTempoBottomFactor": 2.8,
+    "ornamentTempoEdgeRange": 180,
+    "ornamentTempoEdgeBoost": 0.06,
+    "ornamentTempoCurve": 1.7
   }
 }
