@@ -1,5 +1,5 @@
-@font-face { font-family:"Inter"; src:{{BodyFontSource}} format("truetype"); font-weight:100 900; font-style:normal; font-display:swap; }
-@font-face { font-family:"Noto Sans TC"; src:{{TitleFontSource}} format("truetype"); font-weight:100 900; font-style:normal; font-display:swap; }
+@font-face { font-family:"Geist Sans"; src:{{BodyFontSource}} format("woff2"); font-weight:100 900; font-style:normal; font-display:swap; }
+@font-face { font-family:"Geist Mono"; src:{{MonoFontSource}} format("woff2"); font-weight:100 900; font-style:normal; font-display:swap; }
 :root { color-scheme: {{RootColorScheme}}; font-family: {{RootFontFamily}}; font-synthesis: none; font-size: {{RootFontSize}}; color: {{RootColor}}; background: {{RootBackground}}; --muted: {{RootMuted}}; --accent: {{RootAccent}}; --secondary: {{RootSecondary}}; --border: {{RootBorder}}; --surface: {{RootSurface}}; --button-text: {{RootButtonText}}; --overlay: {{RootOverlay}}; --toggle-background: {{RootToggleBackground}}; }
 * { box-sizing: border-box; }
 html { scroll-behavior: smooth; }
@@ -440,7 +440,7 @@ body:has(.portfolio-shell) { overflow-x:clip; }
 
 /* Real shaped word runs retain the font's natural kerning throughout the reveal. */
 .portfolio-page h1 { font-family:{{TitleFontFamily}}; font-weight:{{H1FontWeight}}; font-kerning:normal; font-feature-settings:"kern" 1; }
-.portfolio-shell h1 .title-word { animation:name-reveal {{NameRevealDuration}} {{NameRevealEasing}} both; animation-delay:calc({{NameRevealDelay}} + var(--word-index) * {{NameRevealStagger}}); }
+.portfolio-shell h1 .title-word { animation:none; }
 @media (prefers-reduced-motion:reduce) { .portfolio-shell h1 .title-word { animation:none; } }
 
 /* Consistent display/body pairing across the shared polished-page system. */
@@ -457,3 +457,7 @@ body:has(.portfolio-shell) { overflow-x:clip; }
  .portfolio-shell > .navigation-toggle:active,
  .portfolio-shell > .navigation-toggle[aria-expanded=true] { color:{{MobileMenuControlColor}}; background:transparent; }
 }
+
+/* Reference typography roles, mapped to our existing page components. */
+.section-number, .breadcrumbs, .local-status, .landing-stripe, .project-index, .project-tags { font-family:{{MonoFontFamily}}; }
+.portfolio-page h3 { letter-spacing:{{H3LetterSpacing}}; }

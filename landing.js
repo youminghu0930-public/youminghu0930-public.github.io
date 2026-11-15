@@ -184,13 +184,17 @@ function createTitle(config) {
   const line = element('span', undefined, 'name-line');
   line.setAttribute('aria-hidden', 'true');
   const words = text.split(/\s+/);
+  let letterIndex = 0;
   words.forEach((text, wordIndex) => {
     const last = wordIndex === words.length - 1;
     const word = element('span', undefined, config.accentLastWord && last ? 'title-word title-accent' : 'title-word');
-    word.textContent = text;
-    word.style.setProperty('--word-index', wordIndex);
+    for (const character of Array.from(text)) {
+      const letter = element('span', character, 'name-letter');
+      letter.style.setProperty('--letter-index', letterIndex++);
+      word.append(letter);
+    }
     line.append(word);
-    if (!last) line.append(' ');
+    if (!last) { line.append(' '); letterIndex++; }
   });
   title.append(line);
   return title;

@@ -19,9 +19,10 @@ async function startApp() {
   const { page, projects, navigation, landings } = await response.json();
   // Measure and animate against the final fonts, avoiding fallback-font line wraps.
   if (document.fonts) await Promise.all([
-    document.fonts.load('400 16px Inter'),
-    document.fonts.load('500 32px "Noto Sans TC"'),
-    document.fonts.load('700 80px "Noto Sans TC"')
+    document.fonts.load('400 16px "Geist Sans"'),
+    document.fonts.load('500 32px "Geist Sans"'),
+    document.fonts.load('600 80px "Geist Sans"'),
+    document.fonts.load('400 14px "Geist Mono"')
   ]).catch(error => console.warn('Using available font fallback:', error));
   const app = document.querySelector('#app');
   let currentRoute;
@@ -63,7 +64,8 @@ async function startApp() {
     itemLink.dataset.number = String(index + 1).padStart(2, '0');
     nav.append(itemLink);
   }
-  const brand = element('div', undefined, 'header-identity');
+  const brand = link('', '/', 'header-identity');
+  brand.setAttribute('aria-label', `${page.brandLabel} — Home`);
   const monogram = element('span', page.brandMonogram, 'brand-monogram');
   brand.append(monogram, element('span', page.brandLabel, 'brand-name'));
   header.append(brand, nav);
@@ -108,7 +110,7 @@ async function startApp() {
     main.append(section);
   }
   const footer = element('div', undefined, 'portfolio-footer');
-  footer.append(element('p', page.footerLabel), link(page.mainPage.label, page.mainPage.url, 'text-action'), link(page.footerLinkLabel, '#about', 'text-action'));
+  footer.append(element('p', page.footerLabel), link(page.footerLinkLabel, '#about', 'text-action'));
   main.append(footer);
 
     const old = app.querySelector('main');

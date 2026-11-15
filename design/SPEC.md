@@ -13,3 +13,9 @@ Both renderers use `.hero`, `.eyebrow`, `h1`, `.intro`, `main section`, `h2`, `.
 Large titles use locally bundled Noto Sans TC at 700, with -0.025em tracking. Title entrances animate complete words so font kerning is preserved during and after motion. The SIL license is stored beside the font in materials/data/fonts.
 
 Typography pairing: Noto Sans TC 700 for large titles, 500 for job titles and section headings, 600 for project headings; Inter for body text, navigation, buttons, and supporting UI. Both variable fonts and their licenses are stored locally. The public app waits for the font faces before measuring animated paragraph wraps.
+
+## Active reference typography
+
+Geist Sans is the active body and display family. Geist Mono is used for small labels, breadcrumbs, location/time, stripe text, and project metadata. The local WOFF2 files and SIL OFL license are under materials/data/fonts. Previous font experiments are retained as assets but are not preloaded.
+
+The h1/h2/h3 scale follows aaftab.is-a.dev: weights 600, tracking -0.045/-0.04/-0.03em, and line heights 0.92/0.98/1.05. Existing reveal padding and title-to-description spacing remain. Theme controls remain in theme.json; green branding and layouts are preserved.

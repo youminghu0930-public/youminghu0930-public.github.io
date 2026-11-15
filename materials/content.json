@@ -88,6 +88,10 @@
       "label": "Contact",
       "page": "contact",
       "url": "/contact/"
+    },
+    {
+      "label": "GitHub",
+      "url": "https://github.com/youminghu0930-public"
     }
   ],
   "landings": {
