@@ -81,11 +81,6 @@
       "url": "/works/"
     },
     {
-      "label": "Skills",
-      "page": "skills",
-      "url": "/skills/"
-    },
-    {
       "label": "Contact",
       "page": "contact",
       "url": "/contact/"
@@ -147,19 +142,6 @@
       "showBreadcrumb": true,
       "showCurrentWork": false
     },
-    "skills": {
-      "label": "Skills",
-      "title": "Skills",
-      "role": "",
-      "description": "Skills and areas of expertise will be added here.",
-      "stripeItems": [
-        "Skills"
-      ],
-      "accentLastWord": true,
-      "terminalDot": true,
-      "showBreadcrumb": true,
-      "showCurrentWork": false
-    },
     "contact": {
       "label": "Contact",
       "title": "Contact",
@@ -207,6 +189,37 @@
         "highlights": [
           "What I explored or built",
           "The skills and perspective I developed"
+        ]
+      }
+    ]
+  },
+  "skills": {
+    "eyebrow": "Capabilities",
+    "title": "My skills",
+    "description": "An initial overview of my focus areas. More details will be added as the portfolio develops.",
+    "groups": [
+      {
+        "title": "AI & perception",
+        "items": [
+          "Pose estimation",
+          "Object detection",
+          "Data augmentation"
+        ]
+      },
+      {
+        "title": "3D & motion",
+        "items": [
+          "Multi-view geometry",
+          "3D reconstruction",
+          "Trajectory analysis"
+        ]
+      },
+      {
+        "title": "Project workflow",
+        "items": [
+          "Data preparation",
+          "Model evaluation",
+          "Result visualization"
         ]
       }
     ]

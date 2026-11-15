@@ -23,7 +23,7 @@ function link(label, url, className) {
 function installScrollMotion(main) {
   const media = matchMedia('(prefers-reduced-motion: reduce)');
   const settings = design.effects;
-  const items = Array.from(main.querySelectorAll('.landing-content, .project-index, .project-copy > *, .experience-heading > *, .experience-period, .experience-copy > *')).map(node => ({node, offset:0, opacity:1, initialized:false, order:node.matches('.experience-copy > *, .experience-heading > *, .project-copy > *') ? Array.from(node.parentElement.children).indexOf(node) : 0}));
+  const items = Array.from(main.querySelectorAll('.landing-content, .project-index, .project-copy > *, .experience-heading > *, .experience-period, .experience-copy > *, .skills-heading > *, .skills-group')).map(node => ({node, offset:0, opacity:1, initialized:false, order:node.matches('.experience-copy > *, .experience-heading > *, .project-copy > *') ? Array.from(node.parentElement.children).indexOf(node) : 0}));
   const timeline = main.querySelector('.experience-rail');
   const markers = Array.from(main.querySelectorAll('.experience-marker'));
   let frame = 0;
@@ -104,7 +104,7 @@ function installScrollMotion(main) {
 async function startApp() {
   const response = await fetch(new URL('./materials/content.json', import.meta.url));
   if (!response.ok) throw new Error(`Content request failed: ${response.status}`);
-  const { page, projects, navigation, landings, experience } = await response.json();
+  const { page, projects, navigation, landings, experience, skills } = await response.json();
   // Measure and animate against the final fonts, avoiding fallback-font line wraps.
   if (document.fonts) await Promise.all([
     document.fonts.load('400 16px "Geist Sans"'),
@@ -278,6 +278,26 @@ async function startApp() {
     section.append(heading, timeline);
     main.append(section);
   }
+  if (route === 'home' && skills?.groups?.length) {
+    const section = element('section', undefined, 'skills-section');
+    section.id = 'skills';
+    section.setAttribute('aria-labelledby', 'skills-title');
+    const heading = element('div', undefined, 'skills-heading');
+    const title = element('h2');
+    title.id = 'skills-title';
+    const words = skills.title.split(' ');
+    title.append(words.slice(0,-1).join(' ')+' ', element('span',words.at(-1)+'.'));
+    heading.append(element('p',skills.eyebrow,'skills-label'),title,element('p',skills.description,'skills-intro'));
+    section.append(heading);
+    for (const group of skills.groups) {
+      const row = element('div',undefined,'skills-group');
+      const list = element('ul',undefined,'skills-items');
+      for (const skill of group.items) list.append(element('li',skill));
+      row.append(element('h3',group.title),list);
+      section.append(row);
+    }
+    main.append(section);
+  }
   if (route === 'works') {
     const section = element('section');
     section.id = 'projects';
@@ -344,6 +364,13 @@ async function startApp() {
     reducedMotion.removeEventListener('change', configureScrolling);
   }, {once:true});
   renderRoute({initial:true});
+  if (location.hash) requestAnimationFrame(() => {
+    const target=document.getElementById(location.hash.slice(1));
+    if (!target) return;
+    smoothScroll?.resize();
+    if(smoothScroll) smoothScroll.scrollTo(target,{immediate:true,force:true});
+    else target.scrollIntoView({behavior:'instant'});
+  });
 }
 startApp().catch(error => {
   console.error(error);
