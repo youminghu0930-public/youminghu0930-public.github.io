@@ -98,7 +98,7 @@ function installPageEntrance(hero, header, stripe = null, {animateHeader = true}
     ornamentEntrances.forEach(animation => animation.cancel());
   };
   if (motion.matches) return stopTicker;
-  hero.querySelectorAll('.hero-ornament > svg').forEach((svg,index) => {
+  hero.querySelectorAll('.hero-ornament > .ornament-visual').forEach((svg,index) => {
     ornamentEntrances.push(svg.animate([
       {opacity:0,transform:`translateY(${settings.ornamentEntranceDistance}px) scale(.86)`},
       {opacity:1,transform:'translateY(0) scale(1)'}
@@ -354,8 +354,24 @@ export function createOrnament(kind) {
   const patchCenter = outlineCenter(paper);
   const patchOffset = objectCenter.map((value, axis) => Number((value - patchCenter[axis]).toFixed(5)));
   const patchShape = `<path d="${paper}" class="ornament-patch" transform="translate(${patchOffset.join(' ')})"/>`;
-  button.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 104 104" aria-hidden="true" focusable="false" shape-rendering="geometricPrecision">
+  // Use the same user-space light direction for both shapes, independent of
+  // their different aspect ratios. The shimmer travels along this same vector.
+  const faceLeft=0,faceTop=0;
+  const shineX=104*design.effects.ornamentGradientX;
+  const shineY=104*design.effects.ornamentGradientY;
+  const sparkArm=design.effects.ornamentSparkArm;
+  button.innerHTML = `<span class="ornament-visual"><svg class="ornament-art" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 104 104" aria-hidden="true" focusable="false" shape-rendering="geometricPrecision">
     <defs>
+      <clipPath id="${id}-metal-surface">
+        <path d="${path}"/><path d="${sidewall}"/>
+      </clipPath>
+      <linearGradient id="${id}-shine" gradientUnits="userSpaceOnUse" x1="${faceLeft}" y1="${faceTop}" x2="${faceLeft+shineX}" y2="${faceTop+shineY}">
+        <stop offset="0" class="ornament-shine-stop" stop-opacity="0"/>
+        <stop offset=".25" class="ornament-shine-stop" stop-opacity=".03"/>
+        <stop offset=".5" class="ornament-shine-stop" stop-opacity=".35"/>
+        <stop offset=".75" class="ornament-shine-stop" stop-opacity=".03"/>
+        <stop offset="1" class="ornament-shine-stop" stop-opacity="0"/>
+      </linearGradient>
       <linearGradient id="${id}-chrome" gradientUnits="userSpaceOnUse" x1="0" y1="0" x2="104" y2="104">
         <stop offset="0" class="metal-silver"/>
         <stop offset=".32" class="metal-dark"/>
@@ -368,7 +384,7 @@ export function createOrnament(kind) {
         <stop offset=".94" class="metal-green-dark"/>
         <stop offset="1" class="metal-silver"/>
       </linearGradient>
-      <linearGradient id="${id}-face" x1="0" y1="0" x2=".8" y2="1">
+      <linearGradient id="${id}-face" gradientUnits="userSpaceOnUse" x1="0" y1="0" x2="${shineX}" y2="${shineY}">
         <stop offset="0" class="metal-face-mid"/><stop offset=".35" class="metal-face-light"/>
         <stop offset=".48" class="metal-face-mid"/><stop offset="1" class="metal-face-dark"/>
       </linearGradient>
@@ -384,13 +400,57 @@ export function createOrnament(kind) {
     <g class="ornament-object">
       <path d="${sidewall}" fill="url(#${id}-chrome)"/>
       <path d="${path}" fill="url(#${id}-face)" stroke="url(#${id}-reflection)" stroke-width="1.2" stroke-linejoin="round"/>
+      <g clip-path="url(#${id}-metal-surface)">
+        <rect class="ornament-shimmer" x="-170" y="-170" width="440" height="440" fill="url(#${id}-shine)" opacity="0"/>
+      </g>
     </g>
-  </svg>`;
-  let animation;
+  </svg>
+  <svg class="ornament-sparks-overlay" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 104 104" aria-hidden="true" focusable="false">
+    <g class="ornament-sparks">
+      ${[[20,19],[34,10],[49,5],[65,11],[80,21]].map(([x,y])=>`<g transform="translate(${x} ${y})"><path class="ornament-spark" d="M${-sparkArm} 0 L${sparkArm} 0 M0 ${-sparkArm} L0 ${sparkArm}" opacity="0"/></g>`).join('')}
+    </g>
+  </svg></span>`;
+  let animation, shimmer, shimmerTimer;
+  let visible = false, destroyed = false;
+  const sparks = new Set();
   const motion = matchMedia('(prefers-reduced-motion: reduce)');
-  function shake() {
-    if (motion.matches) return;
+  function pauseEffects() {
+    clearTimeout(shimmerTimer);
+    shimmer?.cancel();
+    sparks.forEach(effect=>effect.cancel());sparks.clear();
     animation?.cancel();
+  }
+  function queueShimmer(delay = design.effects.ornamentShimmerInitialDelay) {
+    clearTimeout(shimmerTimer);
+    if(destroyed || motion.matches || !visible || document.hidden) return;
+    shimmerTimer=setTimeout(()=>{
+      if(destroyed || motion.matches || !visible || document.hidden) return;
+      shimmer?.cancel();
+      shimmer=button.querySelector('.ornament-shimmer').animate([
+        {transform:`translate(${-shineX}px,${-shineY}px)`,opacity:0},
+        {opacity:.65,offset:.35},
+        {opacity:.65,offset:.7},
+        {transform:`translate(${shineX*1.3}px,${shineY*1.3}px)`,opacity:0}
+      ],{duration:design.effects.ornamentShimmerDuration,easing:'linear'});
+    },delay);
+  }
+  function sparkBurst() {
+    button.querySelectorAll('.ornament-spark').forEach((spark,index)=>{
+      const angle=(-125+index*17.5)*Math.PI/180;
+      const travel=design.effects.ornamentSparkDistance;
+      const effect=spark.animate([
+        {transform:'translate(0,0) scale(.25)',opacity:0},
+        {transform:`translate(${Math.cos(angle)*travel*.15}px,${Math.sin(angle)*travel*.15}px) scale(1.4)`,opacity:1,offset:.25},
+        {transform:`translate(${Math.cos(angle)*travel}px,${Math.sin(angle)*travel}px) scale(.4)`,opacity:0}
+      ],{duration:design.effects.ornamentSparkDuration,delay:index*25,easing:'cubic-bezier(.2,.7,.3,1)'});
+      sparks.add(effect);
+      effect.onfinish=()=>sparks.delete(effect);
+    });
+  }
+  function shake() {
+    if (motion.matches || destroyed || document.hidden) return;
+    pauseEffects();
+    sparkBurst();
     animation = button.querySelector('.ornament-object').animate([
       {transform:'perspective(260px) rotateY(0deg) rotateZ(0deg)'},
       {transform:'perspective(260px) rotateY(-28deg) rotateZ(-5deg)', offset:0.22},
@@ -399,24 +459,28 @@ export function createOrnament(kind) {
       {transform:'perspective(260px) rotateY(6deg) rotateZ(1deg)', offset:0.84},
       {transform:'perspective(260px) rotateY(0deg) rotateZ(0deg)'}
     ], {duration:design.effects.ornamentShakeDuration, easing:'ease-in-out'});
+    queueShimmer(design.effects.ornamentShakeDuration+design.effects.ornamentShimmerPause);
   }
   button.addEventListener('pointerenter', event => { if (event.pointerType === 'mouse') shake(); });
   button.addEventListener('click', event => { if (event.pointerType !== 'mouse') shake(); });
-  let visible = false;
   const observer = new IntersectionObserver(entries => {
     visible = entries[0].isIntersecting;
+    if(visible) queueShimmer(); else pauseEffects();
   });
   observer.observe(button);
   const timer = setInterval(() => {
     if (visible && !document.hidden && animation?.playState !== 'running') shake();
   }, design.effects.ornamentWobbleInterval);
-  const stopMotion = () => { if (motion.matches) animation?.cancel(); };
+  const stopMotion = () => { if (motion.matches) pauseEffects(); else queueShimmer(); };
+  const onVisibility = () => { if(document.hidden) pauseEffects(); else queueShimmer(); };
   motion.addEventListener('change', stopMotion);
+  document.addEventListener('visibilitychange',onVisibility);
   button.destroy = () => {
-    clearInterval(timer);
+    destroyed=true;
+    clearInterval(timer);pauseEffects();
     observer.disconnect();
     motion.removeEventListener('change', stopMotion);
-    animation?.cancel();
+    document.removeEventListener('visibilitychange',onVisibility);
   };
   return button;
 }

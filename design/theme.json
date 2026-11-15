@@ -342,7 +342,11 @@
     "OrnamentTrailColor": "rgb(0 240 80 / 24%)",
     "OrnamentTrailDash": "5 11",
     "OrnamentTrailWidth": "1.25px",
-    "OrnamentTrailFlowDuration": "24s"
+    "OrnamentTrailFlowDuration": "24s",
+    "OrnamentSparkColor": "#e5fff0",
+    "OrnamentSparkStroke": "1.8px",
+    "OrnamentPivot": "50px 50px",
+    "OrnamentSparkGlow": "drop-shadow(0 0 2px rgb(0 240 80 / 60%))"
   },
   "layoutReference": "https://aaftab.is-a.dev/",
   "effects": {
@@ -412,6 +416,14 @@
     "ornamentTempoEdgeRange": 180,
     "ornamentTempoEdgeBoost": 0.06,
     "ornamentTempoCurve": 1.7,
-    "ornamentMobileContentGap": 6
+    "ornamentMobileContentGap": 6,
+    "ornamentShimmerInitialDelay": 700,
+    "ornamentShimmerDuration": 1200,
+    "ornamentShimmerPause": 100,
+    "ornamentSparkDuration": 780,
+    "ornamentSparkDistance": 22,
+    "ornamentGradientX": 0.8,
+    "ornamentGradientY": 1,
+    "ornamentSparkArm": 4.5
   }
 }
