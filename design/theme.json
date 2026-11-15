@@ -414,7 +414,8 @@
     "ExperienceDetailGap": "28px",
     "ExperienceHighlightGap": "12px 24px",
     "ExperienceRecognitionBackground": "rgb(0 240 80 / 5%)",
-    "ExperienceRecognitionBorder": "rgb(0 240 80 / 18%)"
+    "ExperienceRecognitionBorder": "rgb(0 240 80 / 18%)",
+    "HomeIntroMaxWidth": "680px"
   },
   "layoutReference": "https://aaftab.is-a.dev/",
   "effects": {

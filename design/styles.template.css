@@ -699,3 +699,5 @@ html[data-skills-expanding=true] { overflow-anchor:none; scroll-behavior:auto; }
 
 .portfolio-shell .experience-recognition-link { display:inline-block; margin:10px 0 0; padding:0; background:transparent; color:var(--accent); font-size:{{ExperiencePositionPeriodSize}}; font-weight:500; text-decoration:underline; text-underline-offset:4px; }
 .portfolio-shell .experience-recognition-link:hover { background:transparent; color:{{RootColor}}; }
+
+.portfolio-shell .home-page .intro { max-width:{{HomeIntroMaxWidth}}; }

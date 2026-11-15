@@ -95,7 +95,7 @@
       "label": "Home",
       "title": "You-Ming Hu",
       "role": "Artificial Intelligence Engineer",
-      "description": "A short introduction about my background and interests will go here.\nThis space will describe the problems I enjoy working on.\nMore details about my approach and direction will follow.",
+      "description": "I’m an AI enthusiast, always looking for new challenges and ideas to explore. As a hands-on developer, I enjoy taking research beyond experiments—implementing ideas, working through practical challenges, and deploying solutions that people can use in the real world.",
       "stripeItems": [
         "Pose estimation",
         "Object detection",
@@ -158,7 +158,7 @@
   },
   "experience": {
     "eyebrow": "Experience",
-    "title": "Diverse experience, driven by AI",
+    "title": "From pharmacy to AI, embracing new challenges",
     "description": "AI is where I focus my curiosity and ambition. My path from pharmacy to AI engineering reflects a willingness to learn unfamiliar disciplines, embrace new challenges, and bring fresh perspectives to the problems I work on.",
     "items": [
       {
