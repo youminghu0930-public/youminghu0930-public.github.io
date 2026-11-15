@@ -111,7 +111,6 @@
     "PortfolioNameMargin": "56px 0 48px",
     "PortfolioDetailsColumns": "minmax(0, 1fr) auto",
     "PortfolioDetailsGap": "40px",
-    "PortfolioIntroFontSize": "clamp(1rem, 1.4vw, 1.2rem)",
     "PortfolioIntroWidth": "590px",
     "PortfolioActionGap": "12px",
     "PortfolioStripPadding": "24px 0",
@@ -141,7 +140,6 @@
     "HeroRoleSize": "clamp(1.5rem, 3.2vw, 2.75rem)",
     "HeroRoleWeight": "500",
     "HeroRoleMargin": "0 0 16px",
-    "HeroDescriptionLineHeight": "1.8",
     "HeroActionsMargin": "28px 0 0",
     "HeroActionsDirection": "row",
     "TopbarBrandSize": "1rem",
@@ -266,7 +264,6 @@
     "ActionEntranceDelay": "900ms",
     "HomeMobileStatusGap": "56px",
     "HomeMobileHeroTop": "120px",
-    "HomeMobileIntroSize": "1.05rem",
     "HomeMobileActionFontSize": "1rem",
     "HomeMobileActionPadding": "12px",
     "HomeMobileActionColumns": "minmax(0, 1.2fr) minmax(0, 1fr)",
@@ -415,7 +412,10 @@
     "ExperienceHighlightGap": "12px 24px",
     "ExperienceRecognitionBackground": "rgb(0 240 80 / 5%)",
     "ExperienceRecognitionBorder": "rgb(0 240 80 / 18%)",
-    "HomeIntroMaxWidth": "680px"
+    "HomeIntroMaxWidth": "680px",
+    "IntroTextSize": "clamp(1rem, 1.4vw, 1.2rem)",
+    "IntroTextLineHeight": "1.8",
+    "IntroTextMobileSize": "1.05rem"
   },
   "layoutReference": "https://aaftab.is-a.dev/",
   "effects": {

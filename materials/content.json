@@ -159,7 +159,7 @@
   "experience": {
     "eyebrow": "Experience",
     "title": "From pharmacy to AI, embracing new challenges",
-    "description": "AI is where I focus my curiosity and ambition. My path from pharmacy to AI engineering reflects a willingness to learn unfamiliar disciplines, embrace new challenges, and bring fresh perspectives to the problems I work on.",
+    "description": "My journey began in pharmacy, where I worked closely with patients and their everyday needs. A growing interest in AI led me into engineering, and later into leading a team. What I enjoy most along the way is discovering new ideas, learning how they work, and bringing them into real-world applications.",
     "items": [
       {
         "period": "Mar 2022 – Present",
@@ -187,13 +187,21 @@
         "recognitions": [
           {
             "label": "Team achievement",
-            "detail": "Top three, Go Healthy with Taiwan 2026 · US$30,000 prize"
+            "detail": "Top three, Go Healthy with Taiwan 2026 · US$30,000 prize",
+            "url": "https://xview.ai/ideaslab-wins-global-honors-at-go-healthy-with-taiwan-the-tech-behind-xview-ai-just-earned-international-recognition/",
+            "linkLabel": "Read on Xview ↗"
           },
           {
             "label": "Company recognition · 2024",
             "detail": "Xview selected for investment through DCO’s Generative AI Center of Excellence initiative—one of 12 selected from over 1,000 AI startups.",
             "url": "https://newtalk.tw/news/view_content/937171",
             "linkLabel": "Read the coverage ↗"
+          },
+          {
+            "label": "Investment & backing · 2024",
+            "detail": "IdeasLab backed by SparkLabs’ AIM AI Fund as part of its first cohort of 14 startups.",
+            "url": "https://techcrunch.com/2024/09/02/sparklabs-closes-50m-fund-to-back-ai-startups/",
+            "linkLabel": "Read on TechCrunch ↗"
           }
         ]
       },

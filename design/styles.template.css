@@ -56,7 +56,7 @@ section, article { scroll-margin-top: {{SectionArticleScrollMarginTop}}; }
 .portfolio-page h1 > span { display:block; }
 .portfolio-page h1 span:last-child { color:var(--accent); }
 .hero-details { display:grid; grid-template-columns:{{PortfolioDetailsColumns}}; align-items:end; gap:{{PortfolioDetailsGap}}; }
-.portfolio-page .intro { max-width:{{PortfolioIntroWidth}}; font-size:{{PortfolioIntroFontSize}}; }
+.portfolio-page .intro { max-width:{{PortfolioIntroWidth}}; font-size:{{IntroTextSize}}; }
 .hero-actions { display:flex; flex-direction:column; align-items:stretch; gap:{{PortfolioActionGap}}; }
 .hero-actions a { margin-top:0; text-align:center; }
 .portfolio-page .secondary-action { background:transparent; color:var(--muted); border:{{ProjectBorder}}; }
@@ -107,7 +107,7 @@ h1, h2, h3, h4, h5, h6 { color:{{HeadingColor}}; }
 .portfolio-shell h1 span:last-child { color:inherit; }
 .portfolio-shell .hero-details { display:block; }
 .portfolio-shell .eyebrow { font-size:{{HeroRoleSize}}; font-weight:{{HeroRoleWeight}}; letter-spacing:normal; text-transform:none; margin:{{HeroRoleMargin}}; }
-.portfolio-shell .intro { white-space:pre-line; line-height:{{HeroDescriptionLineHeight}}; max-width:none; margin:0; color:var(--muted); }
+.portfolio-shell .intro { white-space:pre-line; line-height:{{IntroTextLineHeight}}; max-width:none; margin:0; color:var(--muted); }
 .portfolio-shell .hero-actions { flex-direction:{{HeroActionsDirection}}; flex-wrap:wrap; justify-content:flex-start; margin:{{HeroActionsMargin}}; }
 .portfolio-shell #projects { margin-top:{{HeroNextSectionSpace}}; }
 @media (max-width:{{mobileBreakpoint}}) {
@@ -327,7 +327,7 @@ body:has(.portfolio-shell) { overflow-x:clip; }
  .portfolio-shell .home-page .landing .hero { padding-top:{{HomeMobileHeroTop}}; }
  .portfolio-shell .home-page .landing .hero > .hero-status { position:relative; top:auto; left:auto; right:auto; margin:0 0 {{HomeMobileStatusGap}}; }
  .home-page .hero-status .current-work { width:100%; }
- .portfolio-shell .home-page .intro { font-size:{{HomeMobileIntroSize}}; }
+ .portfolio-shell .home-page .intro { font-size:{{IntroTextMobileSize}}; }
  .home-page .landing-actions { display:grid; grid-template-columns:{{HomeMobileActionColumns}}; }
  .portfolio-shell .home-page .landing-actions .landing-action { padding:{{HomeMobileActionPadding}}; font-size:{{HomeMobileActionFontSize}}; }
  .home-page .landing-actions .action-text { grid-column:1 / -1; justify-self:start; }
@@ -701,3 +701,9 @@ html[data-skills-expanding=true] { overflow-anchor:none; scroll-behavior:auto; }
 .portfolio-shell .experience-recognition-link:hover { background:transparent; color:{{RootColor}}; }
 
 .portfolio-shell .home-page .intro { max-width:{{HomeIntroMaxWidth}}; }
+
+/* Section introductions share the Home landing paragraph's type scale. */
+.portfolio-shell .experience-intro, .portfolio-shell .skills-intro { font-size:{{IntroTextSize}}; line-height:{{IntroTextLineHeight}}; }
+@media (max-width:{{mobileBreakpoint}}) {
+ .portfolio-shell .experience-intro, .portfolio-shell .skills-intro { font-size:{{IntroTextMobileSize}}; }
+}

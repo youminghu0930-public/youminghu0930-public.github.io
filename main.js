@@ -506,6 +506,13 @@ async function startApp() {
     reducedMotion.removeEventListener('change', configureScrolling);
   }, {once:true});
   renderRoute({initial:true});
+  // Explicitly reset the first render after content and fonts are ready.
+  // SPA back/forward navigation still uses its saved route position.
+  if (!location.hash) {
+    smoothScroll?.resize();
+    if (smoothScroll) smoothScroll.scrollTo(0, {immediate:true, force:true});
+    else window.scrollTo({left:0, top:0, behavior:'instant'});
+  }
   if (location.hash) requestAnimationFrame(() => {
     const target=document.getElementById(location.hash.slice(1));
     if (!target) return;

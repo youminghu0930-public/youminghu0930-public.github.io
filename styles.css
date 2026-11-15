@@ -702,3 +702,9 @@ html[data-skills-expanding=true] { overflow-anchor:none; scroll-behavior:auto; }
 .portfolio-shell .experience-recognition-link:hover { background:transparent; color:hsl(0 0% 87%); }
 
 .portfolio-shell .home-page .intro { max-width:680px; }
+
+/* Section introductions share the Home landing paragraph's type scale. */
+.portfolio-shell .experience-intro, .portfolio-shell .skills-intro { font-size:clamp(1rem, 1.4vw, 1.2rem); line-height:1.8; }
+@media (max-width:1000px) {
+ .portfolio-shell .experience-intro, .portfolio-shell .skills-intro { font-size:1.05rem; }
+}
