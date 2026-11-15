@@ -140,7 +140,7 @@ export function installPointerEffects(hero) {
     if (!fine.matches || reduced.matches) { hide(); return; }
     pointer = {x:event.clientX, y:event.clientY};
     updateMagnets(event.clientX, event.clientY);
-    let next = event.target instanceof Element ? event.target.closest('a[href], button, [role="button"]') : null;
+    let next = event.target instanceof Element ? (event.target.closest('[data-cursor-target]') || event.target.closest('a[href], button, [role="button"]')) : null;
     if (next?.matches(':disabled, [aria-disabled="true"]')) next = null;
     const changed = next !== target;
     const previous = changed && !cursor.hidden ? corners.map(corner => {
@@ -148,6 +148,7 @@ export function installPointerEffects(hero) {
       return {x:rect.left + rect.width / 2, y:rect.top + rect.height / 2};
     }) : [];
     if (changed) stopFlights();
+    if (changed) { targetObserver.disconnect(); if (next) targetObserver.observe(next); }
     target = next;
     cursor.hidden = false;
     position();
@@ -185,8 +186,9 @@ export function installPointerEffects(hero) {
   document.documentElement.addEventListener('pointerleave', event => { if (event.pointerType !== 'touch') hide(); }, {signal});
   fine.addEventListener('change', hide, {signal});
   reduced.addEventListener('change', hide, {signal});
+  const targetObserver = new ResizeObserver(() => position());
   const observer = new ResizeObserver(() => { position(); draw(); });
   if (hero) observer.observe(hero);
   hide();
-  return () => { cancelAnimationFrame(touchFrame); resetMagnets(); clearTimeout(releaseTimer); stopFlights(); controller.abort(); observer.disconnect(); cursor.remove(); };
+  return () => { cancelAnimationFrame(touchFrame); resetMagnets(); clearTimeout(releaseTimer); stopFlights(); controller.abort(); observer.disconnect(); targetObserver.disconnect(); cursor.remove(); };
 }

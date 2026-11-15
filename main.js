@@ -2,6 +2,7 @@ import Lenis from './materials/data/vendor/lenis/lenis.js';
 import { design } from './design-settings.js';
 import { createLanding, installLandingEntrance } from './landing.js';
 import { installPointerEffects } from './pointer-effects.js';
+import { installSkillsAccordion } from './materials/data/skills-accordion.js';
 import { installNavigation } from './navigation.js';
 
 function element(tag, text, className) {
@@ -23,8 +24,8 @@ function link(label, url, className) {
 function installScrollMotion(main) {
   const media = matchMedia('(prefers-reduced-motion: reduce)');
   const settings = design.effects;
-  const items = Array.from(main.querySelectorAll('.landing-content, .project-index, .project-copy > *, .experience-heading > *, .experience-period, .experience-copy > *, .skills-heading > *, .skills-group')).map(node => ({node, offset:0, opacity:1, initialized:false, order:node.matches('.experience-copy > *, .experience-heading > *, .project-copy > *') ? Array.from(node.parentElement.children).indexOf(node) : 0}));
-  const timeline = main.querySelector('.experience-rail');
+  const items = Array.from(main.querySelectorAll('.landing-content, .project-index, .project-copy > *, .experience-heading > *, .experience-period, .experience-copy > *, .skills-heading > *')).map(node => ({node, offset:0, opacity:1, initialized:false, order:node.matches('.experience-copy > *, .experience-heading > *, .project-copy > *') ? Array.from(node.parentElement.children).indexOf(node) : 0}));
+  const timelineRails = Array.from(main.querySelectorAll('.experience-rail'));
   const markers = Array.from(main.querySelectorAll('.experience-marker'));
   let frame = 0;
   let lastTime = 0;
@@ -38,11 +39,13 @@ function installScrollMotion(main) {
     let settling = false;
     const height = innerHeight;
     const maxScroll = Math.max(0, document.documentElement.scrollHeight - height);
-    if (timeline) {
-      const rail = timeline.getBoundingClientRect();
+    if (timelineRails.length) {
       const readingLine = height * settings.timelineReadingPosition;
-      const progress = media.matches ? 1 : clamp((readingLine - rail.top) / Math.max(1, rail.height));
-      timeline.style.setProperty('--timeline-progress', String(progress));
+      timelineRails.forEach(segment => {
+        const rail = segment.getBoundingClientRect();
+        const progress = media.matches ? 1 : clamp((readingLine - rail.top) / Math.max(1, rail.height));
+        segment.style.setProperty('--timeline-progress', String(progress));
+      });
       markers.forEach(marker => {
         marker.dataset.reached = String(media.matches || marker.getBoundingClientRect().top <= readingLine);
       });
@@ -259,22 +262,22 @@ async function startApp() {
     title.append(words.slice(0, -1).join(' ') + ' ', element('span', words.at(-1) + '.'));
     heading.append(element('p', experience.eyebrow, 'experience-label'), title, element('p', experience.description, 'experience-intro'));
     const timeline = element('div', undefined, 'experience-timeline');
-    const rail = element('div', undefined, 'experience-rail');
-    rail.setAttribute('aria-hidden', 'true');
-    rail.append(element('div', undefined, 'experience-rail-fill'));
     const list = element('ol', undefined, 'experience-list');
     for (const item of experience.items) {
       const entry = element('li', undefined, 'experience-entry');
+      const rail = element('div', undefined, 'experience-rail');
+      rail.setAttribute('aria-hidden', 'true');
+      rail.append(element('div', undefined, 'experience-rail-fill'));
       const marker = element('span', undefined, 'experience-marker');
       marker.setAttribute('aria-hidden', 'true');
       const copy = element('div', undefined, 'experience-copy');
       const highlights = element('ul', undefined, 'experience-highlights');
       for (const highlight of item.highlights || []) highlights.append(element('li', highlight));
       copy.append(element('h3', item.role), element('p', item.company, 'experience-company'), element('p', item.summary, 'experience-summary'), highlights);
-      entry.append(element('p', item.period, 'experience-period'), marker, copy);
+      entry.append(rail, element('p', item.period, 'experience-period'), marker, copy);
       list.append(entry);
     }
-    timeline.append(rail, list);
+    timeline.append(list);
     section.append(heading, timeline);
     main.append(section);
   }
@@ -289,12 +292,44 @@ async function startApp() {
     title.append(words.slice(0,-1).join(' ')+' ', element('span',words.at(-1)+'.'));
     heading.append(element('p',skills.eyebrow,'skills-label'),title,element('p',skills.description,'skills-intro'));
     section.append(heading);
-    for (const group of skills.groups) {
-      const row = element('div',undefined,'skills-group');
+    for (const [index, group] of skills.groups.entries()) {
+      const row = element('article',undefined,'skills-group');
+      row.dataset.cursorTarget = '';
+      const heading = element('h3',undefined,'skills-group-heading');
+      const toggle = element('button',undefined,'skills-toggle');
+      toggle.type = 'button';
+      toggle.id = `skill-toggle-${index}`;
+      toggle.setAttribute('aria-expanded','false');
+      toggle.setAttribute('aria-controls',`skill-panel-${index}`);
+      const icon = element('span','+','skills-toggle-icon');
+      icon.setAttribute('aria-hidden','true');
+      toggle.append(element('span',String(index+1).padStart(2,'0'),'skills-number'),element('span',group.title,'skills-name'),icon);
+      heading.append(toggle);
+      const panel = element('div',undefined,'skills-panel');
+      panel.id = `skill-panel-${index}`;
+      panel.setAttribute('role','region');
+      panel.setAttribute('aria-labelledby',toggle.id);
+      panel.setAttribute('aria-hidden','true');
+      panel.inert = true;
+      const inner = element('div',undefined,'skills-panel-inner');
+      const copy = element('div',undefined,'skills-copy');
+      copy.append(element('p',group.description));
+      const toolkit = element('div',undefined,'skills-toolkit');
       const list = element('ul',undefined,'skills-items');
-      for (const skill of group.items) list.append(element('li',skill));
-      row.append(element('h3',group.title),list);
-      section.append(row);
+      for (const skill of group.items) {
+        const item = element('li');
+        const action = link('',skill.url,'skill-link');
+        action.setAttribute('aria-label',`${skill.label} (opens in a new tab)`);
+        const icon = element('img',undefined,'skill-icon');
+        icon.src = skill.icon;
+        icon.alt = '';
+        icon.width = 32; icon.height = 32;
+        action.append(icon,element('span',skill.label));
+        item.append(action); list.append(item);
+      }
+      toolkit.append(list);
+      inner.append(copy,toolkit); panel.append(inner);
+      row.append(heading,panel); section.append(row);
     }
     main.append(section);
   }
@@ -326,8 +361,9 @@ async function startApp() {
     if (old) old.replaceWith(main); else app.append(main);
     const stopEntrance = installLandingEntrance(landing, header, {animateHeader:initial});
     const stopPointer = installPointerEffects(landing.hero);
+    const stopSkills = installSkillsAccordion(main);
     const stopScrollMotion = installScrollMotion(main);
-    cleanup = () => { stopScrollMotion(); stopEntrance?.(); stopPointer?.(); landing.destroy(); };
+    cleanup = () => { stopSkills(); stopScrollMotion(); stopEntrance?.(); stopPointer?.(); landing.destroy(); };
     currentRoute = route;
     menu.close();
     if (!initial) {

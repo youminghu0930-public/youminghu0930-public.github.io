@@ -201,26 +201,86 @@
       {
         "title": "AI & perception",
         "items": [
-          "Pose estimation",
-          "Object detection",
-          "Data augmentation"
+          {
+            "label": "Pose estimation",
+            "icon": "/materials/data/skill-icons/pose.svg",
+            "url": "https://docs.opencv.org/4.x/"
+          },
+          {
+            "label": "Object detection",
+            "icon": "/materials/data/skill-icons/scan.svg",
+            "url": "https://docs.opencv.org/4.x/"
+          },
+          {
+            "label": "Data augmentation",
+            "icon": "/materials/data/skill-icons/layers.svg",
+            "url": "https://docs.opencv.org/4.x/"
+          }
+        ],
+        "description": "Turning visual data into useful signals about people, objects, and movement."
+      },
+      {
+        "title": "Edge Computation",
+        "description": "Quantizing and optimizing models to run efficiently on local devices.",
+        "items": [
+          {
+            "label": "Core ML",
+            "icon": "/materials/data/skill-icons/chip.svg",
+            "url": "https://developer.apple.com/documentation/coreml"
+          },
+          {
+            "label": "ONNX",
+            "icon": "/materials/data/skill-icons/network.svg",
+            "url": "https://onnx.ai/"
+          },
+          {
+            "label": "Torch Lite",
+            "icon": "/materials/data/skill-icons/flame.svg",
+            "url": "https://docs.pytorch.org/docs/stable/mobile_optimizer.html"
+          }
         ]
       },
       {
         "title": "3D & motion",
         "items": [
-          "Multi-view geometry",
-          "3D reconstruction",
-          "Trajectory analysis"
-        ]
+          {
+            "label": "Multi-view geometry",
+            "icon": "/materials/data/skill-icons/cube.svg",
+            "url": "https://docs.opencv.org/4.x/"
+          },
+          {
+            "label": "3D reconstruction",
+            "icon": "/materials/data/skill-icons/cube.svg",
+            "url": "https://docs.opencv.org/4.x/"
+          },
+          {
+            "label": "Trajectory analysis",
+            "icon": "/materials/data/skill-icons/chart.svg",
+            "url": "https://numpy.org/doc/"
+          }
+        ],
+        "description": "Connecting perspectives to understand movement in three dimensions."
       },
       {
         "title": "Project workflow",
         "items": [
-          "Data preparation",
-          "Model evaluation",
-          "Result visualization"
-        ]
+          {
+            "label": "Data preparation",
+            "icon": "/materials/data/skill-icons/data.svg",
+            "url": "https://numpy.org/doc/"
+          },
+          {
+            "label": "Model evaluation",
+            "icon": "/materials/data/skill-icons/check.svg",
+            "url": "https://docs.pytorch.org/docs/stable/"
+          },
+          {
+            "label": "Result visualization",
+            "icon": "/materials/data/skill-icons/chart.svg",
+            "url": "https://matplotlib.org/stable/"
+          }
+        ],
+        "description": "Bringing structure to the journey from raw data to understandable results."
       }
     ]
   }

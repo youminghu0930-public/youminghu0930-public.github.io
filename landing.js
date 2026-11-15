@@ -582,10 +582,12 @@ export function createLanding(config, {page, navigation}) {
     content.append(actions);
   }
   hero.append(content);
-  const ornamentScene=installOrnamentScene({hero,createOrnament,kinds:config.ornaments || ['star','bolt'],design});
+  const ornamentScene=config.ornaments?.length
+    ? installOrnamentScene({hero,createOrnament,kinds:config.ornaments,design})
+    : null;
   const stripe = createStripe(config.stripeItems);
   root.append(hero, stripe);
-  return {root, hero, stripe, destroy:() => { status?.destroy(); ornamentScene.destroy(); }};
+  return {root, hero, stripe, destroy:() => { status?.destroy(); ornamentScene?.destroy(); }};
 }
 export function installLandingEntrance(landing, header, options) {
   return installPageEntrance(landing.hero, header, landing.stripe, options);

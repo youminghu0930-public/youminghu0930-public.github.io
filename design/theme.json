@@ -346,7 +346,18 @@
     "OrnamentSparkColor": "#e5fff0",
     "OrnamentSparkStroke": "1.8px",
     "OrnamentPivot": "50px 50px",
-    "OrnamentSparkGlow": "drop-shadow(0 0 2px rgb(0 240 80 / 60%))"
+    "OrnamentSparkGlow": "drop-shadow(0 0 2px rgb(0 240 80 / 60%))",
+    "SkillsRowPadding": "28px",
+    "SkillsRowTitleSize": "clamp(1.7rem, 3.5vw, 3rem)",
+    "SkillsPanelDuration": "420ms",
+    "SkillsActiveBackground": "rgb(0 240 80 / 3%)",
+    "SkillsPanelGap": "48px",
+    "SkillsPanelPadding": "12px 28px 36px",
+    "SkillsMobileTitleSize": "1.55rem",
+    "SkillsIconSize": "32px",
+    "SkillsIconItemWidth": "96px",
+    "SkillsIconLabelSize": ".8rem",
+    "SkillsIconGap": "20px"
   },
   "layoutReference": "https://aaftab.is-a.dev/",
   "effects": {
@@ -424,6 +435,7 @@
     "ornamentSparkDistance": 52,
     "ornamentGradientX": 0.8,
     "ornamentGradientY": 1,
-    "ornamentSparkArm": 4.5
+    "ornamentSparkArm": 4.5,
+    "skillsCloseDelay": 100
   }
 }
