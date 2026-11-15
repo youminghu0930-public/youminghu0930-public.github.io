@@ -461,3 +461,42 @@ body:has(.portfolio-shell) { overflow-x:clip; }
 /* Reference typography roles, mapped to our existing page components. */
 .section-number, .breadcrumbs, .local-status, .landing-stripe, .project-index, .project-tags { font-family:{{MonoFontFamily}}; }
 .portfolio-page h3 { letter-spacing:{{H3LetterSpacing}}; }
+
+/* The work link retains the original status-pill appearance. */
+.portfolio-shell .hero-status a.current-work, .portfolio-shell .hero-status a.current-work:hover { display:flex; background:transparent; color:var(--muted); font-weight:inherit; text-decoration:none; transition:none; }
+
+/* Lenis: smooth the document itself, keeping all visual layers together. */
+html.lenis,
+html.lenis body {
+  height: auto;
+}
+
+.lenis:not(.lenis-autoToggle).lenis-stopped {
+  overflow: clip;
+}
+
+.lenis [data-lenis-prevent],
+.lenis [data-lenis-prevent-wheel],
+.lenis [data-lenis-prevent-touch],
+.lenis [data-lenis-prevent-vertical],
+.lenis [data-lenis-prevent-horizontal] {
+  overscroll-behavior: contain;
+}
+
+.lenis.lenis-smooth iframe {
+  pointer-events: none;
+}
+
+.lenis.lenis-autoToggle {
+  transition-property: overflow;
+  transition-duration: 1ms;
+  transition-behavior: allow-discrete;
+}
+
+/* Compact green page scrollbar, matching the scrolling reference. */
+html.custom-page-scrollbar { scrollbar-width:none; }
+html.custom-page-scrollbar::-webkit-scrollbar { display:none; }
+.page-scrollbar { position:fixed; z-index:19; right:{{ScrollbarRight}}; top:50%; transform:translateY(-50%); width:{{ScrollbarWidth}}; height:{{ScrollbarHeight}}; border-radius:999px; background:{{ScrollbarTrackColor}}; touch-action:none; cursor:pointer; }
+.page-scrollbar[hidden] { display:none; }
+.page-scrollbar-thumb { width:100%; height:100%; transform-origin:top; border-radius:inherit; background:var(--accent); pointer-events:none; }
+.page-scrollbar:focus-visible { outline:2px solid var(--accent); outline-offset:4px; }

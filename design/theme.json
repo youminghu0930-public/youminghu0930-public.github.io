@@ -307,7 +307,11 @@
     "MobileMenuControlColor": "#ffffff",
     "MonoFontFamily": "\"Geist Mono\", ui-monospace, monospace",
     "MonoFontSource": "url(\"materials/data/fonts/GeistMono-Variable.woff2\")",
-    "H3LetterSpacing": "-.03em"
+    "H3LetterSpacing": "-.03em",
+    "ScrollbarWidth": "6px",
+    "ScrollbarHeight": "100px",
+    "ScrollbarRight": "5px",
+    "ScrollbarTrackColor": "rgb(255 255 255 / 5%)"
   },
   "layoutReference": "https://aaftab.is-a.dev/",
   "effects": {
@@ -339,6 +343,14 @@
     "touchFadeOutMs": 350,
     "menuElasticMaxDistance": 48,
     "menuElasticResistance": 160,
-    "menuElasticCompression": 0.025
+    "menuElasticCompression": 0.025,
+    "scrollLerp": 0.1,
+    "scrollWheelMultiplier": 1,
+    "scrollRevealStart": 1.02,
+    "scrollRevealEnd": 0.78,
+    "scrollFadeExitRange": 0.2,
+    "scrollRevealDistance": 24,
+    "scrollExitDistance": 14,
+    "scrollMinOpacity": 0.12
   }
 }

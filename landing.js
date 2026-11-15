@@ -9,6 +9,11 @@ function element(tag, text, className) {
 function link(label, url, className) {
   const node = element('a', label, className);
   node.href = url;
+  const destination = new URL(url, location.href);
+  if (['http:', 'https:'].includes(destination.protocol) && destination.origin !== location.origin) {
+    node.target = '_blank';
+    node.rel = 'noopener noreferrer';
+  }
   return node;
 }
 export function measureRenderedLines(reserved, text) {
@@ -222,7 +227,7 @@ function createStripe(items) {
 function createStatus(work) {
   const status = element('div', undefined, 'hero-status');
   const text = `${work.label} ${work.role}${work.company ? ` ${work.connector} ${work.company}` : ''}`;
-  const role = element('p', text, 'current-work');
+  const role = work.companyUrl ? link(text, work.companyUrl, 'current-work') : element('p', text, 'current-work');
   const local = element('div', undefined, 'local-status');
   const clock = element('time');
   clock.setAttribute('aria-label', work.clockLabel);

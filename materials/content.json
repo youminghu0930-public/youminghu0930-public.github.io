@@ -24,7 +24,8 @@
     "currentWork": {
       "label": "Now:",
       "role": "Artificial Intelligence Engineer",
-      "company": "Ideas Lab",
+      "company": "Ideas Lab Formosa",
+      "companyUrl": "https://ideaslab.com/",
       "connector": "at",
       "location": "Neihu, Taipei, Taiwan",
       "timeZone": "Asia/Taipei",
