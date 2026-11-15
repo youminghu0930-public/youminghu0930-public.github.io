@@ -360,6 +360,13 @@ export function createOrnament(kind) {
   const shineX=104*design.effects.ornamentGradientX;
   const shineY=104*design.effects.ornamentGradientY;
   const sparkArm=design.effects.ornamentSparkArm;
+  const frontOutline=createOrnamentPatch([path],0,0);
+  const outlineCoordinates=frontOutline.match(/-?\d*\.?\d+/g).map(Number);
+  const silhouettePoints=[];
+  for(let i=0;i<outlineCoordinates.length;i+=2)silhouettePoints.push({x:outlineCoordinates[i],y:outlineCoordinates[i+1]});
+  const rightEdge=Math.max(...silhouettePoints.map(point=>point.x));
+  const edgePoints=silhouettePoints.filter(point=>point.x>=rightEdge-.03);
+  const sparkOrigin={x:rightEdge,y:edgePoints.reduce((sum,point)=>sum+point.y,0)/edgePoints.length};
   button.innerHTML = `<span class="ornament-visual"><svg class="ornament-art" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 104 104" aria-hidden="true" focusable="false" shape-rendering="geometricPrecision">
     <defs>
       <clipPath id="${id}-metal-surface">
@@ -407,7 +414,7 @@ export function createOrnament(kind) {
   </svg>
   <svg class="ornament-sparks-overlay" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 104 104" aria-hidden="true" focusable="false">
     <g class="ornament-sparks">
-      ${[[20,19],[34,10],[49,5],[65,11],[80,21]].map(([x,y])=>`<g transform="translate(${x} ${y})"><path class="ornament-spark" d="M${-sparkArm} 0 L${sparkArm} 0 M0 ${-sparkArm} L0 ${sparkArm}" opacity="0"/></g>`).join('')}
+      ${Array.from({length:5},()=>`<g transform="translate(${sparkOrigin.x} ${sparkOrigin.y})"><path class="ornament-spark" d="M${-sparkArm} 0 L${sparkArm} 0 M0 ${-sparkArm} L0 ${sparkArm}" opacity="0"/></g>`).join('')}
     </g>
   </svg></span>`;
   let animation, shimmer, shimmerTimer;
@@ -436,11 +443,12 @@ export function createOrnament(kind) {
   }
   function sparkBurst() {
     button.querySelectorAll('.ornament-spark').forEach((spark,index)=>{
-      const angle=(-125+index*17.5)*Math.PI/180;
+      const angle=(-60+index*30)*Math.PI/180;
       const travel=design.effects.ornamentSparkDistance;
       const effect=spark.animate([
         {transform:'translate(0,0) scale(.25)',opacity:0},
         {transform:`translate(${Math.cos(angle)*travel*.15}px,${Math.sin(angle)*travel*.15}px) scale(1.4)`,opacity:1,offset:.25},
+        {transform:`translate(${Math.cos(angle)*travel*.7}px,${Math.sin(angle)*travel*.7}px) scale(1)`,opacity:.85,offset:.7},
         {transform:`translate(${Math.cos(angle)*travel}px,${Math.sin(angle)*travel}px) scale(.4)`,opacity:0}
       ],{duration:design.effects.ornamentSparkDuration,delay:index*25,easing:'cubic-bezier(.2,.7,.3,1)'});
       sparks.add(effect);

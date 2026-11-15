@@ -568,6 +568,6 @@ html.custom-page-scrollbar::-webkit-scrollbar { display:none; }
 .hero-ornament .ornament-shine-stop { stop-color:{{RoleShimmerHighlight}}; }
 .hero-ornament .ornament-spark { fill:none; stroke:{{OrnamentSparkColor}}; stroke-width:{{OrnamentSparkStroke}}; stroke-linecap:round; filter:{{OrnamentSparkGlow}}; transform-box:fill-box; transform-origin:center; }
 
-.hero-ornament .ornament-visual { position:relative; display:block; width:100%; height:100%; isolation:isolate; }
+.hero-ornament .ornament-visual { position:relative; overflow:visible; display:block; width:100%; height:100%; isolation:isolate; }
 .hero-ornament .ornament-art { position:relative; z-index:1; }
-.hero-ornament .ornament-sparks-overlay { position:absolute; inset:0; z-index:2; filter:none; pointer-events:none; }
+.hero-ornament .ornament-sparks-overlay { position:absolute; inset:0; z-index:2; overflow:visible; clip-path:none; filter:none; pointer-events:none; }

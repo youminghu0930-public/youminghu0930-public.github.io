@@ -420,8 +420,8 @@
     "ornamentShimmerInitialDelay": 700,
     "ornamentShimmerDuration": 1200,
     "ornamentShimmerPause": 100,
-    "ornamentSparkDuration": 780,
-    "ornamentSparkDistance": 22,
+    "ornamentSparkDuration": 900,
+    "ornamentSparkDistance": 52,
     "ornamentGradientX": 0.8,
     "ornamentGradientY": 1,
     "ornamentSparkArm": 4.5
