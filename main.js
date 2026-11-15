@@ -66,7 +66,12 @@ function installScrollMotion(main) {
       }
       const rect = bounds[index];
       // Short pages still reveal fully, without an abrupt end-of-page override.
-      const finishTop = Math.max(height * (settings.scrollRevealEnd - item.order * settings.scrollRevealStagger), rect.top + scrollY - maxScroll);
+      // Long experience cards should not accumulate a delay for every label
+      // and subsection. Their footer reveals at the normal viewport threshold.
+      const revealOrder = item.node.parentElement.matches('.experience-copy')
+        ? (item.node.matches('.experience-footer') ? 0 : Math.min(item.order, 2))
+        : item.order;
+      const finishTop = Math.max(height * (settings.scrollRevealEnd - revealOrder * settings.scrollRevealStagger), rect.top + scrollY - maxScroll);
       const startTop = finishTop + height * (settings.scrollRevealStart - settings.scrollRevealEnd);
       const entering = ease(clamp((startTop - rect.top) / (startTop - finishTop)));
       const leaving = ease(clamp(rect.bottom / (height * settings.scrollFadeExitRange)));
@@ -271,9 +276,50 @@ async function startApp() {
       const marker = element('span', undefined, 'experience-marker');
       marker.setAttribute('aria-hidden', 'true');
       const copy = element('div', undefined, 'experience-copy');
-      const highlights = element('ul', undefined, 'experience-highlights');
+      const highlights = element('ul', undefined, item.highlightStyle === 'compact' ? 'experience-highlights experience-highlights-compact' : 'experience-highlights');
       for (const highlight of item.highlights || []) highlights.append(element('li', highlight));
-      copy.append(element('h3', item.role), element('p', item.company, 'experience-company'), element('p', item.summary, 'experience-summary'), highlights);
+      const cardHeading = element('div', undefined, 'experience-card-heading');
+      cardHeading.append(element('h3', item.role));
+      copy.append(cardHeading);
+      if (item.company) copy.append(element('p', item.company, 'experience-company'));
+      copy.append(element('p', item.summary, 'experience-summary'));
+      if (item.progression) {
+        copy.append(element('p', item.progressionLabel || 'Career progression', 'experience-sublabel'), element('p', item.progression, 'experience-progression'));
+      }
+      for (const detail of item.sections || []) {
+        const points = element('ul', undefined, 'experience-highlights');
+        for (const point of detail.items) points.append(element('li', point));
+        copy.append(element('p', detail.label, 'experience-sublabel'), points);
+      }
+      if (highlights.childElementCount) {
+        copy.append(element('p', item.highlightsLabel || 'Responsibilities', 'experience-sublabel'), highlights);
+      }
+      for (const award of item.recognitions || []) {
+        const recognition = element('div', undefined, 'experience-recognition');
+        recognition.append(element('p', award.label, 'experience-recognition-label'), element('p', award.detail, 'experience-recognition-detail'));
+        if (award.url) recognition.append(link(award.linkLabel || 'Read more ↗', award.url, 'experience-recognition-link'));
+        copy.append(recognition);
+      }
+      if (item.positions?.length) copy.append(element('p', item.positionsLabel || 'Experience', 'experience-sublabel'));
+      for (const position of item.positions || []) {
+        const subsection = element('section', undefined, 'experience-position');
+        subsection.append(element('h4', position.company), element('p', position.period, 'experience-position-period'));
+        if (position.focus) subsection.append(element('p', position.focus, 'experience-position-focus'));
+        if (position.summary) subsection.append(element('p', position.summary, 'experience-summary'));
+        if (position.highlights?.length) {
+          const responsibilities = element('ul', undefined, 'experience-highlights experience-highlights-compact');
+          for (const point of position.highlights) responsibilities.append(element('li', point));
+          subsection.append(element('p', position.highlightsLabel || 'Responsibilities', 'experience-sublabel'), responsibilities);
+        }
+        copy.append(subsection);
+      }
+      if (item.tags?.length) {
+        const tags = element('ul', undefined, 'experience-tags');
+        for (const tag of item.tags) tags.append(element('li', tag));
+        const footer = element('div', undefined, 'experience-footer');
+        footer.append(element('p', item.tagsLabel || 'Focus areas', 'experience-sublabel'), tags);
+        copy.append(footer);
+      }
       entry.append(rail, element('p', item.period, 'experience-period'), marker, copy);
       list.append(entry);
     }

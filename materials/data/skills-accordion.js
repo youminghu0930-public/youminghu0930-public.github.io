@@ -14,6 +14,7 @@ export function installSkillsAccordion(root, {setScrollPosition} = {}) {
   let expandTimer;
   let cooldownTimer;
   let disposed = false;
+  const supportsHover = () => matchMedia('(hover: hover) and (pointer: fine)').matches;
   function updateMarqueeSpeed() {
     if (disposed) return;
     const reference = rows.find(row => row.dataset.marqueeReference === 'true');
@@ -88,14 +89,14 @@ export function installSkillsAccordion(root, {setScrollPosition} = {}) {
   for (const row of rows) {
     const toggle = row.querySelector('.skills-toggle');
     row.addEventListener('pointerenter', event => {
-      if (event.pointerType !== 'mouse') return;
+      if (event.pointerType !== 'mouse' || !supportsHover()) return;
       if (expansionScroll.ignoreShiftedBoundary()) return;
       clearTimeout(closeTimer);
       setHovered(row);
       expandHovered();
     }, {signal});
     row.addEventListener('pointerleave', event => {
-      if (event.pointerType !== 'mouse') return;
+      if (event.pointerType !== 'mouse' || !supportsHover()) return;
       if (expansionScroll.ignoreShiftedBoundary()) return;
       if (dismissedRow === row) dismissedRow = null;
       if (hoveredRow === row) {
@@ -107,7 +108,7 @@ export function installSkillsAccordion(root, {setScrollPosition} = {}) {
     }, {signal});
     toggle.addEventListener('click', event => {
       clearTimeout(closeTimer);
-      if (event.detail && matchMedia('(hover: hover) and (pointer: fine)').matches) {
+      if (event.detail && supportsHover()) {
         setHovered(row);
         if (openRow === row) {
           dismissedRow = row;
@@ -124,7 +125,9 @@ export function installSkillsAccordion(root, {setScrollPosition} = {}) {
       else expand(row);
     }, {signal});
     row.addEventListener('focusout', event => {
-      if (!row.contains(event.relatedTarget) && !row.matches(':hover')) collapse(row);
+      // Touch scrolling can move focus without an intentional close action.
+      // Keep mobile panels open until their heading is tapped again.
+      if (supportsHover() && !row.contains(event.relatedTarget) && !row.matches(':hover')) collapse(row);
     }, {signal});
     row.addEventListener('keydown', event => {
       if (event.key === 'Escape') {

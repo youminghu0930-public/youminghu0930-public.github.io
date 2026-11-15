@@ -158,44 +158,105 @@
   },
   "experience": {
     "eyebrow": "Experience",
-    "title": "My experience",
-    "description": "A first look at my professional journey. Details will be added here.",
+    "title": "Diverse experience, driven by AI",
+    "description": "AI is where I focus my curiosity and ambition. My path from pharmacy to AI engineering reflects a willingness to learn unfamiliar disciplines, embrace new challenges, and bring fresh perspectives to the problems I work on.",
     "items": [
       {
-        "period": "Dates to be added",
-        "role": "Role title placeholder",
-        "company": "Company or organization",
-        "summary": "A short overview of this role, the problems I worked on, and the contribution I made.",
+        "period": "Mar 2022 – Present",
+        "role": "AI Engineer / Team Lead",
+        "company": "Ideas Lab Formosa",
+        "summary": "Building computer vision applications from research to iOS deployment, while leading a four-engineer AI team.",
+        "tags": [
+          "Computer Vision",
+          "PyTorch",
+          "Core ML",
+          "Swift",
+          "MLOps"
+        ],
+        "tagsLabel": "Key technologies",
+        "progressionLabel": "Career progression",
+        "progression": "AI Intern · Mar 2022 → AI Engineer · Jul 2022 → Team Lead · Jul 2024",
+        "highlightsLabel": "Selected contributions",
+        "highlightStyle": "compact",
         "highlights": [
-          "Key responsibility or focus area",
-          "A project, outcome, or achievement"
+          "Built pose-estimation, ball-tracking, and 3D reconstruction pipelines.",
+          "Delivered PyTorch models to iOS with Core ML and Swift.",
+          "Standardized training, data preparation, and shared research tools.",
+          "Built the hiring process: 40+ interviews, five engineers and four interns hired."
+        ],
+        "recognitions": [
+          {
+            "label": "Team achievement",
+            "detail": "Top three, Go Healthy with Taiwan 2026 · US$30,000 prize"
+          },
+          {
+            "label": "Company recognition · 2024",
+            "detail": "Xview selected for investment through DCO’s Generative AI Center of Excellence initiative—one of 12 selected from over 1,000 AI startups.",
+            "url": "https://newtalk.tw/news/view_content/937171",
+            "linkLabel": "Read the coverage ↗"
+          }
         ]
       },
       {
-        "period": "Dates to be added",
-        "role": "Earlier role placeholder",
-        "company": "Company or organization",
-        "summary": "A brief introduction to this chapter of my experience. More context and details will follow.",
-        "highlights": [
-          "Main area of work",
-          "A useful result or lesson learned"
-        ]
-      },
-      {
-        "period": "Dates to be added",
-        "role": "Another experience placeholder",
-        "company": "Company or organization",
-        "summary": "Space for an earlier role, research experience, or another meaningful part of my journey.",
-        "highlights": [
-          "What I explored or built",
-          "The skills and perspective I developed"
-        ]
+        "period": "Dec 2018 – Present",
+        "role": "Pharmacist",
+        "summary": "Pharmacy experience across outpatient and community care, focused on medication counseling, safe dispensing, and workflow improvement. Currently practicing part-time.",
+        "positions": [
+          {
+            "company": "Farhugs Clinics",
+            "period": "Apr 2025 – Present · Part-time",
+            "focus": "Mental-health care",
+            "highlightsLabel": "Key responsibilities",
+            "highlights": [
+              "Provide medication counseling.",
+              "Manage controlled medications with automated error-prevention checks."
+            ]
+          },
+          {
+            "company": "Cofit Clinic",
+            "period": "Feb 2023 – Jan 2025 · Part-time",
+            "focus": "Weight management",
+            "highlightsLabel": "Key responsibilities",
+            "highlights": [
+              "Explain injection-pen use and medication mechanisms.",
+              "Counsel on prescribed dose adjustments.",
+              "Support customized dispensing for weight management."
+            ]
+          },
+          {
+            "company": "Dingxi ENT Clinic",
+            "period": "Aug 2019 – Feb 2022",
+            "focus": "ENT care & automation",
+            "highlightsLabel": "Key responsibilities",
+            "highlights": [
+              "Dispense prescriptions and counsel patients.",
+              "Coordinate automated packaging setup and troubleshooting with engineers."
+            ]
+          },
+          {
+            "company": "Zheng Sheng Pharmacy",
+            "period": "Dec 2018 – Mar 2019",
+            "focus": "Home & long-term care",
+            "highlightsLabel": "Key responsibilities",
+            "highlights": [
+              "Provide home-delivery pharmacy care.",
+              "Support long-term care facilities with regulatory and evaluation documentation."
+            ]
+          }
+        ],
+        "tags": [
+          "Medication Counseling",
+          "Dispensing Automation",
+          "Patient Safety"
+        ],
+        "positionsLabel": "Clinical settings",
+        "tagsLabel": "Areas of practice"
       }
     ]
   },
   "skills": {
-    "eyebrow": "Capabilities",
-    "title": "My skills",
+    "eyebrow": "Skills",
+    "title": "From AI ideas to working applications",
     "description": "I build AI-powered applications, from model training and evaluation to optimized deployment on iOS and Linux. My work combines PyTorch with data pipelines, backend services, and visualization to turn research ideas into working systems.",
     "groups": [
       {
