@@ -9,14 +9,14 @@ export function createExpansionScrollGuard({signal, setScrollPosition = position
     window.addEventListener(type, release, {passive:true, signal});
   }
   signal.addEventListener('abort', release, {once:true});
-  function hold(panel) {
+  function hold(panel, {anchor, anchorTop = anchor?.getBoundingClientRect().top} = {}) {
     release();
     const style = getComputedStyle(panel);
     const milliseconds = value => parseFloat(value) * (value.trim().endsWith('ms') ? 1 : 1000) || 0;
     const durations = style.transitionDuration.split(',').map(milliseconds);
     const delays = style.transitionDelay.split(',').map(milliseconds);
     const duration = Math.max(...durations.map((value,index) => value + delays[index % delays.length]));
-    if (!duration || matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    if ((!duration || matchMedia('(prefers-reduced-motion: reduce)').matches) && !anchor) return;
     const position = {left:window.scrollX, top:window.scrollY};
     const deadline = performance.now() + duration + 34;
     let active = true;
@@ -24,9 +24,12 @@ export function createExpansionScrollGuard({signal, setScrollPosition = position
     let timer;
     const restore = () => {
       if (!active) return false;
-      if (Math.abs(window.scrollY - position.top) > .5 || Math.abs(window.scrollX - position.left) > .5) {
+      // On touch switches, preserve the tapped heading's viewport position
+      // as the previous panel above it shrinks, rather than fixing scrollY.
+      const targetTop = anchor ? Math.max(0, window.scrollY + anchor.getBoundingClientRect().top - anchorTop) : position.top;
+      if (Math.abs(window.scrollY - targetTop) > .5 || Math.abs(window.scrollX - position.left) > .5) {
         correctedUntil = performance.now() + 34;
-        setScrollPosition(position);
+        setScrollPosition({...position, top:targetTop});
         return true;
       }
       return false;

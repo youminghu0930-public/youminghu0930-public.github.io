@@ -70,8 +70,10 @@ export function installSkillsAccordion(root, {setScrollPosition} = {}) {
   }
   function expand(row) {
     if (openRow === row) return;
+    const anchor = !supportsHover() && openRow ? row.querySelector('.skills-toggle') : null;
+    const anchorTop = anchor?.getBoundingClientRect().top;
     if (openRow) collapse(openRow);
-    expansionScroll.hold(row.querySelector('.skills-panel'));
+    expansionScroll.hold(row.querySelector('.skills-panel'), {anchor, anchorTop});
     setOpen(row, true);
     openRow = row;
   }
