@@ -285,16 +285,16 @@
           "Swift",
           "MLOps"
         ],
-        "tagsLabel": "Key technologies",
+        "tagsLabel": "Technologies",
         "progressionLabel": "Career progression",
         "progression": "AI Intern · Mar 2022 → AI Engineer · Jul 2022 → Team Lead · Jul 2024",
-        "highlightsLabel": "Selected contributions",
-        "highlightStyle": "compact",
+        "highlightsLabel": "Contributions",
+        "highlightStyle": "list",
         "highlights": [
-          "Built pose-estimation, ball-tracking, and 3D reconstruction pipelines.",
-          "Delivered PyTorch models to iOS with Core ML and Swift.",
-          "Standardized training, data preparation, and shared research tools.",
-          "Built the hiring process: 40+ interviews, five engineers and four interns hired."
+          "Delivered PyTorch models to iOS through Core ML, with Swift implementations of Python processing workflows.",
+          "Created reusable training templates, traceable data-preparation scripts, and shared visualization and skeleton-mapping tools.",
+          "Built the hiring process: 40+ interviews, five full-time engineers and four interns hired.",
+          "Led an overseas annotation project covering approximately 100,000 images."
         ],
         "recognitions": [
           {
@@ -315,7 +315,17 @@
             "url": "https://techcrunch.com/2024/09/02/sparklabs-closes-50m-fund-to-back-ai-startups/",
             "linkLabel": "Read on TechCrunch ↗"
           }
-        ]
+        ],
+        "sections": [
+          {
+            "label": "Responsibilities",
+            "items": [
+              "Lead a four-engineer AI team, guiding research, delivery, and collaboration with product and iOS teams.",
+              "Develop computer-vision pipelines for pose estimation, ball tracking, and 3D reconstruction."
+            ]
+          }
+        ],
+        "recognitionsLabel": "Awards & recognition"
       },
       {
         "period": "Dec 2018 – Present",

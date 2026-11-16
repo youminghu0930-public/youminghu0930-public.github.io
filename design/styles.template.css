@@ -517,15 +517,15 @@ html.custom-page-scrollbar::-webkit-scrollbar { display:none; }
 .experience-intro { max-width:{{ExperienceIntroWidth}}; color:var(--muted); line-height:1.7; }
 .experience-timeline { position:relative; width:100%; max-width:{{ExperienceTimelineWidth}}; margin-inline:auto; }
 .experience-list { list-style:none; padding:0; margin:0; }
-.experience-entry { position:relative; display:grid; grid-template-columns:{{ExperienceDateWidth}} minmax(0, 1fr); gap:{{ExperienceColumnGap}}; padding-bottom:{{ExperienceRowSpace}}; }
+.experience-entry { position:relative; display:grid; grid-template-columns:{{ExperienceDateColumnWidth}} minmax(0, 1fr); gap:{{ExperienceColumnGap}}; padding-bottom:{{ExperienceRowSpace}}; }
 .experience-entry:last-child { padding-bottom:24px; }
 .experience-period { align-self:start; justify-self:end; text-align:right; margin:5px 0 0; padding:4px 12px; border:1px solid var(--border); border-radius:999px; line-height:1.6; white-space:nowrap; background:var(--surface); }
-.experience-rail { position:absolute; left:calc({{ExperienceDateWidth}} + {{ExperienceColumnGap}} / 2); top:10px; bottom:-10px; width:{{ExperienceRailWidth}}; background:var(--border); pointer-events:none; overflow:hidden; }
+.experience-rail { position:absolute; left:calc({{ExperienceDateColumnWidth}} + {{ExperienceColumnGap}} / 2); top:10px; bottom:-10px; width:{{ExperienceRailWidth}}; background:var(--border); pointer-events:none; overflow:hidden; }
 .experience-entry:last-child .experience-rail { bottom:0; }
 .experience-rail-fill { height:100%; width:100%; transform:scaleY(var(--timeline-progress, 0)); transform-origin:top; background:linear-gradient(to bottom, var(--accent) 0%, var(--accent) 90%, transparent 100%); box-shadow:{{ExperienceRailGlow}}; }
-.experience-marker { position:absolute; top:10px; left:calc({{ExperienceDateWidth}} + {{ExperienceColumnGap}} / 2 + {{ExperienceRailWidth}} / 2); translate:-50% 0; width:{{ExperienceMarkerSize}}; height:{{ExperienceMarkerSize}}; border-radius:50%; border:2px solid var(--border); background:var(--surface); transition:background 180ms ease, border-color 180ms ease; }
+.experience-marker { position:absolute; top:10px; left:calc({{ExperienceDateColumnWidth}} + {{ExperienceColumnGap}} / 2 + {{ExperienceRailWidth}} / 2); translate:-50% 0; width:{{ExperienceMarkerSize}}; height:{{ExperienceMarkerSize}}; border-radius:50%; border:2px solid var(--border); background:var(--surface); transition:background 180ms ease, border-color 180ms ease; }
 .experience-marker[data-reached=true] { border-color:var(--accent); background:var(--accent); box-shadow:{{ExperienceRailGlow}}; }
-.experience-copy { min-width:0; max-width:{{ExperienceCopyWidth}}; padding:{{ExperienceCardPadding}}; border:1px solid var(--border); border-radius:{{ExperienceCardRadius}}; background:{{ExperienceCardBackground}}; }
+.experience-copy { min-width:0; max-width:{{ExperienceCopyWidth}}; padding:{{ExperienceCardPadding}}; border:0; border-radius:{{ExperienceCardRadius}}; background:{{ExperienceCardBackground}}; }
 .experience-card-heading { display:flex; align-items:flex-start; justify-content:space-between; gap:16px; flex-wrap:wrap; margin-bottom:10px; }
 .portfolio-shell .experience-copy h3 { font-size:{{ExperienceRoleSize}}; line-height:1.25; margin:0; flex:1 1 240px; }
 .experience-company { margin:0 0 20px; color:var(--accent); }
@@ -542,7 +542,7 @@ html.custom-page-scrollbar::-webkit-scrollbar { display:none; }
 .experience-highlights li::before { content:""; position:absolute; left:0; top:.85em; width:12px; height:1px; background:var(--accent); }
 .experience-highlights li::marker { color:var(--accent); }
 .experience-progression { margin:0; font-family:{{MonoFontFamily}}; font-size:{{ExperiencePositionPeriodSize}}; color:var(--muted); line-height:1.8; }
-.experience-highlights-compact { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:{{ExperienceHighlightGap}}; }
+.experience-highlights-compact { display:grid; grid-template-columns:minmax(0,1fr); gap:{{ExperienceHighlightGap}}; }
 .experience-highlights-compact li { margin:0; color:{{RootColor}}; }
 .experience-highlights-compact li::before { content:"✓"; top:.35em; width:14px; height:14px; border:1px solid var(--accent); border-radius:50%; background:none; color:var(--accent); font-size:10px; line-height:12px; text-align:center; }
 .experience-recognition { margin:24px 0 0; padding:16px; border:1px solid {{ExperienceRecognitionBorder}}; border-radius:10px; background:{{ExperienceRecognitionBackground}}; line-height:1.7; }
@@ -1031,3 +1031,38 @@ html[data-skills-expanding=true] { overflow-anchor:none; scroll-behavior:auto; }
 /* Project navigation is a quiet footer link, sized alongside the footage credit. */
 .portfolio-shell .project-row-link .project-open-link { min-height:{{ProjectCreditRowHeight}}; padding:0; gap:{{ProjectOpenLinkGap}}; border:0; border-radius:0; background:transparent; color:{{HeadingColor}}; font-size:{{ProjectOpenLinkSize}}; font-weight:{{ProjectOpenLinkWeight}}; line-height:{{ProjectCreditRowHeight}}; box-shadow:none; }
 .portfolio-shell .project-row-link .project-open-link:hover,.portfolio-shell .project-row-link .project-open-link:focus-visible { background:transparent; color:var(--accent); }
+
+/* Spacious editorial timeline with compact dates and a clear reading hierarchy. */
+.portfolio-shell .experience-copy h3 { font-weight:600; line-height:1.05; letter-spacing:-.035em; }
+.experience-period { max-width:{{ExperienceDateWidth}}; padding:0; margin-top:3px; border:0; border-radius:0; background:transparent; white-space:normal; font-size:{{ExperienceDateSize}}; line-height:1.5; }
+.experience-company { margin:0 0 24px; font-size:{{ExperienceCompanySize}}; line-height:1.5; }
+.experience-copy .experience-summary { max-width:{{ExperienceSummaryMaxWidth}}; font-size:{{ExperienceSummarySize}}; font-weight:400; line-height:1.625; }
+.experience-highlights { max-width:{{ExperienceListMaxWidth}}; font-size:{{ExperienceBodySize}}; line-height:1.5; }
+.experience-highlights li { margin-top:12px; }
+.experience-highlights li:first-child { margin-top:0; }
+.experience-highlights-compact li { margin:0; color:var(--muted); }
+.experience-highlights-compact li::before { content:""; top:.75em; width:12px; height:1px; border:0; border-radius:0; background:var(--accent); }
+.experience-sublabel { margin-bottom:16px; font-weight:400; line-height:1.5; }
+.experience-copy .experience-footer { margin:0; }
+.experience-tags li { padding:4px 12px; border-radius:999px; border-color:rgb(255 255 255 / 15%); line-height:1.5; letter-spacing:.025em; }
+.experience-recognition { margin:20px 0 0; padding:0 0 0 16px; border:0; border-left:2px solid {{ExperienceRecognitionBorder}}; border-radius:0; background:transparent; }
+.experience-recognition-detail { max-width:{{ExperienceListMaxWidth}}; font-weight:400; line-height:1.5; }
+.experience-recognition-link { font-size:13px; }
+@media(max-width:{{mobileBreakpoint}}) {
+ .experience-period { max-width:none; }
+ .experience-copy .experience-summary { font-size:16px; }
+ .experience-company { font-size:18px; }
+ .experience-copy .experience-position h4 { font-size:18px; }
+}
+
+/* Timestamps toggle details; the role, company, and short summary always remain. */
+.portfolio-shell .experience-toggle { display:flex; align-items:center; gap:{{ExperienceToggleGap}}; padding:0; margin:3px 0 0; border:0; border-radius:0; background:transparent; color:var(--muted); font-family:{{MonoFontFamily}}; font-size:{{ExperienceDateSize}}; font-weight:400; line-height:1.5; letter-spacing:normal; text-align:right; cursor:pointer; }
+.portfolio-shell .experience-toggle:hover { background:transparent; color:var(--accent); }
+.experience-toggle-chevron { flex:none; width:{{ExperienceToggleChevronSize}}; height:{{ExperienceToggleChevronSize}}; border-right:2px solid currentColor; border-bottom:2px solid currentColor; transform:rotate(225deg); transition:transform {{ExperienceToggleDuration}} ease; }
+.experience-entry.is-collapsed .experience-toggle-chevron { transform:rotate(45deg); }
+.experience-details { display:grid; grid-template-rows:1fr; opacity:1; transition:grid-template-rows {{ExperienceToggleDuration}} cubic-bezier(.22,.61,.36,1),opacity {{ExperienceToggleDuration}} ease; }
+.experience-details-inner { min-height:0; overflow:hidden; }
+.experience-entry.is-collapsed .experience-details { grid-template-rows:0fr; opacity:0; }
+@media(prefers-reduced-motion:reduce) { .experience-details,.experience-toggle-chevron { transition:none; } }
+
+@media(max-width:{{mobileBreakpoint}}) { .portfolio-shell .experience-toggle { margin:0; text-align:left; } }

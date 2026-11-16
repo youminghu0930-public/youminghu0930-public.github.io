@@ -301,9 +301,19 @@ async function startApp() {
         for (const point of detail.items) points.append(element('li', point));
         copy.append(element('p', detail.label, 'experience-sublabel'), points);
       }
+      const appendTechnologies=()=>{
+        if(!item.tags?.length)return;
+        const tags=element('ul',undefined,'experience-tags');
+        for(const tag of item.tags)tags.append(element('li',tag));
+        const footer=element('div',undefined,'experience-footer');
+        footer.append(element('p',item.tagsLabel || 'Technologies','experience-sublabel'),tags);
+        copy.append(footer);
+      };
+      if(!item.positions?.length)appendTechnologies();
       if (highlights.childElementCount) {
         copy.append(element('p', item.highlightsLabel || 'Responsibilities', 'experience-sublabel'), highlights);
       }
+      if(item.recognitions?.length)copy.append(element('p',item.recognitionsLabel || 'Awards & recognition','experience-sublabel'));
       for (const award of item.recognitions || []) {
         const recognition = element('div', undefined, 'experience-recognition');
         recognition.append(element('p', award.label, 'experience-recognition-label'), element('p', award.detail, 'experience-recognition-detail'));
@@ -323,14 +333,28 @@ async function startApp() {
         }
         copy.append(subsection);
       }
-      if (item.tags?.length) {
-        const tags = element('ul', undefined, 'experience-tags');
-        for (const tag of item.tags) tags.append(element('li', tag));
-        const footer = element('div', undefined, 'experience-footer');
-        footer.append(element('p', item.tagsLabel || 'Focus areas', 'experience-sublabel'), tags);
-        copy.append(footer);
-      }
-      entry.append(rail, element('p', item.period, 'experience-period'), marker, copy);
+      if(item.positions?.length)appendTechnologies();
+      const details=element('div',undefined,'experience-details');
+      const detailsInner=element('div',undefined,'experience-details-inner');
+      const summary=copy.querySelector(':scope > .experience-summary');
+      while(summary.nextElementSibling)detailsInner.append(summary.nextElementSibling);
+      details.append(detailsInner);details.id=`experience-details-${list.childElementCount}`;
+      details.setAttribute('role','region');
+      const toggle=element('button',undefined,'experience-period experience-toggle');toggle.type='button';
+      const chevron=element('span',undefined,'experience-toggle-chevron');chevron.setAttribute('aria-hidden','true');
+      toggle.append(chevron,element('span',item.period));
+      toggle.setAttribute('aria-label',`${item.role}: ${item.period}`);
+      toggle.id=`experience-toggle-${list.childElementCount}`;
+      toggle.setAttribute('aria-expanded','true');toggle.setAttribute('aria-controls',details.id);
+      details.setAttribute('aria-labelledby',toggle.id);
+      copy.append(details);
+      toggle.addEventListener('click',()=>{
+        const expanded=toggle.getAttribute('aria-expanded')!=='true';
+        toggle.setAttribute('aria-expanded',String(expanded));
+        entry.classList.toggle('is-collapsed',!expanded);
+        details.setAttribute('aria-hidden',String(!expanded));details.inert=!expanded;
+      });
+      entry.append(rail,toggle,marker,copy);
       list.append(entry);
     }
     timeline.append(list);
