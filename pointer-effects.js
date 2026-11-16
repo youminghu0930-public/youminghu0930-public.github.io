@@ -181,7 +181,7 @@ export function installPointerEffects(hero) {
   function retarget(animate = false) {
     if (!pointer || pointer.touch || cursor.hidden) return;
     const hit = document.elementFromPoint(pointer.x, pointer.y);
-    if (hit instanceof HTMLIFrameElement) { hide(); return; }
+    if (hit instanceof HTMLIFrameElement && !hit.closest('[data-cursor-target]')) { hide(); return; }
     const next = resolveTarget(hit);
     const changed = next !== target;
     const direct = Boolean(target);
@@ -247,7 +247,17 @@ export function installPointerEffects(hero) {
   // Capture keeps nested controls from leaving the cursor on its previous target.
   window.addEventListener('pointermove', move, {passive:true, capture:true, signal});
   // Embedded 3D controls own their input; do not leave the parent cursor frozen at their edge.
-  window.addEventListener('pointerover', event => { if (event.target instanceof HTMLIFrameElement) hide(); }, {capture:true, signal});
+  window.addEventListener('pointerover', event => { if (event.target instanceof HTMLIFrameElement && !event.target.closest('[data-cursor-target]')) hide(); }, {capture:true, signal});
+  // Same-origin preview frames relay pointer coordinates without intercepting 3D gestures.
+  window.addEventListener('message',event=>{
+    if(event.origin!==location.origin||event.data?.type!=='preview-pointer')return;
+    const iframe=[...document.querySelectorAll('.project-interactive-frame')].find(frame=>frame.contentWindow===event.source);
+    if(!iframe?.closest('[data-cursor-target]'))return;
+    const {x,y,pointerType}=event.data;
+    if(!Number.isFinite(x)||!Number.isFinite(y)||pointerType!=='mouse')return;
+    const bounds=iframe.getBoundingClientRect();
+    move({clientX:bounds.left+x,clientY:bounds.top+y,pointerType});
+  },{signal});
   window.addEventListener('scroll', () => { resetMagnets(); stopFlights(); refreshTarget(); }, {passive:true, signal});
   window.addEventListener('resize', refreshTarget, {passive:true, signal});
   window.addEventListener('skills-cooldownchange', () => { stopFlights(); refreshTarget(); }, {signal});

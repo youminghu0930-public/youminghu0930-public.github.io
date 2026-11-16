@@ -83,7 +83,36 @@
         "pose": "/materials/data/project-previews/golf-2d-banner-0026-4.json",
         "poster": "/materials/data/project-previews/golf-2d-banner-0026-4.webp",
         "timing": "/materials/data/project-previews/golf-2d-banner-0026-4-timing.json",
-        "aspectRatio": 0.5625
+        "aspectRatio": 0.5625,
+        "views": [
+          {
+            "video": "/materials/data/project-previews/golf-2d-banner-0000.mp4",
+            "pose": "/materials/data/project-previews/golf-2d-banner-0000.json",
+            "poster": "/materials/data/project-previews/golf-2d-banner-0000.webp",
+            "timing": "/materials/data/project-previews/golf-2d-banner-0000-timing.json",
+            "aspectRatio": 0.5625,
+            "label": "Face-on · 0000",
+            "creditUrl": "https://www.instagram.com/reel/DOn1QDPjEjQ/"
+          },
+          {
+            "video": "/materials/data/project-previews/golf-2d-banner-0026-4.mp4",
+            "pose": "/materials/data/project-previews/golf-2d-banner-0026-4.json",
+            "poster": "/materials/data/project-previews/golf-2d-banner-0026-4.webp",
+            "timing": "/materials/data/project-previews/golf-2d-banner-0026-4-timing.json",
+            "aspectRatio": 0.5625,
+            "label": "Face-on · 0026-4",
+            "creditUrl": "https://www.instagram.com/reel/Dc9nDsgqrfi/"
+          },
+          {
+            "video": "/materials/data/project-previews/golf-2d-banner-0019-1.mp4",
+            "pose": "/materials/data/project-previews/golf-2d-banner-0019-1.json",
+            "poster": "/materials/data/project-previews/golf-2d-banner-0019-1.webp",
+            "timing": "/materials/data/project-previews/golf-2d-banner-0019-1-timing.json",
+            "aspectRatio": 0.5625,
+            "label": "Down-the-line",
+            "creditUrl": "https://www.instagram.com/reel/DcLH2bYqjPk/"
+          }
+        ]
       },
       "previewAspectRatio": 0.5625,
       "footageCredit": {

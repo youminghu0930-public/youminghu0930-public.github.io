@@ -1,115 +1,13 @@
+import { createVectorBannerPreview } from './vector-banner-preview.js';
+import { installPreviewPanZoom } from './preview-pan-zoom.js';
 import { design } from '../../design-settings.js';
 const edges=[['nose','atlas'],['nose','top_head'],['nose','left_ear'],['nose','right_ear'],['left_shoulder','right_shoulder'],['left_shoulder','left_elbow'],['left_elbow','left_wrist'],['right_shoulder','right_elbow'],['right_elbow','right_wrist'],['left_shoulder','left_hip'],['right_shoulder','right_hip'],['left_hip','right_hip'],['left_hip','left_knee'],['left_knee','left_ankle'],['right_hip','right_knee'],['right_knee','right_ankle'],['golf_club_grip','golf_club_shaft'],['golf_club_shaft','golf_club_heel'],['golf_club_heel','golf_club_head']];
 export function createBannerPreview(canvas, config) {
+  if(config.views?.length)return createPairedBannerPreview(canvas,config);
   if(config.rendered) return createRenderedBannerPreview(canvas,config);
-  const controller=new AbortController();
-  const video=document.createElement('video');
-  video.muted=true;video.playsInline=true;video.loop=true;video.preload='none';
-  const poster=new Image();
-  let pose,timing,frame=0,wanted=false,disposed=false,loading;
-  const context=canvas.getContext('2d');
-  const usable=p=>p && Number.isFinite(p[0]) && Number.isFinite(p[1]) && (p[0]!==0 || p[1]!==0) && (p.length<3 || p[2]>=0);
-  function draw() {
-    if(!timing || disposed)return;
-    const targetHeight=Math.round(800/(config.aspectRatio || 4/3));
-    if(canvas.width!==800)canvas.width=800;
-    if(canvas.height!==targetHeight)canvas.height=targetHeight;
-    const height=canvas.height;
-    context.fillStyle='#080808';context.fillRect(0,0,800,height);
-    const fit=800/timing.width;
-    // Account for contain-fit letterboxing: the painted portrait is narrower than its box.
-    const displayScale=1/Math.max(.001,Math.min((canvas.clientWidth||400)/800,(canvas.clientHeight||height)/height));
-    const screenUnit=displayScale/fit;
-    context.save();context.translate((800-timing.width*fit)/2,(height-timing.height*fit)/2);context.scale(fit,fit);
-    const ready=video.readyState>=2;
-    if(ready)context.drawImage(video,0,0,timing.width,timing.height);
-    else if(poster.complete && poster.naturalWidth)context.drawImage(poster,0,0,timing.width,timing.height);
-    const time=video.currentTime;
-    let index=0;
-    while(index+1<timing.times.length && timing.times[index+1]<=time)index++;
-    const data=ready && pose?pose:timing.previewPose;
-    const points=data?.pred?.[ready&&pose?index:0];
-    if(points) {
-      if(ready && pose) {
-        const historyCount=design.effects.projectBannerHistoryFrames;
-        const history=[...(pose.history || []),...pose.pred.slice(0,index+1) ].slice(-historyCount-1);
-        const club=edges.filter(([a])=>a.startsWith('golf_club_'));
-        const trailJoints=design.effects.projectBannerTrailJoints.map(name=>pose.joints.indexOf(name)).filter(index=>index>=0);
-        const previous=new Map();
-        history.forEach((sample,i)=> {
-          const opacity=design.effects.projectBannerHistoryOpacity*((i+1)/Math.max(1,history.length))**2;
-          const rainbow=`hsl(${240*(1-i/Math.max(1,history.length-1))} 90% 62%)`;
-          context.globalAlpha=opacity;context.strokeStyle=rainbow;context.fillStyle=rainbow;context.lineWidth=design.effects.projectBannerGhostWidth*screenUnit;context.lineCap='round';
-          for(const [a,b] of club) {
-            const p=sample[pose.joints.indexOf(a)],q=sample[pose.joints.indexOf(b)];
-            if(!usable(p)||!usable(q))continue;
-            context.beginPath();context.moveTo(p[0],p[1]);context.lineTo(q[0],q[1]);context.stroke();
-          }
-          for(const jointIndex of trailJoints) {
-            const point=sample[jointIndex],last=previous.get(jointIndex);
-            if(usable(point)) {
-              context.globalAlpha=design.effects.projectBannerTrailOpacity*(.2+.8*(i+1)/Math.max(1,history.length));
-              context.strokeStyle=rainbow;context.fillStyle=rainbow;
-              context.lineWidth=design.effects.projectBannerTrailWidth*screenUnit;
-              if(last) {context.beginPath();context.moveTo(last[0],last[1]);context.lineTo(point[0],point[1]);context.stroke();}
-              context.beginPath();context.arc(point[0],point[1],design.effects.projectBannerTrailDotRadius*screenUnit,0,Math.PI*2);context.fill();
-              previous.set(jointIndex,point);
-            } else previous.delete(jointIndex);
-          }
-        });
-        context.globalAlpha=1;
-      }
-      const settings=design.effects;
-      const radius=settings.projectBannerJointRadius*screenUnit;
-      context.strokeStyle=settings.projectBannerPoseColor;
-      context.lineWidth=settings.projectBannerSkeletonWidth*screenUnit;context.lineCap='round';
-      // Clip full bones against circular joints; the ring covers the clip boundary.
-      // This avoids the visible notch produced by rounded caps touching at one point.
-      for(const [a,b] of edges) {
-        const p=points[data.joints.indexOf(a)],q=points[data.joints.indexOf(b)];
-        if(!usable(p)||!usable(q)||Math.hypot(q[0]-p[0],q[1]-p[1])<=2*radius)continue;
-        context.save();
-        for(const point of [p,q]) {
-          context.beginPath();context.rect(-timing.width,-timing.height,timing.width*3,timing.height*3);
-          context.moveTo(point[0]+radius,point[1]);context.arc(point[0],point[1],radius,0,Math.PI*2);
-          context.clip('evenodd');
-        }
-        context.beginPath();context.moveTo(p[0],p[1]);context.lineTo(q[0],q[1]);context.stroke();
-        context.restore();
-      }
-      // Joint interiors and outer mint rings sit above bones, history, and trajectories.
-      points.forEach((point,index)=>{
-        if(!usable(point))return;
-        const name=data.joints[index];
-        context.fillStyle=name.startsWith('left_')?settings.projectBannerLeftColor:name.startsWith('right_')?settings.projectBannerRightColor:settings.projectBannerPoseColor;
-        context.beginPath();context.arc(point[0],point[1],Math.max(0,radius-(settings.projectBannerJointRingWidth/2+settings.projectBannerJointCenterGap)*screenUnit),0,Math.PI*2);context.fill();
-        context.strokeStyle=settings.projectBannerPoseColor;context.lineWidth=settings.projectBannerJointRingWidth*screenUnit;
-        context.beginPath();context.arc(point[0],point[1],radius,0,Math.PI*2);context.stroke();
-      });
-    }
-    context.restore();
-    canvas.hidden=false;
-  }
-  function tick() {frame=0;draw();if(wanted&&!disposed)frame=requestAnimationFrame(tick);}
-  async function load() {
-    if(loading)return loading;
-    loading=(async()=> {
-      const get=async url=>{const r=await fetch(url,{signal:controller.signal});if(!r.ok)throw new Error('Banner asset failed');return r.json();};
-      [pose,timing]=await Promise.all([get(config.pose),get(config.timing)]);
-      if(disposed)return;
-      poster.src=config.poster;await poster.decode().catch(()=>{});
-      if(disposed)return;
-      draw();
-      if(!matchMedia('(prefers-reduced-motion: reduce)').matches) {video.src=config.video;video.load();if(wanted)video.play().catch(()=>{});}
-    })().catch(()=>{if(!disposed)canvas.hidden=true;});
-    return loading;
-  }
-  return {
-    play(){wanted=true;load();if(video.src)video.play().catch(()=>{});if(!frame)frame=requestAnimationFrame(tick);},
-    pause(){wanted=false;video.pause();cancelAnimationFrame(frame);frame=0;},
-    destroy(){disposed=true;wanted=false;controller.abort();cancelAnimationFrame(frame);video.pause();video.removeAttribute('src');video.load();}
-  };
+  return createVectorBannerPreview(canvas,config,edges);
 }
+
 
 
 function createRenderedBannerPreview(canvas,config) {
@@ -143,5 +41,51 @@ function createRenderedBannerPreview(canvas,config) {
     },
     pause(){wanted=false;video.pause();cancelAnimationFrame(frame);frame=0;},
     destroy(){disposed=true;wanted=false;poster.onload=null;cancelAnimationFrame(frame);video.pause();video.removeAttribute('src');video.load();}
+  };
+}
+
+// Camera slots stay fixed while their video content pans and zooms independently.
+function createPairedBannerPreview(canvas,config) {
+  const pair=document.createElement('div');pair.className='project-preview-pair';pair.style.setProperty('--preview-view-count',config.views.length);
+  const media=canvas.closest('.project-preview-media');media.classList.add('has-paired-preview');
+  canvas.parentElement.append(pair);canvas.hidden=true;
+  let active=0,wanted=false,disposed=false;
+  const players=[],panes=[],cleanups=[];
+  const controller=new AbortController();
+  const select=index=>{
+    active=index;
+    panes.forEach((pane,i)=>{
+      pane.classList.toggle('is-active',i===active);
+      pane.dataset.playing=String(i===active);
+      if(wanted&&i===active)players[i]?.play();else players[i]?.pause();
+    });
+  };
+  config.views.forEach((view,index)=>{
+    const pane=document.createElement('div');pane.className='project-preview-pane';pane.setAttribute('aria-label',view.label);pane.setAttribute('data-cursor-target','');
+    const surface=document.createElement('canvas');surface.setAttribute('aria-hidden','true');pane.append(surface);pair.append(pane);panes.push(pane);
+    cleanups.push(installPreviewPanZoom(pane,controller.signal,{constrain:true,aspectRatio:view.aspectRatio}));
+    players.push(createBannerPreview(surface,{...view,onEnded:()=>{if(!disposed)select((active+1)%config.views.length);}}));
+    let press=null;
+    pane.addEventListener('pointerdown',event=>{
+      if(event.pointerType==='mouse'&&event.button!==0)return;
+      if(press){press.dragged=true;return;}
+      press={id:event.pointerId,x:event.clientX,y:event.clientY,dragged:false};
+    },{signal:controller.signal});
+    pane.addEventListener('pointermove',event=>{
+      if(press&&Math.hypot(event.clientX-press.x,event.clientY-press.y)>5)press.dragged=true;
+    },{signal:controller.signal});
+    pane.addEventListener('pointerup',event=>{
+      if(!press||press.id!==event.pointerId)return;
+      if(!press.dragged)select(index);
+      press=null;
+    },{signal:controller.signal});
+    pane.addEventListener('pointercancel',()=>{press=null;},{signal:controller.signal});
+
+  });
+  select(0);
+  return {
+    play(){wanted=true;players.forEach(player=>player.prepare());select(active);},
+    pause(){wanted=false;players.forEach(player=>player.pause());},
+    destroy(){disposed=true;controller.abort();cleanups.forEach(cleanup=>cleanup());players.forEach(player=>player.destroy());pair.remove();media.classList.remove('has-paired-preview');}
   };
 }

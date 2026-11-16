@@ -57,6 +57,7 @@ export function installProjectPreviews(main, projects) {
     canvas.className='project-preview-canvas';canvas.hidden=true;
     canvas.setAttribute('aria-hidden','true');
     const media=document.createElement('div');media.className='project-preview-media';
+    if(project.banner?.interactive)media.setAttribute('data-cursor-target','');
     media.setAttribute('data-lenis-prevent','');media.append(poster,canvas);
     const tools=document.createElement('div');tools.className='project-preview-tools';
     const open=document.createElement('a');open.href=project.url;open.target='_blank';open.rel='noopener noreferrer';
@@ -90,7 +91,17 @@ export function installProjectPreviews(main, projects) {
     for(const type of ['pointerdown','wheel','dblclick'])info.addEventListener(type,event=>event.stopPropagation(),{signal});
     description.inert=true;
     const credit=document.createElement('p');credit.className='project-footage-credit';
-    if(project.footageCredit?.url){const source=document.createElement('a');source.href=project.footageCredit.url;source.target='_blank';source.rel='noopener noreferrer';source.textContent=project.footageCredit.text || 'Footage source';credit.append(source);}
+    if(project.banner?.views?.length){
+      credit.classList.add('has-credit-options');
+      const toggle=document.createElement('button');toggle.type='button';toggle.className='project-credit-toggle';toggle.textContent='Footage source';toggle.setAttribute('aria-expanded','false');
+      const options=document.createElement('div');options.className='project-credit-options';options.id=`${project.id}-credit-options`;toggle.setAttribute('aria-controls',options.id);options.inert=true;
+      for(const [index,view] of project.banner.views.entries()){const link=document.createElement('a');link.textContent=['First','Second','Third'][index] || `Source ${index+1}`;link.href=view.creditUrl;link.target='_blank';link.rel='noopener noreferrer';options.append(link);}
+      const setOpen=open=>{credit.classList.toggle('is-open',open);toggle.setAttribute('aria-expanded',String(open));options.inert=!open;};
+      toggle.addEventListener('click',event=>{event.stopPropagation();setOpen(!credit.classList.contains('is-open'));},{signal});
+      document.addEventListener('pointerdown',event=>{if(!credit.contains(event.target))setOpen(false);},{signal});
+      credit.addEventListener('keydown',event=>{if(event.key==='Escape'){setOpen(false);toggle.focus();}},{signal});
+      credit.append(toggle,options);
+    }else if(project.footageCredit?.url){const source=document.createElement('a');source.href=project.footageCredit.url;source.target='_blank';source.rel='noopener noreferrer';source.textContent=project.footageCredit.text || 'Footage source';credit.append(source);}
     let magnetX=0,magnetY=0;
     const resetMagnet=()=>{magnetX=magnetY=0;open.style.setProperty('--magnet-x','0px');open.style.setProperty('--magnet-y','0px');};
     action.addEventListener('pointermove',event=>{
@@ -107,7 +118,7 @@ export function installProjectPreviews(main, projects) {
     window.addEventListener('blur',resetMagnet,{signal});
     tools.append(credit,open);
     inline.append(media,tools);wrapper.append(inline);action.append(wrapper);
-    const panCleanup=project.banner?.interactive ? ()=>{} : installPreviewPanZoom(media,signal);
+    const panCleanup=project.banner?.interactive || project.banner?.views?.length ? ()=>{} : installPreviewPanZoom(media,signal);
     media.append(info);
     const title=action.querySelector('.project-title-link');
     action.append(title);
