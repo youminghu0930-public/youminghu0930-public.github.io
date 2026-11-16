@@ -463,14 +463,24 @@ async function startApp() {
       title.append(chevron);
       heading.append(title, element('p', project.company, 'project-company'), titleControl);
       const copy = element('div', undefined, 'project-copy');
-      copy.append(element('p', project.summary, 'project-summary'));
+      const description=element('div',undefined,'project-description');
+      const summary=element('p',undefined,'project-summary');
+      let remainder=project.summary;
+      for(const phrase of project.summaryHighlights || []){
+        const index=remainder.indexOf(phrase);
+        if(index<0)continue;
+        summary.append(document.createTextNode(remainder.slice(0,index)),element('strong',phrase,'project-summary-highlight'));
+        remainder=remainder.slice(index+phrase.length);
+      }
+      summary.append(document.createTextNode(remainder));
+      description.append(element('h3',page.projectDescriptionTitle,'project-description-title'),summary);
+      copy.append(description);
       const tags = element('ul', undefined, 'project-tags');
       tags.setAttribute('aria-label', 'Technologies');
       for (const tag of project.tags) tags.append(element('li', tag));
-      const labels = element('ul', undefined, 'project-labels');
-      labels.setAttribute('aria-label', 'Project topics');
-      for (const label of project.labels || []) labels.append(element('li', label));
-      copy.append(tags, labels);
+      const technologies=element('div',undefined,'project-technologies');
+      technologies.append(element('h3',page.projectTechnologyTitle,'project-description-title'),tags);
+      copy.append(technologies);
       const arrow = link('↗', project.url, 'project-row-arrow');
       arrow.setAttribute('aria-label', `Open ${project.title}`);
       action.append(heading, arrow, copy);

@@ -144,7 +144,17 @@ export function installProjectPreviews(main, projects) {
       headerLocked=expanded;
       if(!expanded)sizeHeader();
     };
-    const headerObserver=new ResizeObserver(sizeHeader);
+    const sizeHighlightTimings=()=>{
+      const highlights=[...action.querySelectorAll('.project-summary-highlight')];
+      const widths=highlights.map(node=>{const range=document.createRange();range.selectNodeContents(node);return [...range.getClientRects()].reduce((sum,rect)=>sum+rect.width,0);});
+      const longest=Math.max(1,...widths);
+      const duration=Math.min(design.effects.projectHighlightMaxDuration,longest/design.effects.projectHighlightPixelsPerSecond*1000);
+      highlights.forEach((node,index)=>node.style.setProperty('--project-highlight-duration',`${duration*widths[index]/longest}ms`));
+    };
+    const headerObserver=new ResizeObserver(()=>{sizeHeader();sizeHighlightTimings();});
+    document.fonts.ready.then(()=>{if(!signal.aborted)sizeHighlightTimings();});
+    sizeHighlightTimings();
+
     headerObserver.observe(action);headerObserver.observe(action.querySelector('.project-heading'));headerObserver.observe(action.querySelector('.project-copy'));
     sizeHeader();
     const trigger=document.createElement('button');trigger.type='button';trigger.className='project-expand-trigger';

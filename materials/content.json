@@ -35,23 +35,27 @@
     "breadcrumbLabel": "Breadcrumb",
     "mobileMenuLabel": "Menu",
     "mobileMenuCloseLabel": "Close",
-    "mobileSocialLabel": "Elsewhere"
+    "mobileSocialLabel": "Elsewhere",
+    "projectDescriptionTitle": "What does it do?",
+    "projectTechnologyTitle": "Technology"
   },
   "projects": [
     {
       "id": "golf-2d",
       "navigationTitle": "Golf-Swing-Analysis",
       "title": "Smooth-Swing-Tracking",
-      "summary": "Built for real-world golf analysis, our pipeline brings multiple models and processing techniques together for smooth, accurate tracking that looks as good as it performs.",
+      "summary": "Built for real-world golf analysis, our pipeline brings multiple models and processing techniques together for the industry’s most accurate golf-swing tracking and smooth, visually compelling results.",
       "url": "https://youminghu0930-public.github.io/golf-swing-analysis-poc/",
       "linkLabel": "Explore 2D analysis →",
       "number": "01",
       "category": "Sports-specific pose estimation & smoothness",
       "tags": [
-        "Pose estimation",
-        "Signal processing",
+        "Sports-specific pose estimation",
         "Unified model training",
-        "Blurry object detection"
+        "Blurry object detection",
+        "Signal processing",
+        "Trajectory smoothing",
+        "Multi-model integration"
       ],
       "sections": [
         {
@@ -117,7 +121,10 @@
       "previewAspectRatio": 0.5625,
       "footageCredit": {
         "url": "https://www.instagram.com/reel/Dc9nDsgqrfi/"
-      }
+      },
+      "summaryHighlights": [
+        "the industry’s most accurate golf-swing tracking"
+      ]
     },
     {
       "id": "golf-3d",
@@ -167,7 +174,11 @@
       },
       "footageCredit": {
         "url": "https://youtu.be/P3YksJdejog?si=eyQjC6Fgo7AuV4_v"
-      }
+      },
+      "summaryHighlights": [
+        "single-shot approach",
+        "without a separate, complicated camera-calibration process"
+      ]
     }
   ],
   "navigation": [
@@ -234,7 +245,7 @@
       "label": "Works",
       "title": "Explore the projects that interest you",
       "role": "",
-      "description": "These visual showcases and interactive demos offer a glimpse into my projects, highlighting their ideas, features, and results. Explore them to see how each concept comes to life.",
+      "description": "Explore interactive demos of my real-world projects and see their key ideas and results in action.",
       "stripeItems": [
         "Works"
       ],

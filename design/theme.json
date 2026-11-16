@@ -426,8 +426,8 @@
     "ProjectListCompanySize": "14px",
     "ProjectHoverBackground": "rgb(255 255 255 / 3%)",
     "ProjectTopicLabelSize": "10px",
-    "ProjectSummarySize": "clamp(1rem, 1.4vw, 1.15rem)",
-    "ProjectTechnologySize": "12px",
+    "ProjectSummarySize": "1rem",
+    "ProjectTechnologySize": "0.72rem",
     "ProjectPreviewExpandDuration": "420ms",
     "ProjectInlinePreviewHeight": "clamp(240px, 28vw, 360px)",
     "ProjectInlinePreviewMobileHeight": "clamp(220px, 65vw, 360px)",
@@ -444,7 +444,22 @@
     "PreviewInfoLightBorder": "rgb(38 58 46 / 48%)",
     "PreviewInfoDarkColor": "#eeeeee",
     "PreviewInfoDarkBorder": "rgb(238 238 238 / 42%)",
-    "ProjectCreditRowHeight": "20px"
+    "ProjectCreditRowHeight": "20px",
+    "ProjectDescriptionTitleSize": "13px",
+    "ProjectDescriptionTitleGap": "6px",
+    "ProjectDescriptionGap": "20px",
+    "ProjectDescriptionLineHeight": "1.5",
+    "ProjectTechnologyGap": "12px",
+    "ProjectTechnologyRadius": "999px",
+    "ProjectTechnologyPadding": "4px 12px",
+    "ProjectTechnologyColor": "var(--accent)",
+    "ProjectTechnologyBorder": "1px solid rgb(0 240 80 / 25%)",
+    "ProjectTechnologyTracking": ".025em",
+    "ProjectTitleFillDuration": "600ms",
+    "ProjectTitleBadgePadding": "16px",
+    "ProjectOpenLinkSize": "13px",
+    "ProjectOpenLinkGap": "8px",
+    "ProjectOpenLinkWeight": "500"
   },
   "layoutReference": "https://aaftab.is-a.dev/",
   "effects": {
@@ -556,6 +571,8 @@
     "projectBannerJointCenterGap": 0.8,
     "projectBannerPoseColor": "#63f5b4",
     "projectBannerLeftColor": "#3b82f6",
-    "projectBannerRightColor": "#ef4444"
+    "projectBannerRightColor": "#ef4444",
+    "projectHighlightPixelsPerSecond": 500,
+    "projectHighlightMaxDuration": 700
   }
 }

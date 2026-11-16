@@ -736,9 +736,9 @@ html[data-skills-expanding=true] { overflow-anchor:none; scroll-behavior:auto; }
 .project-row-link:hover .project-heading h2 { color:var(--accent); }
 .project-company { margin:0; color:var(--muted); font-size:14px; font-weight:400; }
 .project-row-arrow { color:var(--muted); }
-.project-summary { margin:0 0 24px; color:hsl(0 0% 87%); font-size:clamp(1rem, 1.4vw, 1.15rem); font-weight:400; line-height:1.75; }
+.project-summary { margin:0 0 24px; color:hsl(0 0% 87%); font-size:1rem; font-weight:400; line-height:1.75; }
 .works-page .project-tags { margin:0 0 20px; gap:8px; }
-.works-page .project-tags li { padding:4px 9px; border-radius:6px; font-size:12px; color:var(--accent); font-weight:400; }
+.works-page .project-tags li { padding:4px 12px; border:1px solid rgb(0 240 80 / 25%); border-radius:999px; font-size:0.72rem; color:var(--accent); font-weight:400; line-height:1.5; letter-spacing:.025em; }
 .project-labels { display:flex; flex-wrap:wrap; gap:6px 12px; list-style:none; padding:0; margin:0; color:var(--muted); font-family:"Geist Mono", ui-monospace, monospace; font-size:10px; font-weight:400; text-transform:uppercase; letter-spacing:.06em; }
 .project-labels li+li::before { content:'·'; margin-right:12px; color:var(--accent); }
 .project-hover-preview { position:fixed; z-index:35; pointer-events:none; padding:8px; border:1px solid var(--border); border-radius:12px; background:var(--surface); opacity:0; transform:translateY(8px) scale(.97); transition:opacity 180ms ease, transform 180ms ease; }
@@ -925,8 +925,6 @@ html[data-skills-expanding=true] { overflow-anchor:none; scroll-behavior:auto; }
 .project-row-link .project-heading .project-company { position:static; margin-top:12px; padding-left:32px; }
 .portfolio-shell .project-title-link { position:absolute; inset:0; z-index:1; display:block; width:100%; height:100%; padding:0; }
 .project-title-chevron { left:4px; right:auto; }
-.project-heading:has(.project-title-link:hover) h2,
-.project-heading:has(.project-title-link:focus-visible) h2 { color:var(--accent); }
 
 /* Expanded collapse control uses the complete original header-row bounds. */
 .portfolio-shell .project-row-link > .project-title-link { inset:var(--project-header-top,0px) 0 auto; width:auto; min-width:100%; max-width:none; height:var(--project-header-height); }
@@ -1000,3 +998,37 @@ html[data-skills-expanding=true] { overflow-anchor:none; scroll-behavior:auto; }
 .project-vector-preview > video,.project-vector-overlay,.project-vector-restart,.project-vector-restart > img,.project-vector-restart > svg { position:absolute; inset:0; width:100%; height:100%; display:block; object-fit:contain; }
 .project-vector-overlay { overflow:hidden; }
 .project-vector-restart { pointer-events:none; }
+
+/* Keep description hierarchy compact within the original project title row. */
+.portfolio-shell .project-description-title { margin:0 0 6px; color:hsl(0 0% 87%); font-size:13px; font-weight:600; line-height:1.4; }
+.project-description { margin:0; }
+.project-copy { display:flex; flex-direction:column; gap:20px; }
+.project-description .project-summary { margin:0; font-family:"Geist Sans", "Noto Sans TC", system-ui, sans-serif; font-weight:400; letter-spacing:normal; line-height:1.5; }
+.works-page .project-copy .project-tags { margin-bottom:12px; }
+
+.works-page .project-technologies .project-tags { margin:0; }
+
+/* Shared landing contract: content grows upward and the stripe owns the bottom row. */
+.portfolio-shell .landing { height:100dvh; min-height:0; grid-template-rows:minmax(0,1fr) auto; }
+.portfolio-shell .landing .hero { min-height:0; padding-top:0; }
+@media(max-width:1000px) {
+ .portfolio-shell .landing { height:100svh; }
+}
+
+.project-summary-highlight { color:#eeeeee; font-weight:600; }
+
+/* A downward green badge covers the complete title, chevron, and company block. */
+.project-row-link .project-heading { isolation:isolate; align-self:start; width:100%; box-sizing:border-box; padding:16px; }
+.project-row-link .project-heading::before { content:''; position:absolute; inset:0; z-index:-1; background:var(--accent); clip-path:inset(0 0 100% 0); transition:clip-path 600ms cubic-bezier(.22,.61,.36,1); pointer-events:none; }
+.project-row-link:hover .project-heading::before { clip-path:inset(0); }
+.project-title-text { color:#eeeeee; transition:color 600ms ease; }
+.project-row-link .project-heading h2,.project-row-link .project-company { transition:color 600ms ease; }
+.project-row-link:hover .project-heading h2,.project-row-link:hover .project-title-text,.project-row-link:hover .project-company { color:var(--button-text); }
+/* Description markers share one sweep speed, with per-phrase durations. */
+.project-summary-highlight { background:linear-gradient(var(--accent),var(--accent)) left center / 0% 100% no-repeat; -webkit-box-decoration-break:clone; box-decoration-break:clone; transition:background-size var(--project-highlight-duration,700ms) linear,color var(--project-highlight-duration,700ms) ease; }
+.project-row-link:hover .project-summary-highlight { background-size:100% 100%; color:var(--button-text); }
+@media(prefers-reduced-motion:reduce) { .project-row-link .project-heading::before,.project-title-text,.project-row-link .project-heading h2,.project-row-link .project-company,.project-summary-highlight { transition:none; } }
+
+/* Project navigation is a quiet footer link, sized alongside the footage credit. */
+.portfolio-shell .project-row-link .project-open-link { min-height:20px; padding:0; gap:8px; border:0; border-radius:0; background:transparent; color:#eeeeee; font-size:13px; font-weight:500; line-height:20px; box-shadow:none; }
+.portfolio-shell .project-row-link .project-open-link:hover,.portfolio-shell .project-row-link .project-open-link:focus-visible { background:transparent; color:var(--accent); }
