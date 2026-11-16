@@ -48,19 +48,30 @@ export function installProjectPreviews(main, projects) {
     item.action.classList.toggle('is-preview-expanded',expanded);
     item.wrapper.setAttribute('aria-hidden',String(!expanded));
     item.wrapper.inert=!expanded;
-    if(expanded && item.visible && !document.hidden && !item.wrapper.classList.contains('is-animating')) {
+    // Build the fixed camera slots before the expansion reveals any media.
+    // Playback still waits until the expansion has finished.
+    if(expanded&&item.visible&&!item.player&&item.config?.views?.length)item.player=createBannerPreview(item.canvas,item.config);
+    if(item.visible&&!document.hidden&&(item.config?.interactive||(expanded&&!item.wrapper.classList.contains('is-animating')))) {
       if(!item.player && item.config) {
         if(item.config.interactive) {
           const iframe=document.createElement('iframe');
           iframe.title='Interactive Golf True 3D preview';iframe.src=item.config.interactive;
           iframe.className='project-interactive-frame';iframe.allow='autoplay';
+          iframe.style.opacity='0';iframe.style.pointerEvents='none';
+          iframe.style.transition=matchMedia('(prefers-reduced-motion:reduce)').matches?'none':'opacity 240ms ease';
           item.media.append(iframe);
-          const visibility=visible=>iframe.contentWindow?.postMessage({type:'preview-visibility',visible},location.origin);
-          iframe.addEventListener('load',()=>visibility(item.visible),{signal});
+          const visibility=visible=>iframe.contentWindow?.postMessage({type:'preview-visibility',visible:visible&&iframe.dataset.ready==='true'},location.origin);
+          const ready=event=>{
+            if(event.origin!==location.origin||event.source!==iframe.contentWindow||event.data?.type!=='preview-ready')return;
+            iframe.dataset.ready='true';iframe.style.opacity='1';iframe.style.pointerEvents='';
+            visibility(item.visible&&item.renderedExpanded&&!document.hidden&&!item.wrapper.classList.contains('is-animating'));
+          };
+          window.addEventListener('message',ready,{signal});
+          iframe.addEventListener('load',()=>visibility(item.visible&&item.renderedExpanded&&!document.hidden&&!item.wrapper.classList.contains('is-animating')),{signal});
           item.player={play:()=>visibility(true),pause:()=>visibility(false),destroy:()=>iframe.remove()};
         } else item.player=createBannerPreview(item.canvas,item.config);
       }
-      item.player?.play();
+      if(expanded&&!item.wrapper.classList.contains('is-animating'))item.player?.play();else item.player?.pause();
     } else item.player?.pause();
   }
   const observer=new IntersectionObserver(entries=>{
@@ -85,7 +96,12 @@ export function installProjectPreviews(main, projects) {
     canvas.className='project-preview-canvas';canvas.hidden=true;
     canvas.setAttribute('aria-hidden','true');
     const media=document.createElement('div');media.className='project-preview-media';
-    if(project.banner?.interactive)media.setAttribute('data-cursor-target','');
+    if(project.banner?.interactive){
+      media.setAttribute('data-cursor-target','');
+      // A raster poster cannot share the live scene's adaptive camera framing.
+      // Keep one fixed surface and reveal the actual scene when it has painted.
+      poster.style.display='none';
+    }
     media.setAttribute('data-lenis-prevent','');media.append(poster,canvas);
     const tools=document.createElement('div');tools.className='project-preview-tools';
     const open=document.createElement('a');open.href=project.url;open.target='_blank';open.rel='noopener noreferrer';
@@ -266,7 +282,10 @@ export function installProjectPreviews(main, projects) {
       if(item.action.closest('[hidden],[inert],[aria-hidden="true"]'))continue;
       const bounds=item.action.getBoundingClientRect();
       if(!bounds.height||bounds.bottom<=top||bounds.top>=top+height)continue;
-      const delta=Math.abs(bounds.top+bounds.height/2-center);
+      const preview=item.media.getBoundingClientRect();
+      const previewCenter=preview.top+preview.height/2;
+      if(previewCenter>center)continue;
+      const delta=center-previewCenter;
       if(delta<distance){nearest=item;distance=delta;}
     }
     for(const item of items)item.action.classList.toggle('is-center-highlighted',item===nearest);

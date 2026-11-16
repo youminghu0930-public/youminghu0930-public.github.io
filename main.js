@@ -123,8 +123,8 @@ async function startApp() {
   const response = await fetch(new URL('./materials/content.json', import.meta.url));
   if (!response.ok) throw new Error(`Content request failed: ${response.status}`);
   const { page, projects, navigation, landings, experience, skills } = await response.json();
-  // Measure and animate against the final fonts, avoiding fallback-font line wraps.
-  if (document.fonts) await Promise.all([
+  // Font downloads must not hold back the static interface.
+  if (document.fonts) void Promise.all([
     document.fonts.load('400 16px "Geist Sans"'),
     document.fonts.load('500 32px "Geist Sans"'),
     document.fonts.load('600 80px "Geist Sans"'),
@@ -232,6 +232,8 @@ async function startApp() {
     smoothScroll = reducedMotion.matches ? null : new Lenis({
       autoRaf: true,
       smoothWheel: true,
+      // Accordion expansion changes the scroll limit on every animation frame.
+      naiveDimensions: true,
       syncTouch: false,
       lerp: design.effects.scrollLerp,
       wheelMultiplier: design.effects.scrollWheelMultiplier,

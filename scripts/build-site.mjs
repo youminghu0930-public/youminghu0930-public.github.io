@@ -3,6 +3,7 @@ import { fileURLToPath } from 'node:url';
 import { cp, mkdir, rm } from 'node:fs/promises';
 const root = new URL('../', import.meta.url);
 execFileSync(process.execPath, [fileURLToPath(new URL('scripts/sync-design.mjs', root)), '--local', '--check'], { stdio: 'inherit' });
+execFileSync(process.execPath, [fileURLToPath(new URL('scripts/prepare-preview-assets.mjs', root))], { stdio: 'inherit' });
 await rm(new URL('dist/', root), { recursive: true, force: true });
 await mkdir(new URL('dist/', root), { recursive: true });
 for (const file of ['index.html', 'works', 'skills', 'contact', 'styles.css', 'main.js', 'landing.js', 'navigation.js', 'pointer-effects.js', '.nojekyll', 'design-settings.js', 'materials/content.json', 'materials/data']) {

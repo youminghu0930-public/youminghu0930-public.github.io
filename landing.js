@@ -128,14 +128,21 @@ function installPageEntrance(hero, header, stripe = null, {animateHeader = true}
     jobs.push(job);
     if (parallelLines) {
       let width = node.getBoundingClientRect().width;
+      const remeasure = () => {
+        if (disposed) return;
+        const measured = measureRenderedLines(reserved, text).map(line => Array.from(line));
+        if (JSON.stringify(measured) === JSON.stringify(job.lines)) return;
+        job.lines = measured;
+        job.lineNodes = job.lines.map(line => element('span', line.join(''), 'type-line'));
+        visible.replaceChildren(...job.lineNodes);
+        finish(job);
+      };
+      document.fonts?.ready.then(remeasure);
       const observer = new ResizeObserver(() => {
         const nextWidth = node.getBoundingClientRect().width;
         if (Math.abs(nextWidth - width) <= 1) return;
         width = nextWidth;
-        job.lines = measureRenderedLines(reserved, text).map(line => Array.from(line));
-        job.lineNodes = job.lines.map(line => element('span', line.join(''), 'type-line'));
-        visible.replaceChildren(...job.lineNodes);
-        finish(job);
+        remeasure();
       });
       observer.observe(node);
       lineObservers.push(observer);

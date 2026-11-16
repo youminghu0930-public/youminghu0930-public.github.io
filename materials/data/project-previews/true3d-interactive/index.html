@@ -1,12 +1,16 @@
-<!doctype html><html><head><meta name="viewport" content="width=device-width,initial-scale=1"><link rel="stylesheet" href="styles.css"><style>
+<!doctype html><html><head><meta name="viewport" content="width=device-width,initial-scale=1"><link rel="modulepreload" href="snapshot-scene.js"><link rel="modulepreload" href="materials/projects/pose-information-extraction/vendor/three/three.module.js"><link rel="stylesheet" href="styles.css"><style>
 html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#080808}.overview-snapshots{position:absolute;inset:0;width:100%;height:100%;padding:0;box-sizing:border-box;}#feature-card{position:relative;inset:auto;transform:none!important;width:100%;height:100%;box-sizing:border-box;border:0;border-radius:0;padding:0;margin:0}.snapshot-overview-header{display:none}.overview-snapshots .snapshot-overview-scene{width:100%;height:100%!important}.snapshot-overview-scene canvas{border:0!important;border-radius:0!important}.video-source-decoders{display:block;position:absolute;top:0;left:0;width:2px;height:2px;overflow:hidden;opacity:.001;pointer-events:none;}
 </style></head><body><div class="overview-snapshots"><article id="feature-card" class="pose-snapshot snapshot-card is-current"></article></div><script type="module">
 import {mountSnapshotCard} from './snapshot-viewer.js';
+// The parent starts playback explicitly; preparing a collapsed scene loads no video.
+window.previewPaused=window.parent!==window;
 window.addEventListener('pointermove',event=>{if(event.pointerType==='mouse')parent.postMessage({type:'preview-pointer',x:event.clientX,y:event.clientY,pointerType:event.pointerType},location.origin);},{capture:true,passive:true});
 window.addEventListener('message',event=>{if(event.source===parent&&event.data?.type==='preview-visibility')window.previewPaused=!event.data.visible;});
 try{await mountSnapshotCard(document.getElementById('feature-card'),'00',{range:[0,null]},'Absolute hip, shoulder rotations and x factor','feature-2');
 const scene=document.querySelector('.snapshot-overview-scene');
 const layer=document.createElement('div');layer.className='preview-measurement-layer';
 layer.append(...scene.querySelectorAll('.rotation-angle-labels,.snapshot-rotation-plots'));scene.append(layer);
+// Expose the scene only after its canvas, metrics and sizing have painted.
+requestAnimationFrame(()=>requestAnimationFrame(()=>parent.postMessage({type:'preview-ready'},location.origin)));
 }catch(error){document.getElementById('feature-card').textContent='Preview unavailable. Open the project to explore the demo.';console.error(error);}
 </script></body></html>

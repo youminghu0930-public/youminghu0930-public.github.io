@@ -25,8 +25,8 @@ import * as THREE from './materials/projects/pose-information-extraction/vendor/
 import {interpolateRotation,constrainCameraAboveGround,constrainOrbitAboveGround} from './materials/projects/pose-information-extraction/camera-flight.js';
 const valid = p => Array.isArray(p) && p.length === 3 && p.every(Number.isFinite);
 async function json(url) { const response = await fetch(url); if (!response.ok) throw new Error(`${url}: ${response.status}`); return response.json(); }
-export async function mountPoseScene(card, id, entry, { showCameras = false, autoPlay = true, cameraVideos = {}, rawDetections = {}, bannerMode = false, bannerMetrics, snapshotMetrics, videoMetrics, calibratedViews = false, hoganPlanes = false, defaultZoomScale = 1, measurementMetrics, measurementFeature = 'geometric-rotations', showRawDetections = true, compositeDetections = false } = {}) {
-  const poseData = await json(`materials/data/3d_results/${encodeURIComponent(id)}.json`);
+export async function mountPoseScene(card, id, entry, { poseData: suppliedPoseData, showCameras = false, autoPlay = true, cameraVideos = {}, rawDetections = {}, bannerMode = false, bannerMetrics, snapshotMetrics, videoMetrics, calibratedViews = false, hoganPlanes = false, defaultZoomScale = 1, measurementMetrics, measurementFeature = 'geometric-rotations', showRawDetections = true, compositeDetections = false } = {}) {
+  const poseData = suppliedPoseData ?? await json(`materials/data/3d_results/${encodeURIComponent(id)}.json`);
   const {reconstruction: frames, calibration, joints: jointNames} = poseData;
   const {names,edges,indexes,clubEdges} = poseStructure(jointNames);
   // Visibility only: keep club samples in every bounds, center, scale and
@@ -903,7 +903,11 @@ diffuseColor.a*=finished?1.0:0.5;`
     await new Promise(resolve=>requestAnimationFrame(()=>{draw();resolve();}));
     card.querySelector('.snapshot-placeholder')?.remove();card.setAttribute('aria-busy','false');
   }
-  if(!autoPlay)return controller;
+  if(!autoPlay){
+    // Metrics are installed after the first scene draw. Initialize them even
+    // when playback is paused so numbers and plots reveal with the skeleton.
+    controller.setFrame(start);return controller;
+  }
   // Loop the selected motion at its recorded frame rate. Only the current,
   // visible carousel card renders; hidden cards retain their playback position.
   const frameCount = end-start+1;

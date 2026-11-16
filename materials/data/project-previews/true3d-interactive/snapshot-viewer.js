@@ -1,10 +1,11 @@
+import {fetchPreviewJson} from '../../preview-json.js';
 import {browserSnapshotResources,createExclusiveSnapshotMount} from './snapshot-resources.js';
 import {measurementFeatureForTitle} from './measurement-features.js';
 import {createSnapshotPipeline} from './snapshot-pipeline.js';
 import {mountPoseScene} from './snapshot-scene.js';
 import {createViewerInfo} from './viewer-info.js';
 import {createFrameSeeker} from './frame-seeker.js';
-async function json(url){const r=await fetch(url,{cache:'no-cache'});if(!r.ok)throw new Error(`${url}: ${r.status}`);return r.json();}
+const json=url=>fetchPreviewJson(url);
 // Reuse the snapshot pipeline so club effects, frame sync and POV behavior match.
 // Release the banner's GPU and decoder resources while it is off screen.
 export async function mountClubBanner(root){
@@ -131,6 +132,10 @@ async function mountSnapshotCard(card,id,entry,title,key){
   if(feature!=='club movement'&&!hoganPlanes&&!measurementFeature){
     status.remove();card.dataset.ready='true';return;
   }
+  const poseRequest=json(`materials/data/3d_results/${encodeURIComponent(id)}.json`);
+  const metricsRequest=measurementFeature?json(`materials/data/metrics/${id}.json`):Promise.resolve(undefined);
+  // Observe early failures while the small catalog and sync map arrive.
+  void poseRequest.catch(()=>{});void metricsRequest.catch(()=>{});
   const catalog=await json('materials/data/snapshot-videos.json'),clip=catalog.find(clip=>clip.id===id);
   if(!clip||clip.alignmentError)throw new Error(clip?.alignmentError||`Missing snapshot swing ${id}`);
   const sync=await json(clip.sync);
@@ -142,14 +147,14 @@ async function mountSnapshotCard(card,id,entry,title,key){
     videos[view.name]=video;decoders.append(video);
   }
   // Build the 3D scene without waiting for either videos or 2D data.
-  const measurementMetrics=measurementFeature?await json(`materials/data/metrics/${id}.json`):undefined;
-  const controller=await mountPoseScene(scene,id,{...entry,joints:entry.joints??['golf_club_head'],range:[0,clip.frames-1],fps:clip.fps},{showCameras:true,autoPlay:false,cameraVideos:videos,hoganPlanes,defaultZoomScale:key==='banner-club'?2.5:measurementFeature==='hip-translation'?10.5:1.25,measurementMetrics,measurementFeature,showRawDetections,compositeDetections:key==='banner-club'});
+  const [measurementMetrics,poseData]=await Promise.all([metricsRequest,poseRequest]);
+  const controller=await mountPoseScene(scene,id,{...entry,joints:entry.joints??['golf_club_head'],range:[0,clip.frames-1],fps:clip.fps},{poseData,showCameras:true,autoPlay:false,cameraVideos:videos,hoganPlanes,defaultZoomScale:key==='banner-club'?2.5:measurementFeature==='hip-translation'?10.5:1.25,measurementMetrics,measurementFeature,showRawDetections,compositeDetections:key==='banner-club'});
   clip.views.forEach((view,i)=>{
     const video=videos[view.name];
     if(showRawDetections)json(`materials/data/2d_detections/${id}/${view.name}.json`).then(raw=>{
       if(!disposed){controller.setRawDetections(view.name,{...raw,pred:sync.mapping[view.name].map(frame=>raw.pred[frame])});rawReady.add(view.name);}
     }).catch(error=>console.warn('Snapshot 2D overlay unavailable',error));
-    json(view.src+'.frames.json').then(timestamps=>{
+    json(view.timing||view.src+'.frames.json').then(timestamps=>{
       if(disposed)return;times[i]=timestamps;
       let settledRaw=null;
       seekers[i]=createFrameSeeker(video,{getTimes:()=>times[i],onRequest:()=>{},onSettled:rawFrame=>{settledRaw=rawFrame;},requirePresentedFrame:true});
@@ -161,7 +166,7 @@ async function mountSnapshotCard(card,id,entry,title,key){
     }).catch(error=>console.warn('Snapshot video timing unavailable',error));
     // A slow or failed source never blocks animation or the other camera.
     video.addEventListener('error',()=>console.warn(`Snapshot video unavailable: ${view.name}`));
-    video.src=view.src;video.load();
+    // Sources are attached only after the complete standalone scene has painted.
   });
   scene.querySelector('h4')?.remove();
   for(const [button,value] of buttons){
@@ -169,6 +174,19 @@ async function mountSnapshotCard(card,id,entry,title,key){
     button.onclick=()=>{controller.setView(value);buttons.forEach(([b,v])=>b.setAttribute('aria-pressed',String(value===v)));};
   }
   status.remove();card.dataset.ready='true';
+  let scenePainted=false,sourcesStarted=false;
+  const startFootage=()=>{
+    if(disposed||sourcesStarted||!scenePainted||window.previewPaused)return;
+    sourcesStarted=true;
+    for(const view of clip.views){const video=videos[view.name];video.src=view.src;video.load();}
+  };
+  const onVisibility=event=>{
+    if(event.source!==parent||event.data?.type!=='preview-visibility'||!event.data.visible)return;
+    // Let the parent reveal the rendered scene before video work begins.
+    requestAnimationFrame(()=>requestAnimationFrame(startFootage));
+  };
+  window.addEventListener('message',onVisibility);
+  requestAnimationFrame(()=>requestAnimationFrame(()=>{scenePainted=true;startFootage();}));
   const [start,end]=entry.range?.map((value,i)=>value===null?(i?clip.frames-1:0):value)??[0,clip.frames-1];
   let elapsed=0,previous,visible=false,lastFrame;
   const profile=new URLSearchParams(location.search).has('snapshotPerf');
@@ -188,7 +206,7 @@ async function mountSnapshotCard(card,id,entry,title,key){
   },onDrop:(name,error)=>console.warn(`Snapshot camera withdrawn until ready: ${name}`,error)});
   const observer=new IntersectionObserver(entries=>{visible=entries[0].isIntersecting;});observer.observe(card);
   const cleanup=()=>{
-    if(disposed)return;disposed=true;observer.disconnect();pipeline.dispose();controller.dispose();
+    if(disposed)return;disposed=true;window.removeEventListener('message',onVisibility);observer.disconnect();pipeline.dispose();controller.dispose();
     Object.values(videos).forEach(v=>{v.pause();v.removeAttribute('src');v.load();v.remove();});
   };
   function tick(now){
@@ -196,7 +214,9 @@ async function mountSnapshotCard(card,id,entry,title,key){
     if(!card.isConnected){cleanup();return;}
     const playing=visible&&!card.inert&&!document.hidden&&!window.previewPaused;
     if(playing){
-      if(previous!==undefined)elapsed+=(now-previous)*clip.fps/1000;
+      // Decoder warm-up is not elapsed swing time. Avoid a catch-up burst
+      // when the first camera frames or GPU resources become available.
+      if(previous!==undefined&&!pipeline.busy)elapsed+=Math.min(now-previous,1000/clip.fps)*clip.fps/1000;
       const frame=start+Math.floor(elapsed)%(end-start+1);
       if(frame!==lastFrame&&!pipeline.busy){
         lastFrame=frame;void pipeline.advance(frame);

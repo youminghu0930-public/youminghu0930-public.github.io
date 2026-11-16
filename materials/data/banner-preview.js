@@ -65,6 +65,8 @@ function createPairedBannerPreview(canvas,config) {
     const surface=document.createElement('canvas');surface.setAttribute('aria-hidden','true');pane.append(surface);pair.append(pane);panes.push(pane);
     cleanups.push(installPreviewPanZoom(pane,controller.signal,{constrain:true,aspectRatio:view.aspectRatio}));
     players.push(createBannerPreview(surface,{...view,onEnded:()=>{if(!disposed)select((active+1)%config.views.length);}}));
+    // Only tiny first-frame geometry is prepared during expansion; videos wait.
+    players.at(-1).prepare();
     let press=null;
     pane.addEventListener('pointerdown',event=>{
       if(event.pointerType==='mouse'&&event.button!==0)return;
