@@ -66,8 +66,10 @@ export function installProjectPreviews(main, projects) {
           const iframe=document.createElement('iframe');
           iframe.title='Interactive Golf True 3D preview';iframe.src=item.config.interactive;
           iframe.className='project-interactive-frame';iframe.allow='autoplay';
-          iframe.style.opacity='0';iframe.style.pointerEvents='none';
-          iframe.style.transition=matchMedia('(prefers-reduced-motion:reduce)').matches?'none':'opacity 240ms ease';
+          // Safari may suspend frame callbacks in a fully transparent iframe.
+          // Keep the frame visible so initialization can finish; its own scene
+          // draws only after geometry and metrics have been initialized.
+          iframe.style.opacity='1';iframe.style.pointerEvents='none';
           item.media.append(iframe);
           const visibility=visible=>iframe.contentWindow?.postMessage({type:'preview-visibility',visible:visible&&iframe.dataset.ready==='true'},location.origin);
           const ready=event=>{

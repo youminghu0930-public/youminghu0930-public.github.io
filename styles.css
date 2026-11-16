@@ -1187,6 +1187,6 @@ html[data-skills-expanding=true] { overflow-anchor:none; scroll-behavior:auto; }
 
 /* Mobile project titles carry the project destination directly. */
 .portfolio-shell .project-row-link .project-open-link[hidden] { display:none; }
-.project-heading .project-mobile-title-link { color:inherit; font:inherit; text-decoration:none; }
+.portfolio-shell .project-heading a.project-mobile-title-link,
+.portfolio-shell .project-heading a.project-mobile-title-link:hover { display:block; width:100%; position:relative; z-index:1; pointer-events:auto; margin:0; padding:0; border:0; border-radius:0; background:transparent; box-shadow:none; color:inherit; font:inherit; letter-spacing:inherit; text-decoration:none; transition:color 600ms ease; }
 .project-mobile-title-link::after { content:'↗'; display:inline-block; margin-left:.25em; font-size:.5em; vertical-align:middle; }
-.project-mobile-title-link:focus-visible { outline:2px solid var(--accent); outline-offset:4px; }

@@ -1,4 +1,5 @@
 {
+  "materials/data/project-previews/true3d-interactive/preview-schedule.js": "41fc2ca2cf129e4034d93478aa3f2f7ef9b75da9d3f074cf5b0a73b72ea3eb31",
   "materials/data/preview-json.js": "1fd830ccb179892268d107f76978af69957be1ed480f8facb635ed4edb899246",
   "materials/data/project-previews/true3d-interactive/snapshot-resources.js": "b360f9e9a6954003fb19f425210283ae530152273ebc768e1cf6c90328458980",
   "materials/data/project-previews/true3d-interactive/rotation-style.js": "3c1d6f6e65ca88c05840136d8e97913e5d4e11e5a6bd84b128df20fcafd1c7e2",
@@ -106,7 +107,7 @@
   "materials/data/project-previews/true3d-interactive/snapshot-scene.js": "2942f08133b13daaa167f745d3e8b619a2d7e8b1b70980e849d099f1660cfb4a",
   "materials/data/project-previews/true3d-interactive/viewer-info.js": "98bcd16a760a195c89b97722181478c11ae2e978fd4483f54666205bb97c939e",
   "materials/data/project-previews/true3d-interactive/frame-seeker.js": "694e2f9c9b98607856d7d02068df0b65e8919a5cebb2aa243356adce185ec075",
-  "materials/data/project-previews/true3d-interactive/snapshot-viewer.js": "e3c6f6c98f7f18107e82429ef665b4924a0f1b13995a8cce669b12345763fca5",
-  "materials/data/project-previews/true3d-interactive/preview-entry.js": "d68d6728497517aa0facf3bf6bf638b53cd588fec9920cee7dc36ad86bdd8717",
-  "materials/data/project-previews/true3d-interactive/preview.bundle.js": "3f47338449b3d333ec5cf776371135defa2e8d50240a516baeadf3717a0b9ac8"
+  "materials/data/project-previews/true3d-interactive/snapshot-viewer.js": "71f17c310e0d889d10ed0cbc687506bc24f5cdbf431522f17fa834cad0439ea9",
+  "materials/data/project-previews/true3d-interactive/preview-entry.js": "2ea4f5a795308ceddba9594084bc764416236c6fd57fffc3a9358dc5c3587fcf",
+  "materials/data/project-previews/true3d-interactive/preview.bundle.js": "3655c2954845f2baaabf6704aa837e3d4f15ea46c1d6c6ddb36fc87c026007fc"
 }

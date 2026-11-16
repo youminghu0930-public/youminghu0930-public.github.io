@@ -1,3 +1,4 @@
+import {afterPreviewPaint} from './preview-schedule.js';
 import {fetchPreviewJson} from '../../preview-json.js';
 import {browserSnapshotResources,createExclusiveSnapshotMount} from './snapshot-resources.js';
 import {measurementFeatureForTitle} from './measurement-features.js';
@@ -175,7 +176,7 @@ async function mountSnapshotCard(card,id,entry,title,key){
     button.onclick=()=>{controller.setView(value);buttons.forEach(([b,v])=>b.setAttribute('aria-pressed',String(value===v)));};
   }
   status.remove();card.dataset.ready='true';
-  let scenePainted=false,sourcesStarted=false;
+  let scenePainted=false,sourcesStarted=false,animationHandle=0;
   const startFootage=()=>{
     if(disposed||sourcesStarted||!scenePainted||window.previewPaused)return;
     sourcesStarted=true;
@@ -184,10 +185,12 @@ async function mountSnapshotCard(card,id,entry,title,key){
   const onVisibility=event=>{
     if(event.source!==parent||event.data?.type!=='preview-visibility'||!event.data.visible)return;
     // Let the parent reveal the rendered scene before video work begins.
-    requestAnimationFrame(()=>requestAnimationFrame(startFootage));
+    afterPreviewPaint(startFootage);
+    // Refresh the animation request when a previously clipped iframe is shown.
+    cancelAnimationFrame(animationHandle);animationHandle=requestAnimationFrame(tick);
   };
   window.addEventListener('message',onVisibility);
-  requestAnimationFrame(()=>requestAnimationFrame(()=>{scenePainted=true;startFootage();}));
+  afterPreviewPaint(()=>{scenePainted=true;startFootage();});
   const [start,end]=entry.range?.map((value,i)=>value===null?(i?clip.frames-1:0):value)??[0,clip.frames-1];
   let elapsed=0,previous,visible=false,lastFrame;
   const profile=new URLSearchParams(location.search).has('snapshotPerf');
@@ -207,10 +210,11 @@ async function mountSnapshotCard(card,id,entry,title,key){
   },onDrop:(name,error)=>console.warn(`Snapshot camera withdrawn until ready: ${name}`,error)});
   const observer=new IntersectionObserver(entries=>{visible=entries[0].isIntersecting;});observer.observe(card);
   const cleanup=()=>{
-    if(disposed)return;disposed=true;window.removeEventListener('message',onVisibility);observer.disconnect();pipeline.dispose();controller.dispose();
+    if(disposed)return;disposed=true;cancelAnimationFrame(animationHandle);window.removeEventListener('message',onVisibility);observer.disconnect();pipeline.dispose();controller.dispose();
     Object.values(videos).forEach(v=>{v.pause();v.removeAttribute('src');v.load();v.remove();});
   };
   function tick(now){
+    animationHandle=0;
     if(disposed)return;
     if(!card.isConnected){cleanup();return;}
     const playing=visible&&!card.inert&&!document.hidden&&!window.previewPaused;
@@ -225,9 +229,9 @@ async function mountSnapshotCard(card,id,entry,title,key){
     }
     if(!playing)presentedAt=undefined;
     previous=playing?now:undefined;
-    if(!disposed)requestAnimationFrame(tick);
+    if(!disposed)animationHandle=requestAnimationFrame(tick);
   }
-  requestAnimationFrame(tick);
+  animationHandle=requestAnimationFrame(tick);
   return cleanup;
 }
 
