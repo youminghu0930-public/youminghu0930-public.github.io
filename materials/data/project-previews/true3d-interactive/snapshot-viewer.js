@@ -144,6 +144,7 @@ async function mountSnapshotCard(card,id,entry,title,key){
   let disposed=false;
   for(const view of clip.views){
     const video=make('video');video.muted=video.defaultMuted=true;video.playsInline=true;video.preload='auto';video.setAttribute('muted','');video.setAttribute('playsinline','');video.setAttribute('aria-hidden','true');video.tabIndex=-1;
+    if(view.imageSize){video.dataset.sourceWidth=String(view.imageSize[0]);video.dataset.sourceHeight=String(view.imageSize[1]);}
     videos[view.name]=video;decoders.append(video);
   }
   // Build the 3D scene without waiting for either videos or 2D data.

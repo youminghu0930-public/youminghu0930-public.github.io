@@ -9,6 +9,15 @@ export function installProjectPreviews(main, projects) {
   const items=[];
   function arrangeProject(item){
     const copy=item.action.querySelector('.project-copy');
+    const text=item.action.querySelector('.project-title-text');
+    if(mobile.matches&&text.tagName!=='A'){
+      const link=document.createElement('a');link.className='project-title-text project-mobile-title-link';
+      link.textContent=item.name;link.href=item.open.href;link.target='_blank';link.rel='noopener noreferrer';
+      link.setAttribute('aria-label',`${item.name} — view project (opens in a new tab)`);text.replaceWith(link);
+    }else if(!mobile.matches&&text.tagName==='A'){
+      const label=document.createElement('span');label.className='project-title-text';label.textContent=item.name;text.replaceWith(label);
+    }
+    item.open.hidden=mobile.matches;
     if(mobile.matches){
       item.action.insertBefore(item.wrapper,copy);
       if(item.qa)item.action.append(item.qa);

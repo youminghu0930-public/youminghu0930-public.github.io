@@ -83,34 +83,34 @@
         "Trajectory smoothing"
       ],
       "banner": {
-        "video": "/materials/data/project-previews/golf-2d-banner-0026-4.mp4",
+        "video": "/materials/data/project-previews/golf-2d-banner-0026-4-preview.mp4",
         "pose": "/materials/data/project-previews/golf-2d-banner-0026-4.json",
-        "poster": "/materials/data/project-previews/golf-2d-banner-0026-4.webp",
+        "poster": "/materials/data/project-previews/golf-2d-banner-0026-4-preview.webp",
         "timing": "/materials/data/project-previews/golf-2d-banner-0026-4-timing.json",
         "aspectRatio": 0.5625,
         "views": [
           {
-            "video": "/materials/data/project-previews/golf-2d-banner-0000.mp4",
+            "video": "/materials/data/project-previews/golf-2d-banner-0000-preview.mp4",
             "pose": "/materials/data/project-previews/golf-2d-banner-0000.json",
-            "poster": "/materials/data/project-previews/golf-2d-banner-0000.webp",
+            "poster": "/materials/data/project-previews/golf-2d-banner-0000-preview.webp",
             "timing": "/materials/data/project-previews/golf-2d-banner-0000-timing.json",
             "aspectRatio": 0.5625,
             "label": "Face-on · 0000",
             "creditUrl": "https://www.instagram.com/reel/DOn1QDPjEjQ/"
           },
           {
-            "video": "/materials/data/project-previews/golf-2d-banner-0026-4.mp4",
+            "video": "/materials/data/project-previews/golf-2d-banner-0026-4-preview.mp4",
             "pose": "/materials/data/project-previews/golf-2d-banner-0026-4.json",
-            "poster": "/materials/data/project-previews/golf-2d-banner-0026-4.webp",
+            "poster": "/materials/data/project-previews/golf-2d-banner-0026-4-preview.webp",
             "timing": "/materials/data/project-previews/golf-2d-banner-0026-4-timing.json",
             "aspectRatio": 0.5625,
             "label": "Face-on · 0026-4",
             "creditUrl": "https://www.instagram.com/reel/Dc9nDsgqrfi/"
           },
           {
-            "video": "/materials/data/project-previews/golf-2d-banner-0019-1.mp4",
+            "video": "/materials/data/project-previews/golf-2d-banner-0019-1-preview.mp4",
             "pose": "/materials/data/project-previews/golf-2d-banner-0019-1.json",
-            "poster": "/materials/data/project-previews/golf-2d-banner-0019-1.webp",
+            "poster": "/materials/data/project-previews/golf-2d-banner-0019-1-preview.webp",
             "timing": "/materials/data/project-previews/golf-2d-banner-0019-1-timing.json",
             "aspectRatio": 0.5625,
             "label": "Down-the-line",
@@ -221,7 +221,7 @@
         "rendered": true,
         "video": "/materials/data/project-previews/golf-3d-rotations-trajectory.mp4",
         "poster": "/materials/data/project-previews/golf-3d-rotations-fitted.png",
-        "interactive": "/materials/data/project-previews/true3d-interactive/index.html"
+        "interactive": "/materials/data/project-previews/true3d-interactive/index.html?v=3f47338449b3"
       },
       "footageCredit": {
         "url": "https://youtu.be/P3YksJdejog?si=eyQjC6Fgo7AuV4_v"

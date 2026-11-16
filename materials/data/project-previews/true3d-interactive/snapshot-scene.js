@@ -428,7 +428,7 @@ diffuseColor.a*=finished?1.0:0.5;`
       if(bannerMode){screenMaterial.depthTest=false;}
       const screen=new THREE.Mesh(new THREE.PlaneGeometry(1,1),screenMaterial);if(bannerMode)screen.renderOrder=1;
       const positionScreen=()=>{
-        const width=video.videoWidth||K[0][2]*2,height=video.videoHeight||K[1][2]*2;
+        const width=Number(video.dataset.sourceWidth)||video.videoWidth||K[0][2]*2,height=Number(video.dataset.sourceHeight)||video.videoHeight||K[1][2]*2;
         screen.scale.set(width*depth/K[0][0],height*depth/K[1][1],1);
         screen.position.set((width/2-K[0][2])*depth/K[0][0],-(height/2-K[1][2])*depth/K[1][1],-depth);
         videoTexture.needsUpdate=true;updateGround();draw();
@@ -442,7 +442,7 @@ diffuseColor.a*=finished?1.0:0.5;`
       const redraw=()=>{};
       video.addEventListener('seeked',redraw);mediaCleanup.push(()=>video.removeEventListener('seeked',redraw));
       // Dimensions are known from intrinsics even before the video decodes.
-      const width=video.videoWidth||K[0][2]*2,height=video.videoHeight||K[1][2]*2;
+      const width=Number(video.dataset.sourceWidth)||video.videoWidth||K[0][2]*2,height=Number(video.dataset.sourceHeight)||video.videoHeight||K[1][2]*2;
       screen.scale.set(width*depth/K[0][0],height*depth/K[1][1],1);
       screen.position.set((width/2-K[0][2])*depth/K[0][0],-(height/2-K[1][2])*depth/K[1][1],-depth);
       
@@ -657,7 +657,7 @@ diffuseColor.a*=finished?1.0:0.5;`
     cameraDecorations.forEach(object=>{object.visible=bannerMode||object.userData.cameraView===selectedView?false:selectedView==='free-view'||(cameraFlight&&cameraFlight.progress<.75);});
     const preset=cameraPresets.get(selectedView);
     if(preset){
-      const width=preset.video?.videoWidth||preset.K[0][2]*2,height=preset.video?.videoHeight||preset.K[1][2]*2;
+      const width=Number(preset.video?.dataset.sourceWidth)||preset.video?.videoWidth||preset.K[0][2]*2,height=Number(preset.video?.dataset.sourceHeight)||preset.video?.videoHeight||preset.K[1][2]*2;
       // Navigation is an offset from calibration, never a mutation of R/t/K.
       const localOrbit=new THREE.Quaternion().setFromEuler(new THREE.Euler(presetPitch,presetYaw,0,'YXZ'));
       const orbit=preset.rotation.clone().multiply(localOrbit).multiply(preset.rotation.clone().invert());

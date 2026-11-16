@@ -479,8 +479,7 @@
     "ProjectQaTopGap": "20px",
     "ProjectPreviewCornerRadius": "8px",
     "ProjectMobileFilterFontSize": "12px",
-    "ProjectMobileFilterPadding": "5px 7px",
-    "WorksMobileLandingTitleSize": "clamp(1.75rem, 7.5vw, 2.25rem)"
+    "ProjectMobileFilterPadding": "5px 7px"
   },
   "layoutReference": "https://aaftab.is-a.dev/",
   "effects": {

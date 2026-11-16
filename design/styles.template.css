@@ -1166,8 +1166,7 @@ html[data-skills-expanding=true] { overflow-anchor:none; scroll-behavior:auto; }
  .works-page .project-filter-button { flex:0 1 auto; min-width:0; padding:{{ProjectMobileFilterPadding}}; font-size:{{ProjectMobileFilterFontSize}}; }
  .works-page .project-filter-count { font-size:10px; padding:0 4px; }
  .works-page .landing-content > .project-filters { margin-top:16px; }
- .portfolio-shell .works-page .landing h1 { font-size:{{WorksMobileLandingTitleSize}}; }
- .portfolio-shell .project-row-link,.portfolio-shell .project-row-link.is-preview-expanded { grid-template-columns:minmax(0,1fr); grid-template-areas:"heading" "preview" "copy" "qa" "open"; grid-template-rows:auto auto auto auto auto; }
+ .portfolio-shell .project-row-link,.portfolio-shell .project-row-link.is-preview-expanded { grid-template-columns:minmax(0,1fr); grid-template-areas:"heading" "preview" "copy" "qa"; grid-template-rows:auto auto auto auto; }
  .portfolio-shell .project-row-link .project-heading { padding:12px; }
  .portfolio-shell .project-row-link .project-heading h2 { padding-left:0; }
  .project-row-link .project-heading .project-company,.project-row-link .project-title-chevron { display:none; }
@@ -1184,3 +1183,9 @@ html[data-skills-expanding=true] { overflow-anchor:none; scroll-behavior:auto; }
  .works-page .project-filter-button { font-size:11px; padding:4px 5px; gap:5px; }
  .works-page .project-filter-count { font-size:9px; padding:0 3px; }
 }
+
+/* Mobile project titles carry the project destination directly. */
+.portfolio-shell .project-row-link .project-open-link[hidden] { display:none; }
+.project-heading .project-mobile-title-link { color:inherit; font:inherit; text-decoration:none; }
+.project-mobile-title-link::after { content:'↗'; display:inline-block; margin-left:.25em; font-size:.5em; vertical-align:middle; }
+.project-mobile-title-link:focus-visible { outline:2px solid var(--accent); outline-offset:4px; }
