@@ -470,7 +470,10 @@
     "ExperienceToggleGap": "12px",
     "ExperienceToggleChevronSize": "10px",
     "ProjectTechnologyHoverDuration": "360ms",
-    "ProjectTechnologyHoverEase": "cubic-bezier(.22,.61,.36,1)"
+    "ProjectTechnologyHoverEase": "cubic-bezier(.22,.61,.36,1)",
+    "ProjectMobileTitleSize": "clamp(2rem, 8.5vw, 2.75rem)",
+    "ProjectMobileRowGap": "24px",
+    "ProjectMobileCompanySize": "14px"
   },
   "layoutReference": "https://aaftab.is-a.dev/",
   "effects": {

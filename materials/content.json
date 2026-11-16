@@ -138,7 +138,7 @@
       "id": "golf-3d",
       "navigationTitle": "Golf-True-3D",
       "title": "Golf-True-3D",
-      "summary": "Inspect a visually engaging 3D swing from every angle. Our single-shot approach works without separate camera calibration.",
+      "summary": "Turn a single swing into a clear, visually engaging 3D reconstruction you can inspect from every angle. Our single-shot approach lets you visually check the results without a separate, complicated camera-calibration process.",
       "url": "https://youminghu0930-public.github.io/golf-true-3d-product/",
       "linkLabel": "Explore True 3D →",
       "number": "02",
@@ -188,7 +188,7 @@
       },
       "summaryHighlights": [
         "single-shot approach",
-        "without separate camera calibration"
+        "without a separate, complicated camera-calibration process"
       ],
       "technologyLinks": {
         "Multi-view geometry": "https://youminghu0930-public.github.io/golf-swing-3d-reconstruction/",

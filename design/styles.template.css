@@ -504,7 +504,7 @@ html.custom-page-scrollbar { scrollbar-width:none; }
 html.custom-page-scrollbar::-webkit-scrollbar { display:none; }
 .page-scrollbar { position:fixed; z-index:19; right:{{ScrollbarRight}}; top:50%; transform:translateY(-50%); width:{{ScrollbarWidth}}; height:{{ScrollbarHeight}}; border-radius:999px; background:{{ScrollbarTrackColor}}; touch-action:none; cursor:pointer; }
 .page-scrollbar[hidden] { display:none; }
-.page-scrollbar-thumb { width:100%; height:100%; transform-origin:top; border-radius:inherit; background:var(--accent); pointer-events:none; }
+.page-scrollbar-thumb { width:100%; height:0; border-radius:inherit; background:var(--accent); pointer-events:none; }
 .page-scrollbar:focus-visible { outline:2px solid var(--accent); outline-offset:4px; }
 
 /* Homepage experience: a stable spine with a scroll-linked green progression. */
@@ -1099,3 +1099,37 @@ html[data-skills-expanding=true] { overflow-anchor:none; scroll-behavior:auto; }
 /* Shared destinations reveal as a group without changing cursor-frame ownership. */
 .portfolio-shell .project-technology-tag.is-link-group-active .project-technology-link { background:transparent; color:{{HeadingColor}}; font-weight:600; }
 .project-technology-tag.is-link-group-active .project-technology-outline rect { stroke:{{HeadingColor}}; stroke-width:2; }
+
+/* Preserve complete descriptions within the shared desktop title row. */
+@media(width > {{mobileBreakpoint}}) {
+ .project-copy.is-content-tight { gap:8px; }
+ .portfolio-shell .project-copy.is-content-tight .project-description-title { margin-bottom:2px; }
+ .works-page .project-copy.is-content-tight .project-tags { gap:6px 8px; }
+}
+/* Mobile cards follow a single readable flow, independent of desktop row sizing. */
+@media(max-width:{{mobileBreakpoint}}) {
+ .portfolio-shell .project-row-link,.portfolio-shell .project-row-link.is-preview-expanded { grid-template-columns:minmax(0,1fr); grid-template-areas:"preview" "heading" "copy"; grid-template-rows:auto auto auto; gap:{{ProjectMobileRowGap}}; padding:24px 0; }
+ .portfolio-shell .project-row-link:not(.is-preview-expanded) { grid-template-areas:"heading" "copy"; grid-template-rows:auto auto; }
+ .portfolio-shell .project-row-link:not(.is-preview-expanded) .project-preview-expansion { display:none; }
+ .portfolio-shell .project-row-link .project-row-arrow { display:none; }
+ .portfolio-shell .project-row-link .project-heading { height:auto; align-self:start; padding:0; }
+ .portfolio-shell .project-row-link .project-heading h2 { position:relative; top:auto; left:auto; right:auto; transform:none; padding-left:24px; font-size:{{ProjectMobileTitleSize}}; line-height:1.1; overflow-wrap:normal; }
+ .project-row-link .project-heading .project-company { position:static; margin-top:8px; padding-left:24px; font-size:{{ProjectMobileCompanySize}}; }
+ .project-row-link .project-copy { height:auto; gap:20px; }
+ .portfolio-shell .project-row-link .project-preview-expansion { grid-area:preview; grid-row:auto; margin:0; width:100%; }
+ .project-row-link .project-inline-preview { width:100%; grid-template-columns:minmax(0,1fr); }
+ .project-row-link .project-title-chevron { width:10px; height:10px; left:2px; }
+ .portfolio-shell .project-row-link .project-open-link { min-height:32px; line-height:32px; }
+ .project-row-link .project-technology-link { max-width:100%; box-sizing:border-box; }
+ .works-page .project-tags .project-technology-tag { max-width:100%; }
+ .project-technology-label { min-width:0; overflow-wrap:anywhere; }
+}
+@media(hover:none),(pointer:coarse) {
+ .portfolio-shell .project-row-link:hover { background:transparent; }
+ .project-row-link:hover .project-heading::before { clip-path:inset(0 0 100% 0); }
+ .project-row-link:hover .project-heading h2,.project-row-link:hover .project-title-text { color:{{HeadingColor}}; }
+ .project-row-link:hover .project-company { color:var(--muted); }
+ .project-row-link:hover .project-summary-highlight { background-size:0% 100%; color:{{HeadingColor}}; }
+}
+
+@media(max-width:{{mobileBreakpoint}}) { .project-row-link > .project-expand-trigger { inset:var(--project-header-top,0px) 0 auto; height:var(--project-header-height); } }

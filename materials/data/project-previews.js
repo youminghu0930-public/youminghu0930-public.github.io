@@ -87,6 +87,8 @@ export function installProjectPreviews(main, projects) {
     const setInfoOpen=expanded=>{if(expanded)info.style.setProperty('--preview-help-width',`${content.scrollWidth+16}px`);info.classList.toggle('is-open',expanded);summary.setAttribute('aria-expanded',String(expanded));description.inert=!expanded;};
     info.addEventListener('pointerenter',event=>{if(event.pointerType==='mouse')setInfoOpen(true);},{signal});
     info.addEventListener('pointerleave',()=>setInfoOpen(false),{signal});
+    summary.addEventListener('click',()=>{if(!matchMedia('(hover:hover) and (pointer:fine)').matches)setInfoOpen(!info.classList.contains('is-open'));},{signal});
+    document.addEventListener('pointerdown',event=>{if(!info.contains(event.target))setInfoOpen(false);},{signal});
     // Keep overlay gestures from starting a pan on the media beneath it.
     for(const type of ['pointerdown','wheel','dblclick'])info.addEventListener(type,event=>event.stopPropagation(),{signal});
     description.inert=true;
@@ -127,7 +129,7 @@ export function installProjectPreviews(main, projects) {
       const width=action.offsetWidth;
       if(headerLocked&&!mobile.matches&&width===headerWidth)return;
       headerWidth=width;
-      const nodes=[...action.querySelectorAll('.project-heading,.project-copy')];
+      const nodes=[...action.querySelectorAll(mobile.matches?'.project-heading':'.project-heading,.project-copy')];
       const top=mobile.matches?Math.min(...nodes.map(node=>node.offsetTop)):0;
       const bottom=Math.max(...nodes.map(node=>node.offsetTop+node.offsetHeight));
       action.style.setProperty('--project-header-top',`${top}px`);
@@ -161,7 +163,7 @@ export function installProjectPreviews(main, projects) {
     trigger.setAttribute('aria-label',`Expand ${project.title}`);
     wrapper.id=`${project.id}-preview`;trigger.setAttribute('aria-controls',wrapper.id);title.setAttribute('aria-controls',wrapper.id);
     action.append(trigger);
-    const item={action,wrapper,canvas,media,tools,trigger,title,headerObserver,setHeaderExpanded,name:project.title,panCleanup,config:project.banner,player:null,visible:false,expanded:false};
+    const item={action,wrapper,canvas,media,tools,trigger,title,headerObserver,setHeaderExpanded,name:project.title,panCleanup,config:project.banner,player:null,visible:false,expanded:mobile.matches};
     items.push(item);update(item);observer.observe(action);
     trigger.addEventListener('click',event=>{event.stopPropagation();if(item.expanded){setInfoOpen(false);resetMagnet();}item.expanded=!item.expanded;update(item);},{signal});
     title.addEventListener('click',event=>{event.stopPropagation();item.expanded=!item.expanded;setInfoOpen(false);resetMagnet();update(item);if(!item.expanded)trigger.focus({preventScroll:true});},{signal});
@@ -176,6 +178,7 @@ export function installProjectPreviews(main, projects) {
     const title=heading.querySelector('h2'),company=heading.querySelector('.project-company');
     const headingStyle=getComputedStyle(heading),companyStyle=getComputedStyle(company);
     const titleHeight=title.offsetHeight+company.offsetHeight+parseFloat(companyStyle.marginTop)+parseFloat(headingStyle.paddingTop)+parseFloat(headingStyle.paddingBottom);
+    for(const item of items)item.action.querySelector('.project-copy').classList.remove('is-content-tight');
     const copy=reference.querySelector('.project-copy');
     const copyHeight=[...copy.children].reduce((sum,node)=>sum+node.offsetHeight,0)+Math.max(0,copy.childElementCount-1)*parseFloat(getComputedStyle(copy).rowGap);
     const cellHeight=Math.ceil(Math.max(titleHeight,copyHeight));
@@ -184,6 +187,12 @@ export function installProjectPreviews(main, projects) {
       item.action.style.setProperty('--project-mobile-heading-height',`${Math.ceil(titleHeight)}px`);
       item.action.style.setProperty('--project-mobile-copy-height',`${Math.ceil(copyHeight)}px`);
       item.action.style.setProperty('--project-title-half-height',`${item.action.querySelector('.project-heading h2').offsetHeight/2}px`);
+      if(!mobile.matches){
+        const content=item.action.querySelector('.project-copy');
+        const naturalHeight=[...content.children].reduce((sum,node)=>sum+node.offsetHeight,0)+Math.max(0,content.childElementCount-1)*parseFloat(getComputedStyle(content).rowGap);
+        content.classList.toggle('is-content-tight',naturalHeight>cellHeight+1);
+      }
+
     }
   };
   const scheduleRowLayout=()=>{if(!rowLayoutFrame)rowLayoutFrame=requestAnimationFrame(syncRowLayout);};

@@ -194,7 +194,7 @@ async function startApp() {
     const progress = limit ? Math.max(0, Math.min(1, scrollY / limit)) : 0;
     scrollRail.hidden = limit <= 1 || document.body.style.overflow === 'hidden';
     scrollRail.setAttribute('aria-valuenow', String(Math.round(progress * 100)));
-    scrollThumb.style.transform = `scaleY(${progress})`;
+    scrollThumb.style.height = `${progress>0?Math.max(scrollRail.clientWidth,scrollRail.clientHeight*progress):0}px`;
   }
   function seekScrollbar(event) {
     const rect = scrollRail.getBoundingClientRect();
