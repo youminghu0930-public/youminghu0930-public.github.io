@@ -76,16 +76,19 @@ export function installPointerEffects(hero) {
   }
   function flyToTarget(previous, direct = false) {
     stopFlights();
-    if (!target || reduced.matches) return;
+    if (!pointer || reduced.matches) return;
     const bounds = targetBounds();
-    const center = {x:bounds.left + bounds.width / 2, y:bounds.top + bounds.height / 2};
+    const center = bounds ? {x:bounds.left + bounds.width / 2, y:bounds.top + bounds.height / 2} : {x:pointer.x,y:pointer.y};
+    const transform=getComputedStyle(frame.querySelector('.cursor-rotor')).transform;
+    const inverse=new DOMMatrix(transform==='none'?undefined:transform).inverse();
     corners.forEach((corner, index) => {
       const end = corner.getBoundingClientRect();
       const x = end.left + end.width / 2, y = end.top + end.height / 2;
       const from = previous[index] || {x:pointer.x, y:pointer.y};
       if (direct && Math.hypot(from.x-x,from.y-y)<.5) return;
+      const offset=new DOMPoint(from.x-x,from.y-y).matrixTransform(inverse);
       const keyframes=direct ? [
-        {transform:`translate(${from.x-x}px, ${from.y-y}px)`,borderColor:cornerColor},
+        {transform:`translate(${offset.x}px, ${offset.y}px)`,borderColor:cornerColor},
         {transform:'translate(0, 0)',borderColor:cornerColor}
       ] : [
         {transform:`translate(${from.x - x}px, ${from.y - y}px)`,borderColor:cornerColor,offset:0},
@@ -181,7 +184,7 @@ export function installPointerEffects(hero) {
     if (hit instanceof HTMLIFrameElement) { hide(); return; }
     const next = resolveTarget(hit);
     const changed = next !== target;
-    const direct = Boolean(target && next);
+    const direct = Boolean(target);
     const shouldAnimate = animate || direct;
     const previous = changed && shouldAnimate ? corners.map(corner => {
       const rect = corner.getBoundingClientRect();
@@ -190,7 +193,7 @@ export function installPointerEffects(hero) {
     if (changed) stopFlights();
     setTarget(next);
     position();
-    if (changed && target && shouldAnimate) flyToTarget(previous, direct);
+    if (changed && shouldAnimate) flyToTarget(previous, direct);
   }
   function track() {
     trackingFrame = 0;

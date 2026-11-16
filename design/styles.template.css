@@ -889,8 +889,8 @@ html[data-skills-expanding=true] { overflow-anchor:none; scroll-behavior:auto; }
 .project-row-link .project-preview-tools { align-items:center; }
 .project-row-link .project-footage-credit { margin:0; align-self:center; line-height:1.4; }
 .project-preview-info { width:40px; overflow:hidden; transition:width {{PreviewInfoDuration}} ease, background {{PreviewInfoDuration}} ease, backdrop-filter {{PreviewInfoDuration}} ease; }
-.project-preview-info.is-open { width:{{PreviewInfoOpenWidth}}; }
-.project-preview-help-content { width:calc({{PreviewInfoOpenWidth}} - 16px); max-width:100%; }
+.project-preview-info.is-open { width:var(--preview-help-width,{{PreviewInfoOpenWidth}}); }
+.project-preview-help-content { width:max-content; max-width:none; }
 @media(max-width:{{mobileBreakpoint}}) {
  .portfolio-shell .project-row-link { padding-top:20px; padding-bottom:{{ProjectCompactBottomPadding}}; }
  .project-row-link .project-preview-expansion, .project-row-link.is-preview-expanded .project-preview-expansion { margin:0; }
@@ -935,3 +935,41 @@ html[data-skills-expanding=true] { overflow-anchor:none; scroll-behavior:auto; }
 /* One persistent header control keeps all four cursor corners fixed on expansion. */
 .project-row-link.is-preview-expanded > .project-expand-trigger { inset:var(--project-header-top,0px) 0 auto; height:var(--project-header-height); }
 .portfolio-shell .project-title-link[hidden] { display:none; }
+
+/* The idle question mark has no backdrop; only expanded instructions use the panel. */
+.project-preview-info:not(.is-open) { background:transparent; -webkit-backdrop-filter:none; backdrop-filter:none; }
+
+/* Control icon variants follow the preview surface, rather than the page theme. */
+.project-preview-info[data-theme=light] .project-preview-info-toggle { color:{{PreviewInfoLightColor}}; }
+.project-preview-info[data-theme=light] .project-preview-question { border-color:{{PreviewInfoLightBorder}}; }
+.project-preview-info[data-theme=dark] .project-preview-info-toggle { color:{{PreviewInfoDarkColor}}; }
+.project-preview-info[data-theme=dark] .project-preview-question { border-color:{{PreviewInfoDarkBorder}}; }
+.project-preview-info[data-theme] .project-preview-info-toggle:hover .project-preview-question,
+.project-preview-info[data-theme] .project-preview-info-toggle:focus-visible .project-preview-question { color:var(--accent); border-color:var(--accent); }
+
+.project-preview-info[data-theme=light].is-open .project-preview-info-toggle { color:{{PreviewInfoDarkColor}}; }
+.project-preview-info[data-theme=light].is-open .project-preview-question { border-color:{{PreviewInfoDarkBorder}}; }
+
+/* Row two is exactly the preview plus its fixed attribution line. */
+.project-row-link .project-inline-preview { grid-template-rows:{{ProjectInlinePreviewHeight}} {{ProjectCreditRowHeight}}; align-items:start; }
+.project-row-link .project-preview-media { grid-row:1; align-self:start; }
+.project-row-link .project-preview-tools { display:contents; }
+.project-row-link .project-footage-credit { grid-column:1; grid-row:2; height:{{ProjectCreditRowHeight}}; line-height:{{ProjectCreditRowHeight}}; align-self:center; }
+.portfolio-shell .project-row-link .project-open-link { grid-column:2; grid-row:1 / 3; align-self:end; justify-self:start; margin:0; }
+@media(width > {{mobileBreakpoint}}) {
+ .portfolio-shell .project-row-link.is-preview-expanded { grid-template-rows:calc(var(--project-header-height) - {{ProjectCompactTopPadding}}) auto; row-gap:{{ProjectCompactGap}}; }
+}
+@media(max-width:{{mobileBreakpoint}}) {
+ .project-row-link .project-inline-preview { grid-template-rows:{{ProjectInlinePreviewMobileHeight}} {{ProjectCreditRowHeight}}; }
+ .portfolio-shell .project-row-link .project-open-link { grid-column:1; grid-row:2; justify-self:end; min-height:{{ProjectCreditRowHeight}}; padding:4px 10px; font-size:12px; }
+ .project-row-link .project-footage-credit { justify-self:start; }
+}
+
+@media(max-width:{{mobileBreakpoint}}) {
+ .project-row-link .project-inline-preview { grid-template-rows:{{ProjectInlinePreviewMobileHeight}} 32px; }
+ .project-row-link .project-footage-credit { height:32px; line-height:32px; }
+}
+
+.portfolio-shell .project-row-link .project-open-link { justify-self:end; }
+
+.project-preview-question { flex:none; box-sizing:border-box; font-family:Arial,sans-serif; font-size:13px; font-weight:400; font-style:normal; line-height:1; }

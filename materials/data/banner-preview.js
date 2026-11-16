@@ -17,7 +17,8 @@ export function createBannerPreview(canvas, config) {
     const height=canvas.height;
     context.fillStyle='#080808';context.fillRect(0,0,800,height);
     const fit=800/timing.width;
-    const displayScale=800/Math.max(1,canvas.clientWidth || 400);
+    // Account for contain-fit letterboxing: the painted portrait is narrower than its box.
+    const displayScale=1/Math.max(.001,Math.min((canvas.clientWidth||400)/800,(canvas.clientHeight||height)/height));
     const screenUnit=displayScale/fit;
     context.save();context.translate((800-timing.width*fit)/2,(height-timing.height*fit)/2);context.scale(fit,fit);
     const ready=video.readyState>=2;
@@ -37,7 +38,8 @@ export function createBannerPreview(canvas, config) {
         const previous=new Map();
         history.forEach((sample,i)=> {
           const opacity=design.effects.projectBannerHistoryOpacity*((i+1)/Math.max(1,history.length))**2;
-          context.globalAlpha=opacity;context.strokeStyle='#a2d8b9';context.fillStyle='#a2d8b9';context.lineWidth=design.effects.projectBannerGhostWidth*screenUnit;context.lineCap='round';
+          const rainbow=`hsl(${240*(1-i/Math.max(1,history.length-1))} 90% 62%)`;
+          context.globalAlpha=opacity;context.strokeStyle=rainbow;context.fillStyle=rainbow;context.lineWidth=design.effects.projectBannerGhostWidth*screenUnit;context.lineCap='round';
           for(const [a,b] of club) {
             const p=sample[pose.joints.indexOf(a)],q=sample[pose.joints.indexOf(b)];
             if(!usable(p)||!usable(q))continue;
@@ -47,7 +49,7 @@ export function createBannerPreview(canvas, config) {
             const point=sample[jointIndex],last=previous.get(jointIndex);
             if(usable(point)) {
               context.globalAlpha=design.effects.projectBannerTrailOpacity*(.2+.8*(i+1)/Math.max(1,history.length));
-              context.strokeStyle='#63f5b4';context.fillStyle='#9affcf';
+              context.strokeStyle=rainbow;context.fillStyle=rainbow;
               context.lineWidth=design.effects.projectBannerTrailWidth*screenUnit;
               if(last) {context.beginPath();context.moveTo(last[0],last[1]);context.lineTo(point[0],point[1]);context.stroke();}
               context.beginPath();context.arc(point[0],point[1],design.effects.projectBannerTrailDotRadius*screenUnit,0,Math.PI*2);context.fill();
@@ -57,13 +59,33 @@ export function createBannerPreview(canvas, config) {
         });
         context.globalAlpha=1;
       }
-      context.strokeStyle='#63f5b4';context.fillStyle='#63f5b4';context.lineWidth=design.effects.projectBannerSkeletonWidth*screenUnit;context.lineCap='round';
+      const settings=design.effects;
+      const radius=settings.projectBannerJointRadius*screenUnit;
+      context.strokeStyle=settings.projectBannerPoseColor;
+      context.lineWidth=settings.projectBannerSkeletonWidth*screenUnit;context.lineCap='round';
+      // Clip full bones against circular joints; the ring covers the clip boundary.
+      // This avoids the visible notch produced by rounded caps touching at one point.
       for(const [a,b] of edges) {
         const p=points[data.joints.indexOf(a)],q=points[data.joints.indexOf(b)];
-        if(!usable(p)||!usable(q))continue;
+        if(!usable(p)||!usable(q)||Math.hypot(q[0]-p[0],q[1]-p[1])<=2*radius)continue;
+        context.save();
+        for(const point of [p,q]) {
+          context.beginPath();context.rect(-timing.width,-timing.height,timing.width*3,timing.height*3);
+          context.moveTo(point[0]+radius,point[1]);context.arc(point[0],point[1],radius,0,Math.PI*2);
+          context.clip('evenodd');
+        }
         context.beginPath();context.moveTo(p[0],p[1]);context.lineTo(q[0],q[1]);context.stroke();
+        context.restore();
       }
-      for(const point of points)if(usable(point)) {context.beginPath();context.arc(point[0],point[1],design.effects.projectBannerJointRadius*screenUnit,0,Math.PI*2);context.fill();}
+      // Joint interiors and outer mint rings sit above bones, history, and trajectories.
+      points.forEach((point,index)=>{
+        if(!usable(point))return;
+        const name=data.joints[index];
+        context.fillStyle=name.startsWith('left_')?settings.projectBannerLeftColor:name.startsWith('right_')?settings.projectBannerRightColor:settings.projectBannerPoseColor;
+        context.beginPath();context.arc(point[0],point[1],Math.max(0,radius-(settings.projectBannerJointRingWidth/2+settings.projectBannerJointCenterGap)*screenUnit),0,Math.PI*2);context.fill();
+        context.strokeStyle=settings.projectBannerPoseColor;context.lineWidth=settings.projectBannerJointRingWidth*screenUnit;
+        context.beginPath();context.arc(point[0],point[1],radius,0,Math.PI*2);context.stroke();
+      });
     }
     context.restore();
     canvas.hidden=false;

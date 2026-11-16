@@ -82,6 +82,17 @@ export function createMeasurementOverlays(options){
     updateView(camera,w,h){
       overlays.forEach(overlay=>overlay.updateView(camera,w,h));svg.setAttribute('viewBox',`0 0 ${w} ${h}`);
       const order=[...labels.keys()];
+      const strip=options.canvas.parentElement.querySelector('.snapshot-bottom-strip');
+      const clearBottom=strip?.offsetTop??h;
+      const top=8,gap=3;
+      const tagHeight=Math.max(20,Math.min(42,(clearBottom-top-6-gap*(order.length-1))/order.length));
+      const titleSize=Math.max(8,Math.min(10,tagHeight*.27));
+      const valueSize=Math.max(10,Math.min(15,tagHeight*.4));
+      const measure=document.createElement('canvas').getContext('2d');
+      measure.font=`${titleSize}px system-ui`;
+      const titleWidth=Math.max(...[...labels.values()].map(label=>measure.measureText(w<260&&label.title.length>16?label.title.replace('Shoulder','Sh.').replace('Spine','Sp.'):label.title).width));
+      measure.font=`600 ${valueSize}px system-ui`;
+      const tagWidth=Math.ceil(Math.max(titleWidth,measure.measureText('-180.0°').width)+16);
       for(const [id,label] of labels){
         const sector=label.sector;
         if(!sector&&!label.anchor){label.group.style.display=label.line.style.display=label.dot.style.display='none';continue;}
@@ -91,17 +102,21 @@ export function createMeasurementOverlays(options){
         const visible=point.clone().applyMatrix4(camera.matrixWorldInverse).z<0&&projected.z>=-1&&projected.z<=1&&Math.abs(projected.x)<1.15&&Math.abs(projected.y)<1.15;
         label.group.style.display=label.line.style.display=label.dot.style.display=visible?'':'none';if(!visible)continue;
         const px=(projected.x+1)*w/2,py=(1-projected.y)*h/2;
-        const tagWidth=w<260?100:126;
-        const x=Math.max(5,w-tagWidth-10),y=10+order.indexOf(id)*50;
+        let x=Math.max(5,w-tagWidth-8);const y=top+order.indexOf(id)*(tagHeight+gap);
         label.group.setAttribute('transform',`translate(${x},${y})`);
-        label.box.setAttribute('width',tagWidth);label.text.setAttribute('font-size','10');
+        label.box.setAttribute('width',tagWidth);label.box.setAttribute('height',tagHeight);
+        label.text.setAttribute('font-size',titleSize);label.text.setAttribute('y',tagHeight*.36);
+        label.value.setAttribute('y',tagHeight*.81);
         const [region,measurement]=label.title.split(' ');
         label.text.textContent=w<260&&label.title.length>16?label.title.replace('Shoulder','Sh.').replace('Spine','Sp.'):label.title;
         label.kind.textContent='';
-        label.value.setAttribute('font-size',w<260?'11':'15');label.value.textContent=sector?`${sector.angle.toFixed(1)}°`:`${label.measurement.toFixed(3)} units`;
+        label.value.setAttribute('font-size',valueSize);label.value.textContent=sector?`${sector.angle.toFixed(1)}°`:`${label.measurement.toFixed(3)} units`;
+        x=Math.max(5,w-tagWidth-8);
+        label.box.setAttribute('width',tagWidth);
+        label.group.setAttribute('transform',`translate(${x},${y})`);
         label.group.setAttribute('aria-label',`${label.title}: ${label.value.textContent}`);
         // Inverted L: rise from the angle, then enter the box at left-center.
-        label.line.setAttribute('d',`M ${px} ${py} V ${y+22} H ${x}`);
+        label.line.setAttribute('d',`M ${px} ${py} V ${y+tagHeight/2} H ${x}`);
         label.dot.setAttribute('cx',px);label.dot.setAttribute('cy',py);
       }
     },

@@ -439,7 +439,12 @@
     "ProjectCreditGap": "4px",
     "PreviewInfoOpenWidth": "224px",
     "ProjectTitleChevronSpace": "32px",
-    "ProjectTitleChevronSize": "12px"
+    "ProjectTitleChevronSize": "12px",
+    "PreviewInfoLightColor": "#263a2e",
+    "PreviewInfoLightBorder": "rgb(38 58 46 / 48%)",
+    "PreviewInfoDarkColor": "#eeeeee",
+    "PreviewInfoDarkBorder": "rgb(238 238 238 / 42%)",
+    "ProjectCreditRowHeight": "20px"
   },
   "layoutReference": "https://aaftab.is-a.dev/",
   "effects": {
@@ -535,8 +540,8 @@
     "projectPreviewControlBottomRatio": 0.5,
     "projectBannerHistoryFrames": 30,
     "projectBannerHistoryOpacity": 0.45,
-    "projectBannerSkeletonWidth": 1.8,
-    "projectBannerJointRadius": 2.7,
+    "projectBannerSkeletonWidth": 2.4,
+    "projectBannerJointRadius": 4.8,
     "projectBannerTrailWidth": 3,
     "projectBannerTrailDotRadius": 2.5,
     "projectBannerTrailOpacity": 0.85,
@@ -546,6 +551,11 @@
       "golf_club_head",
       "right_wrist"
     ],
-    "projectFilterTransitionDuration": 700
+    "projectFilterTransitionDuration": 700,
+    "projectBannerJointRingWidth": 2.4,
+    "projectBannerJointCenterGap": 0.8,
+    "projectBannerPoseColor": "#63f5b4",
+    "projectBannerLeftColor": "#3b82f6",
+    "projectBannerRightColor": "#ef4444"
   }
 }

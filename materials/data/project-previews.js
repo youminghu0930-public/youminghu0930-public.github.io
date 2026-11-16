@@ -63,6 +63,7 @@ export function installProjectPreviews(main, projects) {
     open.className='action-primary project-open-link';open.textContent='View project';
     const arrow=document.createElement('span');arrow.className='action-arrow';arrow.textContent='→';arrow.setAttribute('aria-hidden','true');open.append(arrow);
     const info=document.createElement('div');info.className='project-preview-info';
+    info.dataset.theme=project.banner?.interactive?'light':'dark';
     const summary=document.createElement('button');summary.type='button';
     const question=document.createElement('span');question.className='project-preview-question';question.textContent='?';
     summary.append(question);
@@ -71,12 +72,18 @@ export function installProjectPreviews(main, projects) {
     const description=document.createElement('div');description.className='project-preview-help';
     description.id=`${project.id}-preview-help`;summary.setAttribute('aria-controls',description.id);
     const content=document.createElement('div');content.className='project-preview-help-content';
-    const gestures=project.banner?.interactive
-      ? ['Left-drag to rotate','Right-drag to translate','Scroll to zoom','One-finger drag to rotate','Two-finger drag to translate','Pinch to zoom']
-      : ['Drag to pan','Scroll to zoom','Pinch to zoom','Double-click to reset'];
-    for(const gesture of gestures){const line=document.createElement('p');line.textContent=gesture;content.append(line);}
+    const mouseControls=matchMedia('(hover:hover) and (pointer:fine)');
+    const renderGestures=()=>{
+      const gestures=project.banner?.interactive
+        ? (mouseControls.matches ? ['Rotate: Left-drag','Pan: Right-drag','Zoom: Scroll'] : ['Rotate: One-finger drag','Pan: Two-finger drag','Zoom: Pinch'])
+        : (mouseControls.matches ? ['Pan: Drag','Zoom: Scroll','Reset: Double-click'] : ['Pan: One-finger drag','Zoom: Pinch']);
+      content.replaceChildren();
+      for(const gesture of gestures){const line=document.createElement('p');line.textContent=gesture;content.append(line);}
+    };
+    renderGestures();
+    mouseControls.addEventListener('change',renderGestures,{signal});
     description.append(content);info.append(summary,description);
-    const setInfoOpen=expanded=>{info.classList.toggle('is-open',expanded);summary.setAttribute('aria-expanded',String(expanded));description.inert=!expanded;};
+    const setInfoOpen=expanded=>{if(expanded)info.style.setProperty('--preview-help-width',`${content.scrollWidth+16}px`);info.classList.toggle('is-open',expanded);summary.setAttribute('aria-expanded',String(expanded));description.inert=!expanded;};
     info.addEventListener('pointerenter',event=>{if(event.pointerType==='mouse')setInfoOpen(true);},{signal});
     info.addEventListener('pointerleave',()=>setInfoOpen(false),{signal});
     // Keep overlay gestures from starting a pan on the media beneath it.
