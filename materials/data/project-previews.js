@@ -7,13 +7,25 @@ export function installProjectPreviews(main, projects) {
   const {signal}=controller;
   const mobile=matchMedia(`(max-width: ${design.mobileBreakpoint})`);
   const items=[];
+  function arrangeProject(item){
+    const copy=item.action.querySelector('.project-copy');
+    if(mobile.matches){
+      item.action.insertBefore(item.wrapper,copy);
+      if(item.qa)item.action.append(item.qa);
+      item.action.append(item.open);
+    }else{
+      item.action.insertBefore(item.wrapper,item.title);
+      if(item.qa)item.inline.append(item.qa);
+      item.tools.append(item.open);
+    }
+  }
   function finishExpansion(item){
     if(!item.wrapper.classList.contains('is-animating'))return;
     clearTimeout(item.expansionTimer);item.wrapper.classList.remove('is-animating');
     update(item);
   }
   function update(item) {
-    const expanded=item.expanded;
+    const expanded=mobile.matches||item.expanded;
     const changed=item.renderedExpanded!==undefined&&item.renderedExpanded!==expanded;
     item.renderedExpanded=expanded;
     if(changed){
@@ -26,7 +38,7 @@ export function installProjectPreviews(main, projects) {
       }
     }
     item.setHeaderExpanded(expanded);
-    item.trigger.hidden=false;
+    item.trigger.hidden=mobile.matches;
     item.trigger.setAttribute('aria-label',`${expanded?'Collapse':'Expand'} ${item.name}`);
     item.trigger.setAttribute('aria-expanded',String(expanded));
     item.title.hidden=true;
@@ -101,8 +113,8 @@ export function installProjectPreviews(main, projects) {
     mouseControls.addEventListener('change',renderGestures,{signal});
     description.append(content);info.append(summary,description);
     const setInfoOpen=expanded=>{if(expanded)info.style.setProperty('--preview-help-width',`${content.scrollWidth+16}px`);info.classList.toggle('is-open',expanded);summary.setAttribute('aria-expanded',String(expanded));description.inert=!expanded;};
-    info.addEventListener('pointerenter',event=>{if(event.pointerType==='mouse')setInfoOpen(true);},{signal});
-    info.addEventListener('pointerleave',()=>setInfoOpen(false),{signal});
+    info.addEventListener('pointerenter',event=>{if(event.pointerType==='mouse'&&mouseControls.matches)setInfoOpen(true);},{signal});
+    info.addEventListener('pointerleave',event=>{if(event.pointerType==='mouse'&&mouseControls.matches)setInfoOpen(false);},{signal});
     summary.addEventListener('click',()=>{if(!matchMedia('(hover:hover) and (pointer:fine)').matches)setInfoOpen(!info.classList.contains('is-open'));},{signal});
     document.addEventListener('pointerdown',event=>{if(!info.contains(event.target))setInfoOpen(false);},{signal});
     // Keep overlay gestures from starting a pan on the media beneath it.
@@ -199,8 +211,8 @@ export function installProjectPreviews(main, projects) {
     trigger.setAttribute('aria-label',`Expand ${project.title}`);
     wrapper.id=`${project.id}-preview`;trigger.setAttribute('aria-controls',wrapper.id);title.setAttribute('aria-controls',wrapper.id);
     action.append(trigger);
-    const item={action,wrapper,canvas,media,tools,trigger,title,headerObserver,setHeaderExpanded,name:project.title,panCleanup,config:project.banner,player:null,visible:false,expanded:mobile.matches};
-    items.push(item);update(item);observer.observe(action);
+    const item={action,wrapper,canvas,media,tools,inline,open,qa:inline.querySelector('.project-preview-qa'),trigger,title,headerObserver,setHeaderExpanded,name:project.title,panCleanup,config:project.banner,player:null,visible:false,expanded:false};
+    items.push(item);arrangeProject(item);update(item);observer.observe(action);
     wrapper.addEventListener('transitionend',event=>{if(event.target===wrapper&&event.propertyName==='grid-template-rows')finishExpansion(item);},{signal});
     trigger.addEventListener('click',event=>{event.stopPropagation();if(item.expanded){setInfoOpen(false);resetMagnet();}item.expanded=!item.expanded;update(item);},{signal});
     title.addEventListener('click',event=>{event.stopPropagation();item.expanded=!item.expanded;setInfoOpen(false);resetMagnet();update(item);if(!item.expanded)trigger.focus({preventScroll:true});},{signal});
@@ -244,8 +256,33 @@ export function installProjectPreviews(main, projects) {
   window.addEventListener('resize',scheduleRowLayout,{passive:true,signal});
   document.fonts.ready.then(()=>{if(!signal.aborted)scheduleRowLayout();});
   scheduleRowLayout();
-  const refresh=()=>items.forEach(update);
+  let centerFrame=0;
+  const highlightCenter=()=>{
+    centerFrame=0;
+    const viewport=window.visualViewport;
+    const top=viewport?.offsetTop || 0,height=viewport?.height || innerHeight,center=top+height/2;
+    let nearest=null,distance=Infinity;
+    if(mobile.matches)for(const item of items){
+      if(item.action.closest('[hidden],[inert],[aria-hidden="true"]'))continue;
+      const bounds=item.action.getBoundingClientRect();
+      if(!bounds.height||bounds.bottom<=top||bounds.top>=top+height)continue;
+      const delta=Math.abs(bounds.top+bounds.height/2-center);
+      if(delta<distance){nearest=item;distance=delta;}
+    }
+    for(const item of items)item.action.classList.toggle('is-center-highlighted',item===nearest);
+  };
+  const scheduleCenterHighlight=()=>{if(!centerFrame)centerFrame=requestAnimationFrame(highlightCenter);};
+  const centerObserver=new ResizeObserver(scheduleCenterHighlight);
+  for(const item of items)centerObserver.observe(item.action);
+  const filterObserver=new MutationObserver(scheduleCenterHighlight);
+  filterObserver.observe(main,{subtree:true,attributes:true,attributeFilter:['hidden','inert']});
+  window.addEventListener('scroll',scheduleCenterHighlight,{passive:true,signal});
+  window.addEventListener('resize',scheduleCenterHighlight,{passive:true,signal});
+  window.visualViewport?.addEventListener('resize',scheduleCenterHighlight,{passive:true,signal});
+  window.visualViewport?.addEventListener('scroll',scheduleCenterHighlight,{passive:true,signal});
+  scheduleCenterHighlight();
+  const refresh=()=>{for(const item of items){arrangeProject(item);update(item);}scheduleRowLayout();scheduleCenterHighlight();};
   mobile.addEventListener('change',refresh,{signal});
   document.addEventListener('visibilitychange',refresh,{signal});
-  return ()=>{cancelAnimationFrame(rowLayoutFrame);rowLayoutObserver.disconnect();observer.disconnect();controller.abort();for(const item of items){clearTimeout(item.expansionTimer);item.player?.destroy();item.panCleanup();item.headerObserver.disconnect();item.wrapper.remove();item.tools.remove();item.trigger.remove();item.action.classList.remove('is-preview-expanded');}};
+  return ()=>{cancelAnimationFrame(centerFrame);centerObserver.disconnect();filterObserver.disconnect();cancelAnimationFrame(rowLayoutFrame);rowLayoutObserver.disconnect();observer.disconnect();controller.abort();for(const item of items){clearTimeout(item.expansionTimer);item.player?.destroy();item.panCleanup();item.headerObserver.disconnect();item.wrapper.remove();item.tools.remove();item.trigger.remove();item.qa?.remove();item.open.remove();item.action.classList.remove('is-preview-expanded','is-center-highlighted');}};
 }

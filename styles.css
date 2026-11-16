@@ -1160,3 +1160,28 @@ html[data-skills-expanding=true] { overflow-anchor:none; scroll-behavior:auto; }
 .project-row-link .project-inline-preview { align-self:start; }
 .project-row-link .project-preview-expansion { overflow:clip; transition-timing-function:cubic-bezier(.22,.61,.36,1); }
 .project-row-link.is-preview-expanded .project-preview-expansion:not(.is-animating) { overflow:visible; }
+
+/* Mobile Works: visible wrapped filters and a linear project-reading order. */
+@media(max-width:1000px) {
+ .works-page .project-filter-bar { flex-wrap:wrap; overflow:visible; gap:4px; padding:4px; }
+ .works-page .project-filter-button { flex:0 1 auto; min-width:0; padding:5px 7px; font-size:12px; }
+ .works-page .project-filter-count { font-size:10px; padding:0 4px; }
+ .works-page .landing-content > .project-filters { margin-top:16px; }
+ .portfolio-shell .works-page .landing h1 { font-size:clamp(1.75rem, 7.5vw, 2.25rem); }
+ .portfolio-shell .project-row-link,.portfolio-shell .project-row-link.is-preview-expanded { grid-template-columns:minmax(0,1fr); grid-template-areas:"heading" "preview" "copy" "qa" "open"; grid-template-rows:auto auto auto auto auto; }
+ .portfolio-shell .project-row-link .project-heading { padding:12px; }
+ .portfolio-shell .project-row-link .project-heading h2 { padding-left:0; }
+ .project-row-link .project-heading .project-company,.project-row-link .project-title-chevron { display:none; }
+ .project-row-link > .project-preview-qa { grid-area:qa; margin:0; }
+ .project-row-link > .project-preview-qa .project-qa-item:first-child { border-top:0; padding-top:0; }
+ .portfolio-shell .project-row-link > .project-open-link { grid-area:open; justify-self:end; align-self:end; }
+ .project-row-link.is-center-highlighted { background:rgb(255 255 255 / 3%); }
+ .project-row-link.is-center-highlighted .project-heading::before { clip-path:inset(0); }
+ .project-row-link.is-center-highlighted .project-heading h2,.project-row-link.is-center-highlighted .project-title-text { color:var(--button-text); }
+ .project-row-link.is-center-highlighted .project-summary-highlight { background-size:100% 100%; color:var(--button-text); }
+}
+
+@media(max-width:360px) {
+ .works-page .project-filter-button { font-size:11px; padding:4px 5px; gap:5px; }
+ .works-page .project-filter-count { font-size:9px; padding:0 3px; }
+}
