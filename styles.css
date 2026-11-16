@@ -691,8 +691,6 @@ html.custom-page-scrollbar::-webkit-scrollbar { display:none; }
  .skills-hover-window { width:calc(100% - 48px); margin-left:48px; }
 }
 
-/* Keep hover colors while hiding the decorative cursor during skill cooldown. */
-:root[data-skills-cooldown=true] .pointer-diamond { visibility:hidden; }
 
 /* Opening panels reveal downward; explicit user scrolling releases the hold. */
 html[data-skills-expanding=true] { overflow-anchor:none; scroll-behavior:auto; }

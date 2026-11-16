@@ -260,7 +260,7 @@ export function installPointerEffects(hero) {
   },{signal});
   window.addEventListener('scroll', () => { resetMagnets(); stopFlights(); refreshTarget(); }, {passive:true, signal});
   window.addEventListener('resize', refreshTarget, {passive:true, signal});
-  window.addEventListener('skills-cooldownchange', () => { stopFlights(); refreshTarget(); }, {signal});
+  window.addEventListener('skills-cooldownchange', refreshTarget, {signal});
   window.addEventListener('blur', hide, {signal});
   document.documentElement.addEventListener('pointerleave', event => { if (event.pointerType !== 'touch') hide(); }, {signal});
   fine.addEventListener('change', hide, {signal});
