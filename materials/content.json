@@ -132,7 +132,47 @@
         "Signal processing": "https://youminghu0930-public.github.io/trajectory-postprocessing/",
         "Trajectory smoothing": "https://youminghu0930-public.github.io/trajectory-postprocessing/",
         "Multi-model integration": "https://youminghu0930-public.github.io/integrating-golfer-club-detection-models/"
-      }
+      },
+      "qa": [
+        {
+          "question": "Why is it important?",
+          "answer": "Without measurable feedback, golfers can struggle to identify what needs to change. Quantitative motion analysis gives them a clear basis for adjusting their swing and improving more efficiently.",
+          "highlights": [
+            "measurable feedback"
+          ]
+        },
+        {
+          "question": "Why do we do it?",
+          "answer": "Golf is our entry point into sports technology, combining advanced AI pose estimation with established coaching criteria to validate the concept and build a viable business.",
+          "highlights": [
+            "entry point into sports technology"
+          ]
+        },
+        {
+          "question": "What is the challenge?",
+          "answer": "Consumer-grade footage often contains severe motion blur, leading to missed detections. Body joints can also be occluded from the camera’s viewpoint.",
+          "highlights": [
+            "severe motion blur",
+            "occluded"
+          ]
+        },
+        {
+          "question": "How do we solve the problem?",
+          "answer": "We train a unified model on in-house datasets with custom annotation specifications, use segmentation-based augmentation, and apply custom smoothing for fluid, accurate trajectories.",
+          "highlights": [
+            "custom annotation specifications",
+            "custom smoothing"
+          ]
+        },
+        {
+          "question": "What’s next?",
+          "answer": "Next, we’ll turn 2D detections into metrics based on established golf-coaching criteria and explore LLM-generated swing guidance.",
+          "highlights": [
+            "2D detections into metrics",
+            "LLM-generated swing guidance"
+          ]
+        }
+      ]
     },
     {
       "id": "golf-3d",
@@ -197,7 +237,51 @@
         "Time synchronization": "https://youminghu0930-public.github.io/two-event-time-sync/",
         "Kinematic analysis": "https://youminghu0930-public.github.io/pose-information-extraction/",
         "Calibration-free 3D reconstruction": "https://youminghu0930-public.github.io/golf-swing-3d-reconstruction/"
-      }
+      },
+      "qa": [
+        {
+          "question": "Why is it important?",
+          "answer": "Perspective distortion can skew 2D measurements. Reconstructing the swing in 3D enables more accurate angle measurements and clearer guidance for improvement.",
+          "highlights": [
+            "Perspective distortion",
+            "more accurate angle measurements"
+          ]
+        },
+        {
+          "question": "Why do we do it?",
+          "answer": "Most 3D joint-tracking products still rely on expensive marker-based systems. We aim to break this barrier with AI and build a scalable, profitable business.",
+          "highlights": [
+            "expensive marker-based systems",
+            "scalable, profitable business"
+          ]
+        },
+        {
+          "question": "What is the challenge?",
+          "answer": "Accurate 3D reconstruction usually requires camera calibration and synchronized recordings, both impractical for everyday users. Maintaining accuracy without them is one challenge; reconciling different practitioners’ body-angle definitions is another.",
+          "highlights": [
+            "camera calibration and synchronized recordings",
+            "body-angle definitions"
+          ]
+        },
+        {
+          "question": "How do we solve the problem?",
+          "answer": "We estimate spatial relationships using golf-specific priors, provide an intuitive UI for manual time synchronization, and visualize rotation definitions for clarity.",
+          "highlights": [
+            "spatial relationships",
+            "manual time synchronization",
+            "rotation definitions"
+          ]
+        },
+        {
+          "question": "What’s next?",
+          "answer": "We’ll strengthen our algorithms, automate synchronization, and improve device capture quality, then combine motion data with golf-informed AI to automatically generate swing guidance.",
+          "highlights": [
+            "automate synchronization",
+            "device capture quality",
+            "automatically generate swing guidance"
+          ]
+        }
+      ]
     }
   ],
   "navigation": [

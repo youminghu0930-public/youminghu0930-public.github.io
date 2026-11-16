@@ -26,7 +26,7 @@ function link(label, url, className) {
 function installScrollMotion(main) {
   const media = matchMedia('(prefers-reduced-motion: reduce)');
   const settings = design.effects;
-  const items = Array.from(main.querySelectorAll('.landing-content, .project-index, .project-copy > *, .project-heading > *, .project-visual > *, .project-detail > *, .experience-heading > *, .experience-period, .experience-copy > *, .skills-heading > *')).map(node => ({node, offset:0, opacity:1, initialized:false, order:node.matches('.experience-copy > *, .experience-heading > *, .project-copy > *') ? Array.from(node.parentElement.children).indexOf(node) : 0}));
+  const items = Array.from(main.querySelectorAll('.landing-content, .project-index, .project-copy > *, .project-heading > *, .project-visual > *, .project-detail > *, .project-qa-item, .project-preview-media, .project-footage-credit, .experience-heading > *, .experience-period, .experience-copy > *, .skills-heading > *')).map(node => ({node, offset:0, opacity:1, initialized:false, order:node.matches('.experience-copy > *, .experience-heading > *, .project-copy > *') ? Array.from(node.parentElement.children).indexOf(node) : 0}));
   const timelineRails = Array.from(main.querySelectorAll('.experience-rail'));
   const markers = Array.from(main.querySelectorAll('.experience-marker'));
   let frame = 0;
@@ -569,8 +569,8 @@ async function startApp() {
         smoothScroll.scrollTo(position.top, {immediate:true, force:true});
       } else window.scrollTo({...position, behavior:'instant'});
     }});
-    const stopScrollMotion = installScrollMotion(main);
     const stopProjectPreviews = route === 'works' ? installProjectPreviews(main, projects) : () => {};
+    const stopScrollMotion = installScrollMotion(main);
     cleanup = () => { stopProjectPreviews(); stopSkills(); stopScrollMotion(); stopEntrance?.(); stopPointer?.(); landing.destroy(); };
     currentRoute = route;
     updateScrollbar();

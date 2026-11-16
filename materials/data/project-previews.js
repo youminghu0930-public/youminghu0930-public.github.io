@@ -7,8 +7,24 @@ export function installProjectPreviews(main, projects) {
   const {signal}=controller;
   const mobile=matchMedia(`(max-width: ${design.mobileBreakpoint})`);
   const items=[];
+  function finishExpansion(item){
+    if(!item.wrapper.classList.contains('is-animating'))return;
+    clearTimeout(item.expansionTimer);item.wrapper.classList.remove('is-animating');
+    update(item);
+  }
   function update(item) {
     const expanded=item.expanded;
+    const changed=item.renderedExpanded!==undefined&&item.renderedExpanded!==expanded;
+    item.renderedExpanded=expanded;
+    if(changed){
+      clearTimeout(item.expansionTimer);
+      const animate=!mobile.matches&&!matchMedia('(prefers-reduced-motion:reduce)').matches;
+      item.wrapper.classList.toggle('is-animating',animate);
+      if(animate){
+        const duration=Math.max(...getComputedStyle(item.wrapper).transitionDuration.split(',').map(value=>parseFloat(value)*(value.trim().endsWith('ms')?1:1000)));
+        item.expansionTimer=setTimeout(()=>finishExpansion(item),duration+60);
+      }
+    }
     item.setHeaderExpanded(expanded);
     item.trigger.hidden=false;
     item.trigger.setAttribute('aria-label',`${expanded?'Collapse':'Expand'} ${item.name}`);
@@ -20,7 +36,7 @@ export function installProjectPreviews(main, projects) {
     item.action.classList.toggle('is-preview-expanded',expanded);
     item.wrapper.setAttribute('aria-hidden',String(!expanded));
     item.wrapper.inert=!expanded;
-    if(expanded && item.visible && !document.hidden) {
+    if(expanded && item.visible && !document.hidden && !item.wrapper.classList.contains('is-animating')) {
       if(!item.player && item.config) {
         if(item.config.interactive) {
           const iframe=document.createElement('iframe');
@@ -119,7 +135,27 @@ export function installProjectPreviews(main, projects) {
     action.addEventListener('pointerleave',resetMagnet,{signal});
     window.addEventListener('blur',resetMagnet,{signal});
     tools.append(credit,open);
-    inline.append(media,tools);wrapper.append(inline);action.append(wrapper);
+    inline.append(media,tools);
+    if(project.qa?.length){
+      const qa=document.createElement('dl');qa.className='project-preview-qa';
+      qa.setAttribute('aria-label',`${project.title} questions and answers`);
+      for(const entry of project.qa){
+        const item=document.createElement('div');item.className='project-qa-item';
+        const question=document.createElement('dt');question.className='project-qa-question';question.textContent=entry.question;
+        const answer=document.createElement('dd');answer.className='project-qa-answer';
+        let remaining=entry.answer;
+        for(const phrase of entry.highlights || []){
+          const index=remaining.indexOf(phrase);if(index<0)continue;
+          const highlight=document.createElement('strong');highlight.className='project-qa-highlight';highlight.textContent=phrase;
+          answer.append(document.createTextNode(remaining.slice(0,index)),highlight);
+          remaining=remaining.slice(index+phrase.length);
+        }
+        answer.append(document.createTextNode(remaining));
+        item.append(question,answer);qa.append(item);
+      }
+      inline.append(qa);
+    }
+    wrapper.append(inline);action.append(wrapper);
     const panCleanup=project.banner?.interactive || project.banner?.views?.length ? ()=>{} : installPreviewPanZoom(media,signal);
     media.append(info);
     const title=action.querySelector('.project-title-link');
@@ -165,6 +201,7 @@ export function installProjectPreviews(main, projects) {
     action.append(trigger);
     const item={action,wrapper,canvas,media,tools,trigger,title,headerObserver,setHeaderExpanded,name:project.title,panCleanup,config:project.banner,player:null,visible:false,expanded:mobile.matches};
     items.push(item);update(item);observer.observe(action);
+    wrapper.addEventListener('transitionend',event=>{if(event.target===wrapper&&event.propertyName==='grid-template-rows')finishExpansion(item);},{signal});
     trigger.addEventListener('click',event=>{event.stopPropagation();if(item.expanded){setInfoOpen(false);resetMagnet();}item.expanded=!item.expanded;update(item);},{signal});
     title.addEventListener('click',event=>{event.stopPropagation();item.expanded=!item.expanded;setInfoOpen(false);resetMagnet();update(item);if(!item.expanded)trigger.focus({preventScroll:true});},{signal});
     action.addEventListener('keydown',event=>{if(event.key==='Escape'&&item.expanded){item.expanded=false;setInfoOpen(false);resetMagnet();update(item);trigger.focus();}},{signal});
@@ -182,8 +219,10 @@ export function installProjectPreviews(main, projects) {
     const copy=reference.querySelector('.project-copy');
     const copyHeight=[...copy.children].reduce((sum,node)=>sum+node.offsetHeight,0)+Math.max(0,copy.childElementCount-1)*parseFloat(getComputedStyle(copy).rowGap);
     const cellHeight=Math.ceil(Math.max(titleHeight,copyHeight));
+    const qaHeight=Math.ceil(Math.max(0,...items.map(item=>item.action.querySelector('.project-preview-qa')?.offsetHeight || 0)));
     for(const item of items){
       item.action.style.setProperty('--project-cell-height',`${cellHeight}px`);
+      item.action.style.setProperty('--project-qa-shared-height',`${qaHeight}px`);
       item.action.style.setProperty('--project-mobile-heading-height',`${Math.ceil(titleHeight)}px`);
       item.action.style.setProperty('--project-mobile-copy-height',`${Math.ceil(copyHeight)}px`);
       item.action.style.setProperty('--project-title-half-height',`${item.action.querySelector('.project-heading h2').offsetHeight/2}px`);
@@ -199,6 +238,7 @@ export function installProjectPreviews(main, projects) {
   const rowLayoutObserver=new ResizeObserver(scheduleRowLayout);
   for(const item of items){
     rowLayoutObserver.observe(item.action.querySelector('.project-heading h2'));
+    const qa=item.action.querySelector('.project-preview-qa');if(qa)rowLayoutObserver.observe(qa);
     for(const node of item.action.querySelector('.project-copy').children)rowLayoutObserver.observe(node);
   }
   window.addEventListener('resize',scheduleRowLayout,{passive:true,signal});
@@ -207,5 +247,5 @@ export function installProjectPreviews(main, projects) {
   const refresh=()=>items.forEach(update);
   mobile.addEventListener('change',refresh,{signal});
   document.addEventListener('visibilitychange',refresh,{signal});
-  return ()=>{cancelAnimationFrame(rowLayoutFrame);rowLayoutObserver.disconnect();observer.disconnect();controller.abort();for(const item of items){item.player?.destroy();item.panCleanup();item.headerObserver.disconnect();item.wrapper.remove();item.tools.remove();item.trigger.remove();item.action.classList.remove('is-preview-expanded');}};
+  return ()=>{cancelAnimationFrame(rowLayoutFrame);rowLayoutObserver.disconnect();observer.disconnect();controller.abort();for(const item of items){clearTimeout(item.expansionTimer);item.player?.destroy();item.panCleanup();item.headerObserver.disconnect();item.wrapper.remove();item.tools.remove();item.trigger.remove();item.action.classList.remove('is-preview-expanded');}};
 }

@@ -774,7 +774,7 @@ html[data-skills-expanding=true] { overflow-anchor:none; scroll-behavior:auto; }
 /* Project previews expand down inside the row; mobile keeps them visible above it. */
 .portfolio-shell .project-row-link { grid-template-columns:minmax(0,1fr) minmax(0,1fr); }
 .project-row-arrow { display:none; }
-.project-preview-expansion { display:grid; grid-template-rows:0fr; grid-column:1; min-width:0; margin-top:-24px; opacity:0; transition:grid-template-rows 420ms ease, opacity 420ms ease, margin-top 420ms ease; }
+.project-preview-expansion { display:grid; grid-template-rows:0fr; grid-column:1; min-width:0; margin-top:-24px; opacity:0; transition:grid-template-rows 560ms ease, opacity 560ms ease, margin-top 560ms ease; }
 .is-preview-expanded .project-preview-expansion { grid-template-rows:1fr; margin-top:12px; opacity:1; }
 .project-inline-preview { display:block; position:relative; min-height:0; min-width:0; overflow:hidden; width:100%; max-width:100%; justify-self:start; border-radius:12px; background:#080808; }
 .project-inline-preview img { display:block; width:100%; height:clamp(240px, 28vw, 360px); object-fit:contain; }
@@ -820,7 +820,7 @@ html[data-skills-expanding=true] { overflow-anchor:none; scroll-behavior:auto; }
 
 /* Overlay instructions never change the preview or project row height. */
 .project-inline-preview { border-radius:0; overflow:hidden; background:transparent; }
-.project-preview-media { border-radius:12px; }
+.project-preview-media { border-radius:8px; }
 .project-preview-info { position:absolute; z-index:3; top:12px; left:12px; max-width:calc(100% - 24px); padding:8px; border-radius:16px; background:rgb(8 8 8 / 48%); -webkit-backdrop-filter:blur(2px); backdrop-filter:blur(2px); transition:background 320ms ease, backdrop-filter 320ms ease; }
 .project-preview-info.is-open { -webkit-backdrop-filter:blur(8px); backdrop-filter:blur(8px); }
 .project-preview-info-toggle { width:24px; height:24px; padding:0; border:0; font:inherit; font-size:12px; color:hsl(0 0% 87%); }
@@ -915,7 +915,7 @@ html[data-skills-expanding=true] { overflow-anchor:none; scroll-behavior:auto; }
 
 /* The title owns expansion; the dedicated project button owns navigation. */
 .portfolio-shell .project-title-link { position:relative; display:block; width:100%; padding-right:32px; text-align:left; cursor:pointer; appearance:none; }
-.project-title-chevron { position:absolute; top:.45em; right:4px; width:12px; height:12px; border-right:2px solid currentColor; border-bottom:2px solid currentColor; transform:rotate(45deg); transition:transform 420ms ease; }
+.project-title-chevron { position:absolute; top:.45em; right:4px; width:12px; height:12px; border-right:2px solid currentColor; border-bottom:2px solid currentColor; transform:rotate(45deg); transition:transform 560ms ease; }
 .is-preview-expanded .project-title-chevron { transform:rotate(225deg); }
 @media(prefers-reduced-motion:reduce) { .project-title-chevron { transition:none; } }
 
@@ -989,7 +989,7 @@ html[data-skills-expanding=true] { overflow-anchor:none; scroll-behavior:auto; }
 }
 @media(prefers-reduced-motion:reduce) { .project-preview-pane .project-vector-preview,.project-credit-options { transition:none; } }
 
-.has-paired-preview { background:#080808; border-radius:12px; overflow:hidden; }
+.has-paired-preview { background:#080808; border-radius:8px; overflow:hidden; }
 
 .portfolio-shell .project-preview-media.has-paired-preview > img,
 .portfolio-shell .project-preview-media.has-paired-preview > canvas { display:none; }
@@ -1000,10 +1000,10 @@ html[data-skills-expanding=true] { overflow-anchor:none; scroll-behavior:auto; }
 .project-vector-restart { pointer-events:none; }
 
 /* Keep description hierarchy compact within the original project title row. */
-.portfolio-shell .project-description-title { margin:0 0 6px; color:hsl(0 0% 87%); font-size:13px; font-weight:600; line-height:1.4; }
+.portfolio-shell .project-description-title,.project-qa-question { margin:0 0 6px; color:hsl(0 0% 87%); font-size:13px; font-weight:600; line-height:1.4; }
 .project-description { margin:0; }
 .project-copy { display:flex; flex-direction:column; gap:20px; }
-.project-description .project-summary { margin:0; font-family:"Geist Sans", "Noto Sans TC", system-ui, sans-serif; font-weight:400; letter-spacing:normal; line-height:1.5; }
+.project-description .project-summary,.project-qa-answer { margin:0; color:var(--muted); font-family:"Geist Sans", "Noto Sans TC", system-ui, sans-serif; font-size:1rem; font-weight:400; letter-spacing:normal; line-height:1.5; }
 .works-page .project-copy .project-tags { margin-bottom:12px; }
 
 .works-page .project-technologies .project-tags { margin:0; }
@@ -1134,3 +1134,29 @@ html[data-skills-expanding=true] { overflow-anchor:none; scroll-behavior:auto; }
 }
 
 @media(max-width:1000px) { .project-row-link > .project-expand-trigger { inset:var(--project-header-top,0px) 0 auto; height:var(--project-header-height); } }
+
+/* Editable Q&A sits beside the expanded preview, stacking below it on mobile. */
+.project-preview-qa { grid-column:1; grid-row:3; min-width:0; margin:20px 0 0; padding:0; }
+.project-qa-item { margin:0; padding:20px 0; border-top:1px solid var(--border); }
+.project-qa-item:last-child { padding-bottom:0; }
+.project-qa-question { margin:0 0 8px; }
+.project-qa-answer { font-size:13px; overflow-wrap:anywhere; }
+@media(width > 1000px) {
+ .project-preview-qa { grid-column:2; grid-row:1; margin-top:0; align-self:start; }
+ .project-qa-item:first-child { padding-top:0; border-top:0; }
+ .portfolio-shell .project-row-link .project-inline-preview:has(.project-preview-qa) { grid-template-rows:minmax(clamp(240px, 28vw, 360px),max-content) 20px; }
+ .portfolio-shell .project-row-link .project-inline-preview:has(.project-preview-qa) .project-open-link { grid-row:2; }
+}
+
+/* Shared desktop preview height follows the taller Q&A, preserving the credit row. */
+@media(width > 1000px) {
+ .portfolio-shell .project-row-link .project-preview-media { height:max(clamp(240px, 28vw, 360px),var(--project-qa-shared-height,0px)); }
+ .portfolio-shell .project-row-link .project-inline-preview:has(.project-preview-qa) { grid-template-rows:max(clamp(240px, 28vw, 360px),var(--project-qa-shared-height,0px)) 20px; }
+}
+
+.project-qa-highlight { color:#eeeeee; font-weight:600; }
+
+/* Reveal a stable inner layout, then release clipping for controls at rest. */
+.project-row-link .project-inline-preview { align-self:start; }
+.project-row-link .project-preview-expansion { overflow:clip; transition-timing-function:cubic-bezier(.22,.61,.36,1); }
+.project-row-link.is-preview-expanded .project-preview-expansion:not(.is-animating) { overflow:visible; }

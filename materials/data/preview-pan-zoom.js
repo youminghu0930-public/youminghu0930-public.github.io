@@ -3,17 +3,20 @@ export function installPreviewPanZoom(media,signal,options={}) {
   stage.append(...media.childNodes);media.append(stage);
   const points=new Map();let zoom=1,x=0,y=0;
   const draw=()=>{
-    let centerOffset=0;
+    let centerOffset=0,scale=zoom;
     if(options.constrain){
       const width=media.clientWidth,height=media.clientHeight;
       const baseHeight=width/options.aspectRatio;
-      const limitX=Math.max(0,(width*zoom-width)/2);
-      const limitY=Math.max(0,(baseHeight*zoom-height)/2);
+      // Zoom is relative to the current cover-fit minimum, not the old slot size.
+      const minimum=width>0&&height>0?Math.max(1,height/baseHeight):1;
+      scale=zoom*minimum;
+      const limitX=Math.max(0,(width*scale-width)/2);
+      const limitY=Math.max(0,(baseHeight*scale-height)/2);
       x=Math.max(-limitX,Math.min(limitX,x));y=Math.max(-limitY,Math.min(limitY,y));
       stage.style.top='50%';stage.style.bottom='auto';stage.style.height=`${baseHeight}px`;
       centerOffset=baseHeight/2;
     }
-    stage.style.transform=`translate(${x}px,${y-centerOffset}px) scale(${zoom})`;
+    stage.style.transform=`translate(${x}px,${y-centerOffset}px) scale(${scale})`;
   };
   const observer=options.constrain?new ResizeObserver(draw):null;
   observer?.observe(media);draw();

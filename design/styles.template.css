@@ -819,7 +819,7 @@ html[data-skills-expanding=true] { overflow-anchor:none; scroll-behavior:auto; }
 
 /* Overlay instructions never change the preview or project row height. */
 .project-inline-preview { border-radius:0; overflow:hidden; background:transparent; }
-.project-preview-media { border-radius:12px; }
+.project-preview-media { border-radius:{{ProjectPreviewCornerRadius}}; }
 .project-preview-info { position:absolute; z-index:3; top:12px; left:12px; max-width:calc(100% - 24px); padding:8px; border-radius:16px; background:{{PreviewInfoBackground}}; -webkit-backdrop-filter:blur({{NavBackdropBlur}}); backdrop-filter:blur({{NavBackdropBlur}}); transition:background {{PreviewInfoDuration}} ease, backdrop-filter {{PreviewInfoDuration}} ease; }
 .project-preview-info.is-open { -webkit-backdrop-filter:blur({{NavHoverBackdropBlur}}); backdrop-filter:blur({{NavHoverBackdropBlur}}); }
 .project-preview-info-toggle { width:24px; height:24px; padding:0; border:0; font:inherit; font-size:12px; color:{{RootColor}}; }
@@ -988,7 +988,7 @@ html[data-skills-expanding=true] { overflow-anchor:none; scroll-behavior:auto; }
 }
 @media(prefers-reduced-motion:reduce) { .project-preview-pane .project-vector-preview,.project-credit-options { transition:none; } }
 
-.has-paired-preview { background:#080808; border-radius:12px; overflow:hidden; }
+.has-paired-preview { background:#080808; border-radius:{{ProjectPreviewCornerRadius}}; overflow:hidden; }
 
 .portfolio-shell .project-preview-media.has-paired-preview > img,
 .portfolio-shell .project-preview-media.has-paired-preview > canvas { display:none; }
@@ -999,10 +999,10 @@ html[data-skills-expanding=true] { overflow-anchor:none; scroll-behavior:auto; }
 .project-vector-restart { pointer-events:none; }
 
 /* Keep description hierarchy compact within the original project title row. */
-.portfolio-shell .project-description-title { margin:0 0 {{ProjectDescriptionTitleGap}}; color:{{RootColor}}; font-size:{{ProjectDescriptionTitleSize}}; font-weight:600; line-height:1.4; }
+.portfolio-shell .project-description-title,.project-qa-question { margin:0 0 {{ProjectDescriptionTitleGap}}; color:{{RootColor}}; font-size:{{ProjectDescriptionTitleSize}}; font-weight:600; line-height:1.4; }
 .project-description { margin:0; }
 .project-copy { display:flex; flex-direction:column; gap:{{ProjectDescriptionGap}}; }
-.project-description .project-summary { margin:0; font-family:{{RootFontFamily}}; font-weight:400; letter-spacing:normal; line-height:{{ProjectDescriptionLineHeight}}; }
+.project-description .project-summary,.project-qa-answer { margin:0; color:var(--muted); font-family:{{RootFontFamily}}; font-size:{{ProjectSummarySize}}; font-weight:400; letter-spacing:normal; line-height:{{ProjectDescriptionLineHeight}}; }
 .works-page .project-copy .project-tags { margin-bottom:{{ProjectTechnologyGap}}; }
 
 .works-page .project-technologies .project-tags { margin:0; }
@@ -1133,3 +1133,29 @@ html[data-skills-expanding=true] { overflow-anchor:none; scroll-behavior:auto; }
 }
 
 @media(max-width:{{mobileBreakpoint}}) { .project-row-link > .project-expand-trigger { inset:var(--project-header-top,0px) 0 auto; height:var(--project-header-height); } }
+
+/* Editable Q&A sits beside the expanded preview, stacking below it on mobile. */
+.project-preview-qa { grid-column:1; grid-row:3; min-width:0; margin:{{ProjectQaTopGap}} 0 0; padding:0; }
+.project-qa-item { margin:0; padding:{{ProjectQaItemGap}} 0; border-top:1px solid var(--border); }
+.project-qa-item:last-child { padding-bottom:0; }
+.project-qa-question { margin:0 0 {{ProjectQaQuestionGap}}; }
+.project-qa-answer { font-size:{{ProjectDescriptionTitleSize}}; overflow-wrap:anywhere; }
+@media(width > {{mobileBreakpoint}}) {
+ .project-preview-qa { grid-column:2; grid-row:1; margin-top:0; align-self:start; }
+ .project-qa-item:first-child { padding-top:0; border-top:0; }
+ .portfolio-shell .project-row-link .project-inline-preview:has(.project-preview-qa) { grid-template-rows:minmax({{ProjectInlinePreviewHeight}},max-content) {{ProjectCreditRowHeight}}; }
+ .portfolio-shell .project-row-link .project-inline-preview:has(.project-preview-qa) .project-open-link { grid-row:2; }
+}
+
+/* Shared desktop preview height follows the taller Q&A, preserving the credit row. */
+@media(width > {{mobileBreakpoint}}) {
+ .portfolio-shell .project-row-link .project-preview-media { height:max({{ProjectInlinePreviewHeight}},var(--project-qa-shared-height,0px)); }
+ .portfolio-shell .project-row-link .project-inline-preview:has(.project-preview-qa) { grid-template-rows:max({{ProjectInlinePreviewHeight}},var(--project-qa-shared-height,0px)) {{ProjectCreditRowHeight}}; }
+}
+
+.project-qa-highlight { color:{{HeadingColor}}; font-weight:600; }
+
+/* Reveal a stable inner layout, then release clipping for controls at rest. */
+.project-row-link .project-inline-preview { align-self:start; }
+.project-row-link .project-preview-expansion { overflow:clip; transition-timing-function:cubic-bezier(.22,.61,.36,1); }
+.project-row-link.is-preview-expanded .project-preview-expansion:not(.is-animating) { overflow:visible; }

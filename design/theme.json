@@ -428,7 +428,7 @@
     "ProjectTopicLabelSize": "10px",
     "ProjectSummarySize": "1rem",
     "ProjectTechnologySize": "0.72rem",
-    "ProjectPreviewExpandDuration": "420ms",
+    "ProjectPreviewExpandDuration": "560ms",
     "ProjectInlinePreviewHeight": "clamp(240px, 28vw, 360px)",
     "ProjectInlinePreviewMobileHeight": "clamp(220px, 65vw, 360px)",
     "PreviewInfoBackground": "rgb(8 8 8 / 48%)",
@@ -473,7 +473,11 @@
     "ProjectTechnologyHoverEase": "cubic-bezier(.22,.61,.36,1)",
     "ProjectMobileTitleSize": "clamp(2rem, 8.5vw, 2.75rem)",
     "ProjectMobileRowGap": "24px",
-    "ProjectMobileCompanySize": "14px"
+    "ProjectMobileCompanySize": "14px",
+    "ProjectQaQuestionGap": "8px",
+    "ProjectQaItemGap": "20px",
+    "ProjectQaTopGap": "20px",
+    "ProjectPreviewCornerRadius": "8px"
   },
   "layoutReference": "https://aaftab.is-a.dev/",
   "effects": {
