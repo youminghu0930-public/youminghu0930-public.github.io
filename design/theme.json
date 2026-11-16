@@ -427,7 +427,19 @@
     "ProjectHoverBackground": "rgb(255 255 255 / 3%)",
     "ProjectTopicLabelSize": "10px",
     "ProjectSummarySize": "clamp(1rem, 1.4vw, 1.15rem)",
-    "ProjectTechnologySize": "12px"
+    "ProjectTechnologySize": "12px",
+    "ProjectPreviewExpandDuration": "420ms",
+    "ProjectInlinePreviewHeight": "clamp(240px, 28vw, 360px)",
+    "ProjectInlinePreviewMobileHeight": "clamp(220px, 65vw, 360px)",
+    "PreviewInfoBackground": "rgb(8 8 8 / 48%)",
+    "PreviewInfoDuration": "320ms",
+    "ProjectCompactGap": "16px",
+    "ProjectCompactTopPadding": "24px",
+    "ProjectCompactBottomPadding": "6px",
+    "ProjectCreditGap": "4px",
+    "PreviewInfoOpenWidth": "224px",
+    "ProjectTitleChevronSpace": "32px",
+    "ProjectTitleChevronSize": "12px"
   },
   "layoutReference": "https://aaftab.is-a.dev/",
   "effects": {
@@ -533,6 +545,7 @@
     "projectBannerTrailJoints": [
       "golf_club_head",
       "right_wrist"
-    ]
+    ],
+    "projectFilterTransitionDuration": 700
   }
 }

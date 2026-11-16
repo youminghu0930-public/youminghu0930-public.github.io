@@ -85,7 +85,10 @@
         "timing": "/materials/data/project-previews/golf-2d-banner-0026-4-timing.json",
         "aspectRatio": 0.5625
       },
-      "previewAspectRatio": 0.5625
+      "previewAspectRatio": 0.5625,
+      "footageCredit": {
+        "url": "https://www.instagram.com/reel/Dc9nDsgqrfi/"
+      }
     },
     {
       "id": "golf-3d",
@@ -130,7 +133,11 @@
       "banner": {
         "rendered": true,
         "video": "/materials/data/project-previews/golf-3d-rotations-trajectory.mp4",
-        "poster": "/materials/data/project-previews/golf-3d-rotations-fitted.png"
+        "poster": "/materials/data/project-previews/golf-3d-rotations-fitted.png",
+        "interactive": "/materials/data/project-previews/true3d-interactive/index.html"
+      },
+      "footageCredit": {
+        "url": "https://youtu.be/P3YksJdejog?si=eyQjC6Fgo7AuV4_v"
       }
     }
   ],

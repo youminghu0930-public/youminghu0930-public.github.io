@@ -141,8 +141,8 @@ body:has(.portfolio-shell) { overflow-x:clip; }
 .portfolio-shell header nav a { border-radius:{{NavPillRadius}}; transition:{{NavHoverTransition}}; }
 .portfolio-shell header nav a:hover, .portfolio-shell header nav a:focus-visible { background:{{NavHoverBackground}}; color:{{NavHoverText}}; }
 .cursor-frame { position:absolute; width:{{CursorFrameSize}}; height:{{CursorFrameSize}}; transform:translate(-50%, -50%); color:{{CursorIdleColor}}; transition:none; }
-.pointer-diamond[data-link=true] .cursor-frame { color:var(--accent); }
-.pointer-diamond[data-link=true][data-nav-inactive=true] .cursor-frame { color:{{CursorInactiveNavColor}}; }
+.pointer-diamond[data-tone=accent] .cursor-frame { color:var(--accent); }
+.pointer-diamond[data-link=true][data-tone=neutral] .cursor-frame { color:{{CursorInactiveNavColor}}; }
 .cursor-frame i { position:absolute; width:{{CursorCornerLength}}; height:{{CursorCornerLength}}; border:0 solid currentColor; }
 .cursor-frame i:nth-child(1) { top:0; left:0; border-top-width:{{CursorStroke}}; border-left-width:{{CursorStroke}}; }
 .cursor-frame i:nth-child(2) { top:0; right:0; border-top-width:{{CursorStroke}}; border-right-width:{{CursorStroke}}; }
@@ -772,13 +772,166 @@ html[data-skills-expanding=true] { overflow-anchor:none; scroll-behavior:auto; }
 .project-preview-canvas { position:absolute; top:8px; left:8px; width:calc(100% - 16px); height:auto; aspect-ratio:var(--project-preview-aspect, 4 / 3); border-radius:7px; background:{{RootBackground}}; }
 .project-preview-canvas[hidden] { display:none; }
 
-/* Touch layouts keep project media in the document flow above the project copy. */
-.project-inline-preview { display:none; }
+/* Project previews expand down inside the row; mobile keeps them visible above it. */
+.portfolio-shell .project-row-link { grid-template-columns:minmax(0,1fr) minmax(0,1fr); }
+.project-row-arrow { display:none; }
+.project-preview-expansion { display:grid; grid-template-rows:0fr; grid-column:1; min-width:0; margin-top:-24px; opacity:0; transition:grid-template-rows {{ProjectPreviewExpandDuration}} ease, opacity {{ProjectPreviewExpandDuration}} ease, margin-top {{ProjectPreviewExpandDuration}} ease; }
+.is-preview-expanded .project-preview-expansion { grid-template-rows:1fr; margin-top:12px; opacity:1; }
+.project-inline-preview { display:block; position:relative; min-height:0; min-width:0; overflow:hidden; width:100%; max-width:100%; justify-self:start; border-radius:12px; background:{{RootBackground}}; }
+.project-inline-preview img { display:block; width:100%; height:{{ProjectInlinePreviewHeight}}; object-fit:contain; }
+.project-inline-preview .project-preview-canvas { inset:0; width:100%; height:100%; aspect-ratio:auto; object-fit:contain; border-radius:0; }
 @media(max-width:{{mobileBreakpoint}}) {
- .project-inline-preview { display:block; position:relative; grid-column:1 / -1; width:100%; min-width:0; overflow:hidden; border:1px solid var(--border); border-radius:12px; background:{{RootBackground}}; margin-bottom:12px; }
- .project-inline-preview img { display:block; width:100%; height:auto; aspect-ratio:var(--project-preview-aspect,4 / 3); object-fit:contain; }
- .project-inline-preview .project-preview-canvas { inset:0; width:100%; height:100%; border-radius:0; }
+ .portfolio-shell .project-row-link { grid-template-columns:minmax(0,1fr) 24px; }
+ .project-row-arrow { display:block; }
+ .project-preview-expansion, .is-preview-expanded .project-preview-expansion { grid-column:1 / -1; grid-row:1; grid-template-rows:1fr; opacity:1; margin:0 0 12px; }
+ .project-inline-preview { max-width:100%; }
+ .project-inline-preview img { height:{{ProjectInlinePreviewMobileHeight}}; }
  .project-row-link .project-heading { min-width:0; }
  .portfolio-shell .project-heading h2 { overflow-wrap:anywhere; }
  .project-copy, .project-tags, .project-labels { min-width:0; max-width:100%; }
 }
+@media(prefers-reduced-motion:reduce) { .project-preview-expansion { transition:none; } }
+
+/* Keep filtered cards hidden despite the more specific project layout rule. */
+.portfolio-shell .works-page .project[hidden] { display:none; }
+
+.works-page .projects { overflow-anchor:none; }
+
+/* Preview controls are separate from project navigation. */
+.project-preview-media { position:relative; width:100%; height:{{ProjectInlinePreviewHeight}}; overflow:hidden; cursor:grab; touch-action:none; }
+.project-preview-media.is-dragging { cursor:grabbing; }
+.project-preview-stage { position:relative; width:100%; height:100%; transform-origin:center; }
+.project-preview-media img { width:100%; height:100%; object-fit:contain; }
+.project-interactive-frame { position:absolute; inset:0; width:100%; height:100%; border:0; background:{{RootBackground}}; }
+.project-preview-tools { display:flex; justify-content:space-between; align-items:flex-start; gap:16px; padding-top:16px; }
+.portfolio-shell .project-open-link { display:inline-flex; padding:8px 16px; font-size:14px; border:1px solid var(--border); border-radius:999px; text-decoration:none; }
+.project-preview-info { position:absolute; z-index:3; top:12px; left:12px; max-width:calc(100% - 24px); padding:8px; border-radius:16px; background:{{PreviewInfoBackground}}; -webkit-backdrop-filter:blur({{NavBackdropBlur}}); backdrop-filter:blur({{NavBackdropBlur}}); cursor:default; touch-action:auto; }
+.project-preview-info-toggle { display:flex; width:28px; height:28px; padding:0; align-items:center; justify-content:center; border:1px solid var(--border); border-radius:50%; background:transparent; color:{{RootColor}}; cursor:pointer; font-family:serif; font-style:italic; }
+.project-preview-help { display:grid; grid-template-rows:0fr; opacity:0; color:{{RootColor}}; font-size:12px; line-height:1.7; transition:grid-template-rows {{PreviewInfoDuration}} ease, opacity {{PreviewInfoDuration}} ease; }
+.project-preview-info.is-open .project-preview-help { grid-template-rows:1fr; opacity:1; }
+.project-preview-help-content { min-height:0; overflow:hidden; }
+.project-preview-help p { margin:6px 4px; }
+.project-preview-help p:first-child { margin-top:12px; }
+.project-footage-credit { margin:0; align-self:center; font-size:12px; color:var(--muted); }
+.project-footage-credit a { color:inherit; text-decoration:underline; text-underline-offset:3px; }
+.project-preview-tools { justify-content:space-between; }
+.project-open-link { margin-left:auto; }
+@media(prefers-reduced-motion:reduce) { .project-preview-help { transition:none; } }
+@media(max-width:{{mobileBreakpoint}}) { .project-preview-media { height:{{ProjectInlinePreviewMobileHeight}}; } }
+
+/* Overlay instructions never change the preview or project row height. */
+.project-inline-preview { border-radius:0; overflow:hidden; background:transparent; }
+.project-preview-media { border-radius:12px; }
+.project-preview-info { position:absolute; z-index:3; top:12px; left:12px; max-width:calc(100% - 24px); padding:8px; border-radius:16px; background:{{PreviewInfoBackground}}; -webkit-backdrop-filter:blur({{NavBackdropBlur}}); backdrop-filter:blur({{NavBackdropBlur}}); transition:background {{PreviewInfoDuration}} ease, backdrop-filter {{PreviewInfoDuration}} ease; }
+.project-preview-info.is-open { -webkit-backdrop-filter:blur({{NavHoverBackdropBlur}}); backdrop-filter:blur({{NavHoverBackdropBlur}}); }
+.project-preview-info-toggle { width:24px; height:24px; padding:0; border:0; font:inherit; font-size:12px; color:{{RootColor}}; }
+.project-preview-question { display:inline-flex; align-items:center; justify-content:center; width:24px; height:24px; border:1px solid var(--border); border-radius:50%; }
+.project-preview-tools { grid-column:1 / -1; justify-content:space-between; align-items:center; padding:0; min-width:0; }
+.project-footage-credit { margin:0; }
+.portfolio-shell .project-open-link { margin:0 0 0 auto; flex-shrink:0; }
+.portfolio-shell .project-footage-credit a, .portfolio-shell .project-footage-credit a:hover { display:inline; margin:0; padding:0; border:0; border-radius:0; background:transparent; box-shadow:none; color:var(--muted); font:inherit; font-weight:400; text-decoration:underline; text-underline-offset:3px; }
+
+/* Bound every media layer independently of image/canvas intrinsic dimensions. */
+.portfolio-shell .project-row-link { grid-template-areas:"heading copy" "preview ." "footer footer"; }
+.project-row-link .project-heading { grid-area:heading; }
+.project-row-link .project-copy { grid-area:copy; }
+.project-row-link .project-preview-expansion { grid-area:preview; }
+.project-row-link .project-preview-tools { grid-area:footer; }
+.portfolio-shell .project-preview-media { isolation:isolate; contain:layout paint; min-width:0; max-width:100%; flex:none; }
+.portfolio-shell .project-preview-stage { position:absolute; inset:0; width:100%; height:100%; min-width:0; min-height:0; }
+.portfolio-shell .project-preview-media > img,
+.portfolio-shell .project-preview-stage > img,
+.portfolio-shell .project-preview-stage > canvas,
+.portfolio-shell .project-preview-media > canvas,
+.portfolio-shell .project-preview-media > iframe { position:absolute; inset:0; display:block; width:100%; height:100%; max-width:100%; max-height:100%; margin:0; object-fit:contain; aspect-ratio:auto; }
+.portfolio-shell .project-preview-media canvas[hidden] { display:none; }
+@media(max-width:{{mobileBreakpoint}}) {
+ .portfolio-shell .project-row-link { grid-template-areas:"preview preview" "heading arrow" "copy copy" "footer footer"; grid-template-columns:minmax(0,1fr) 24px; width:100%; min-width:0; }
+ .project-row-link .project-row-arrow { grid-area:arrow; align-self:center; }
+ .project-row-link .project-preview-expansion { width:100%; margin:0; }
+ .portfolio-shell .project-preview-media { height:{{ProjectInlinePreviewMobileHeight}}; max-height:{{ProjectInlinePreviewMobileHeight}}; }
+ .project-row-link .project-preview-tools { flex-wrap:wrap; gap:12px; }
+}
+
+.portfolio-shell .project-title-link { display:inline; margin:0; padding:0; border:0; border-radius:0; background:transparent; color:inherit; font:inherit; letter-spacing:inherit; line-height:inherit; text-decoration:none; box-shadow:none; }
+.portfolio-shell .project-title-link:hover, .portfolio-shell .project-title-link:focus-visible { background:transparent; color:var(--accent); text-decoration:none; }
+
+/* The whole expansion, including attribution and navigation, collapses as one unit. */
+.portfolio-shell .project-row-link { grid-template-areas:"heading copy" "preview preview"; }
+.project-row-link .project-inline-preview { display:grid; grid-template-columns:minmax(0,1fr) minmax(0,1fr); gap:24px; width:100%; }
+.project-row-link .project-preview-media { grid-column:1; }
+.project-row-link .project-preview-tools { grid-column:1 / -1; grid-area:auto; }
+.portfolio-shell .project-open-link { display:inline-flex; align-items:center; justify-content:center; gap:{{ActionArrowGap}}; min-height:{{ActionMinHeight}}; padding:{{ActionPadding}}; border:1px solid transparent; border-radius:{{ActionRadius}}; background:var(--accent); color:var(--button-text); font-family:inherit; font-size:{{ActionFontSize}}; font-weight:{{MainAFontWeight}}; line-height:{{BodyLineHeight}}; text-decoration:none; transition:{{NavHoverTransition}}; }
+.portfolio-shell .project-open-link:hover { background:{{PrimaryActionHoverBackground}}; color:var(--button-text); text-decoration:none; }
+@media(max-width:{{mobileBreakpoint}}) {
+ .portfolio-shell .project-row-link { grid-template-areas:"preview preview" "heading arrow" "copy copy"; }
+ .project-row-link .project-inline-preview { grid-template-columns:minmax(0,1fr); gap:16px; }
+ .portfolio-shell .project-open-link { font-size:{{HomeMobileActionFontSize}}; padding:{{HomeMobileActionPadding}}; }
+}
+
+/* Keep the credit directly below the media, with navigation at the row's far right. */
+.project-row-link .project-preview-tools { grid-area:auto; grid-column:1 / -1; grid-row:2; align-items:center; }
+.project-preview-info-toggle:hover .project-preview-question,
+.project-preview-info-toggle:focus-visible .project-preview-question { color:var(--accent); border-color:var(--accent); }
+.project-preview-question { transition:color {{PreviewInfoDuration}} ease, border-color {{PreviewInfoDuration}} ease; }
+.portfolio-shell .project-footage-credit a:hover,
+.portfolio-shell .project-footage-credit a:focus-visible { color:var(--accent); }
+@media(hover:hover) and (pointer:fine) {
+ .portfolio-shell .project-open-link { translate:var(--magnet-x,0px) var(--magnet-y,0px); transition:{{NavHoverTransition}}, {{ButtonMagnetTransition}}; }
+}
+@media(prefers-reduced-motion:reduce) { .portfolio-shell .project-open-link { translate:none; } }
+
+/* Compact project spacing; the credit/button row defines the expansion's bottom. */
+.portfolio-shell .project-row-link { gap:{{ProjectCompactGap}} 24px; padding-top:{{ProjectCompactTopPadding}}; padding-bottom:{{ProjectCompactBottomPadding}}; }
+.project-row-link .project-preview-expansion { margin-top:calc(-1 * {{ProjectCompactGap}}); }
+.project-row-link.is-preview-expanded .project-preview-expansion { margin-top:0; }
+.project-row-link .project-inline-preview { row-gap:{{ProjectCreditGap}}; }
+.project-row-link .project-preview-tools { align-items:center; }
+.project-row-link .project-footage-credit { margin:0; align-self:center; line-height:1.4; }
+.project-preview-info { width:40px; overflow:hidden; transition:width {{PreviewInfoDuration}} ease, background {{PreviewInfoDuration}} ease, backdrop-filter {{PreviewInfoDuration}} ease; }
+.project-preview-info.is-open { width:{{PreviewInfoOpenWidth}}; }
+.project-preview-help-content { width:calc({{PreviewInfoOpenWidth}} - 16px); max-width:100%; }
+@media(max-width:{{mobileBreakpoint}}) {
+ .portfolio-shell .project-row-link { padding-top:20px; padding-bottom:{{ProjectCompactBottomPadding}}; }
+ .project-row-link .project-preview-expansion, .project-row-link.is-preview-expanded .project-preview-expansion { margin:0; }
+}
+
+/* Let magnetic controls move beyond the expansion's clipping wrapper. */
+.project-row-link.is-preview-expanded .project-inline-preview { overflow:visible; }
+.project-row-link .project-preview-tools { display:grid; grid-template-columns:minmax(0,1fr) minmax(0,1fr); column-gap:24px; overflow:visible; }
+.project-row-link .project-footage-credit { grid-column:1; justify-self:center; align-self:center; text-align:center; }
+.project-row-link .project-open-link { grid-column:2; justify-self:end; align-self:center; }
+@media(max-width:{{mobileBreakpoint}}) {
+ .project-row-link .project-preview-tools { column-gap:12px; }
+}
+
+/* Project previews open explicitly, rather than on hover or focus. */
+.project-expand-trigger { position:absolute; inset:0; z-index:2; width:100%; height:100%; margin:0; padding:0; border:0; border-radius:0; background:transparent; cursor:pointer; }
+.project-expand-trigger[hidden] { display:none; }
+.portfolio-shell .project-row-link:not(.is-preview-expanded) .project-preview-expansion { grid-template-rows:0fr; opacity:0; margin-top:calc(-1 * {{ProjectCompactGap}}); }
+.project-row-link:not(.is-preview-expanded) .project-title-link { pointer-events:none; }
+@media(max-width:{{mobileBreakpoint}}) {
+ .portfolio-shell .project-row-link:not(.is-preview-expanded) { grid-template-areas:"heading arrow" "copy copy" "preview preview"; }
+}
+
+/* The title owns expansion; the dedicated project button owns navigation. */
+.portfolio-shell .project-title-link { position:relative; display:block; width:100%; padding-right:{{ProjectTitleChevronSpace}}; text-align:left; cursor:pointer; appearance:none; }
+.project-title-chevron { position:absolute; top:.45em; right:4px; width:{{ProjectTitleChevronSize}}; height:{{ProjectTitleChevronSize}}; border-right:2px solid currentColor; border-bottom:2px solid currentColor; transform:rotate(45deg); transition:transform {{ProjectPreviewExpandDuration}} ease; }
+.is-preview-expanded .project-title-chevron { transform:rotate(225deg); }
+@media(prefers-reduced-motion:reduce) { .project-title-chevron { transition:none; } }
+
+/* The full title/company box is the expanded project's collapse control. */
+.project-row-link .project-heading { position:relative; min-width:0; }
+.portfolio-shell .project-heading h2 { position:relative; padding-left:{{ProjectTitleChevronSpace}}; }
+.project-row-link .project-heading .project-company { position:static; margin-top:12px; padding-left:{{ProjectTitleChevronSpace}}; }
+.portfolio-shell .project-title-link { position:absolute; inset:0; z-index:1; display:block; width:100%; height:100%; padding:0; }
+.project-title-chevron { left:4px; right:auto; }
+.project-heading:has(.project-title-link:hover) h2,
+.project-heading:has(.project-title-link:focus-visible) h2 { color:var(--accent); }
+
+/* Expanded collapse control uses the complete original header-row bounds. */
+.portfolio-shell .project-row-link > .project-title-link { inset:var(--project-header-top,0px) 0 auto; width:auto; min-width:100%; max-width:none; height:var(--project-header-height); }
+
+/* One persistent header control keeps all four cursor corners fixed on expansion. */
+.project-row-link.is-preview-expanded > .project-expand-trigger { inset:var(--project-header-top,0px) 0 auto; height:var(--project-header-height); }
+.portfolio-shell .project-title-link[hidden] { display:none; }

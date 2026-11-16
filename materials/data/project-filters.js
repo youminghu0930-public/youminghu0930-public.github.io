@@ -1,3 +1,5 @@
+import { design } from '../../design-settings.js';
+
 export function matchesProjectTags(project, selected) {
   return selected.size === 0 || (project.tags || []).some(tag => selected.has(tag));
 }
@@ -18,6 +20,8 @@ export function createProjectFilters(projects, cards, onChange = () => {}) {
     for (const tag of new Set(project.tags || [])) counts.set(tag, (counts.get(tag) || 0) + 1);
   }
   const buttons = new Map();
+  const transitions = new Map();
+  let initialized = false;
   function makeButton(label, count, tag) {
     const button = document.createElement('button');
     button.type = 'button';
@@ -40,14 +44,46 @@ export function createProjectFilters(projects, cards, onChange = () => {}) {
   }
   function update() {
     let visible = 0;
-    projects.forEach((project, index) => {
-      const matches = matchesProjectTags(project, selected);
-      cards.children[index].hidden = !matches;
-      if (matches) visible++;
+    // Snapshot every row before changing layout; all animations share one clock.
+    const changes = projects.map((project,index) => {
+      const card=cards.children[index], rect=card.getBoundingClientRect();
+      const matches=matchesProjectTags(project,selected);
+      if(matches)visible++;
+      return {card,matches,previous:transitions.get(card),height:rect.height,
+        opacity:card.hidden ? 0 : Number(getComputedStyle(card).opacity),
+        below:rect.top>=innerHeight,changed:transitions.has(card) || card.hidden===matches};
     });
+    const animations=[];
+    for(const change of changes) {
+      const {card,matches,previous,height,opacity,below,changed}=change;
+      previous?.cancel();transitions.delete(card);
+      card.inert=!matches;
+      card.setAttribute('aria-hidden',String(!matches));
+      if(!initialized || !changed || below || matchMedia('(prefers-reduced-motion: reduce)').matches) {
+        card.hidden=!matches;
+        continue;
+      }
+      card.hidden=false;
+      const targetHeight=matches ? card.getBoundingClientRect().height : 0;
+      const animation=card.animate([
+        {height:`${height}px`,opacity,overflow:'clip'},
+        {height:`${targetHeight}px`,opacity:matches?1:0,overflow:'clip'}
+      ],{duration:design.effects.projectFilterTransitionDuration,easing:'cubic-bezier(.4,0,.2,1)',fill:'both'});
+      animation.pause();
+      transitions.set(card,animation);
+      animations.push(animation);
+      animation.onfinish=()=>{
+        if(transitions.get(card)!==animation)return;
+        transitions.delete(card);card.hidden=!matches;animation.cancel();
+        if(!transitions.size)onChange();
+      };
+    }
+    const start=document.timeline.currentTime;
+    for(const animation of animations){animation.play();animation.startTime=start;}
     for (const [tag, button] of buttons) {
       button.setAttribute('aria-pressed', String(tag === null ? !selected.size : selected.has(tag)));
     }
+    initialized = true;
     status.textContent = `${visible} of ${projects.length} projects${selected.size ? ' · Matching any selected tag' : ''}`;
   }
   makeButton('All', projects.length, null);

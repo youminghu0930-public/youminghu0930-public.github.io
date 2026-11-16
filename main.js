@@ -73,7 +73,15 @@ function installScrollMotion(main) {
       const revealOrder = item.node.parentElement.matches('.experience-copy')
         ? (item.node.matches('.experience-footer') ? 0 : Math.min(item.order, 2))
         : item.order;
-      const finishTop = Math.max(height * (settings.scrollRevealEnd - revealOrder * settings.scrollRevealStagger), rect.top + scrollY - maxScroll);
+      const viewportFinish = height * (settings.scrollRevealEnd - revealOrder * settings.scrollRevealStagger);
+      // Filtering offscreen projects must not change visible content's reveal position.
+      const isWorks = main.classList.contains('works-page');
+      // Finish each project fragment once its full bounds enter the viewport.
+      // This also works for the final row without depending on document height.
+      const projectFinish = height - (rect.bottom - rect.top);
+      const finishTop = isWorks
+        ? (item.node.closest('.project') ? Math.max(viewportFinish, projectFinish) : viewportFinish)
+        : Math.max(viewportFinish, rect.top + scrollY - maxScroll);
       const startTop = finishTop + height * (settings.scrollRevealStart - settings.scrollRevealEnd);
       const entering = ease(clamp((startTop - rect.top) / (startTop - finishTop)));
       const leaving = ease(clamp(rect.bottom / (height * settings.scrollFadeExitRange)));
@@ -444,10 +452,16 @@ async function startApp() {
     for (const project of projects) {
       const card = element('article', undefined, 'project');
       card.id = project.id;
-      const action = link('', project.url, 'project-row-link');
-      action.setAttribute('data-cursor-target', '');
+      const action = element('div', undefined, 'project-row-link');
       const heading = element('div', undefined, 'project-heading');
-      heading.append(element('h2', project.title), element('p', project.company, 'project-company'));
+      const title = element('h2');
+      const titleControl = element('button', undefined, 'project-title-link');
+      titleControl.type = 'button';
+      title.append(element('span', project.title, 'project-title-text'));
+      const chevron = element('span', undefined, 'project-title-chevron');
+      chevron.setAttribute('aria-hidden', 'true');
+      title.append(chevron);
+      heading.append(title, element('p', project.company, 'project-company'), titleControl);
       const copy = element('div', undefined, 'project-copy');
       copy.append(element('p', project.summary, 'project-summary'));
       const tags = element('ul', undefined, 'project-tags');
@@ -457,8 +471,8 @@ async function startApp() {
       labels.setAttribute('aria-label', 'Project topics');
       for (const label of project.labels || []) labels.append(element('li', label));
       copy.append(tags, labels);
-      const arrow = element('span', '↗', 'project-row-arrow');
-      arrow.setAttribute('aria-hidden', 'true');
+      const arrow = link('↗', project.url, 'project-row-arrow');
+      arrow.setAttribute('aria-label', `Open ${project.title}`);
       action.append(heading, arrow, copy);
       card.append(action);
       cards.append(card);
