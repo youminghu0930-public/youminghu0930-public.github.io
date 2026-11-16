@@ -52,10 +52,10 @@
       "tags": [
         "Sports-specific pose estimation",
         "Unified model training",
+        "Multi-model integration",
         "Blurry object detection",
         "Signal processing",
-        "Trajectory smoothing",
-        "Multi-model integration"
+        "Trajectory smoothing"
       ],
       "sections": [
         {
@@ -124,21 +124,32 @@
       },
       "summaryHighlights": [
         "the industry’s most accurate golf-swing tracking"
-      ]
+      ],
+      "technologyLinks": {
+        "Sports-specific pose estimation": "https://youminghu0930-public.github.io/improving-golf-swing-pose-estimation/",
+        "Unified model training": "https://youminghu0930-public.github.io/integrating-golfer-club-detection-models/",
+        "Blurry object detection": "https://youminghu0930-public.github.io/enhancing-blurry-club-recall/",
+        "Signal processing": "https://youminghu0930-public.github.io/trajectory-postprocessing/",
+        "Trajectory smoothing": "https://youminghu0930-public.github.io/trajectory-postprocessing/",
+        "Multi-model integration": "https://youminghu0930-public.github.io/integrating-golfer-club-detection-models/"
+      }
     },
     {
       "id": "golf-3d",
       "navigationTitle": "Golf-True-3D",
       "title": "Golf-True-3D",
-      "summary": "Turn a single swing into a clear, visually engaging 3D reconstruction you can inspect from every angle. Our single-shot approach lets you visually check the results without a separate, complicated camera-calibration process.",
+      "summary": "Inspect a visually engaging 3D swing from every angle. Our single-shot approach works without separate camera calibration.",
       "url": "https://youminghu0930-public.github.io/golf-true-3d-product/",
       "linkLabel": "Explore True 3D →",
       "number": "02",
       "category": "3D movement",
       "tags": [
-        "Pose estimation",
-        "3D reconstruction",
-        "Multi-view geometry"
+        "Smooth Swing Tracking",
+        "Calibration-free 3D reconstruction",
+        "Multi-view geometry",
+        "Triangulation",
+        "Time synchronization",
+        "Kinematic analysis"
       ],
       "sections": [
         {
@@ -177,8 +188,16 @@
       },
       "summaryHighlights": [
         "single-shot approach",
-        "without a separate, complicated camera-calibration process"
-      ]
+        "without separate camera calibration"
+      ],
+      "technologyLinks": {
+        "Multi-view geometry": "https://youminghu0930-public.github.io/golf-swing-3d-reconstruction/",
+        "Smooth Swing Tracking": "https://youminghu0930-public.github.io/golf-swing-analysis-poc/",
+        "Triangulation": "https://youminghu0930-public.github.io/golf-swing-3d-reconstruction/",
+        "Time synchronization": "https://youminghu0930-public.github.io/two-event-time-sync/",
+        "Kinematic analysis": "https://youminghu0930-public.github.io/pose-information-extraction/",
+        "Calibration-free 3D reconstruction": "https://youminghu0930-public.github.io/golf-swing-3d-reconstruction/"
+      }
     }
   ],
   "navigation": [

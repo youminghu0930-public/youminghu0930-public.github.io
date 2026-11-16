@@ -166,6 +166,8 @@ export function installPointerEffects(hero) {
   }
   function resolveTarget(node) {
     if (!(node instanceof Element)) return null;
+    const technology=node.closest('.project-technology-link');
+    if(technology)return technology.closest('.project-row-link')?.querySelector('.project-expand-trigger') || null;
     const marked = node.closest('[data-cursor-target]');
     const control = node.closest('a[href], button, [role="button"], [role="scrollbar"]');
     // Skill headings frame the entire expandable card; links inside it frame themselves.

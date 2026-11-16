@@ -1067,3 +1067,36 @@ html[data-skills-expanding=true] { overflow-anchor:none; scroll-behavior:auto; }
 @media(prefers-reduced-motion:reduce) { .experience-details,.experience-toggle-chevron { transition:none; } }
 
 @media(max-width:1000px) { .portfolio-shell .experience-toggle { margin:0; text-align:left; } }
+
+/* Technology links keep the project cursor frame and respond through their own styling. */
+.works-page .project-tags .project-technology-tag { position:relative; padding:0; border-color:transparent; box-shadow:none; }
+.portfolio-shell .project-technology-link { position:relative; z-index:3; display:inline-flex; align-items:center; gap:6px; margin:0; padding:4px 12px; border:0; border-radius:inherit; background:transparent; color:var(--accent); font:inherit; font-weight:400; line-height:inherit; letter-spacing:inherit; text-decoration:none; cursor:pointer; transition:color 360ms cubic-bezier(.22,.61,.36,1),font-weight 360ms cubic-bezier(.22,.61,.36,1); }
+.portfolio-shell .project-technology-link:hover,.portfolio-shell .project-technology-link:focus-visible { background:transparent; color:#eeeeee; font-weight:600; text-decoration:none; }
+ .project-technology-outline { position:absolute; inset:-1px; width:calc(100% + 2px); height:calc(100% + 2px); overflow:visible; pointer-events:none; }
+.project-technology-outline rect { width:calc(100% - 2px); height:calc(100% - 2px); fill:none; stroke:rgb(0 240 80 / 25%); stroke-width:1; shape-rendering:geometricPrecision; transition:stroke 360ms cubic-bezier(.22,.61,.36,1),stroke-width 360ms cubic-bezier(.22,.61,.36,1); }
+.project-technology-tag:has(.project-technology-link:hover) .project-technology-outline rect,.project-technology-tag:has(.project-technology-link:focus-visible) .project-technology-outline rect { stroke:#eeeeee; stroke-width:2; }
+.project-technology-label { display:inline-grid; }
+.project-technology-label::after { content:attr(data-label); grid-area:1 / 1; visibility:hidden; font-weight:600; height:0; }
+.project-technology-link-icon { font-family:"Geist Sans", "Noto Sans TC", system-ui, sans-serif; font-size:13px; line-height:1; }
+
+.project-row-link .project-copy { position:relative; z-index:3; pointer-events:none; }
+.project-row-link .project-technology-link { pointer-events:auto; }
+
+@media(prefers-reduced-motion:reduce) { .project-technology-outline rect,.portfolio-shell .project-technology-link { transition:none; } }
+
+/* All project headers use the first project's responsive height. */
+@media(width > 1000px) {
+ .portfolio-shell .project-row-link,.portfolio-shell .project-row-link.is-preview-expanded { grid-template-rows:var(--project-cell-height,auto) auto; }
+ .project-row-link .project-heading,.project-row-link .project-copy { height:var(--project-cell-height,auto); }
+}
+.project-row-link .project-heading { align-self:stretch; }
+.portfolio-shell .project-row-link .project-heading h2 { position:absolute; top:50%; left:16px; right:16px; transform:translateY(-50%); }
+.project-row-link .project-heading .project-company { position:absolute; top:calc(50% + var(--project-title-half-height,0px)); left:16px; right:16px; }
+@media(max-width:1000px) {
+ .project-row-link .project-heading { height:var(--project-mobile-heading-height,auto); }
+ .project-row-link .project-copy { height:var(--project-mobile-copy-height,auto); }
+}
+
+/* Shared destinations reveal as a group without changing cursor-frame ownership. */
+.portfolio-shell .project-technology-tag.is-link-group-active .project-technology-link { background:transparent; color:#eeeeee; font-weight:600; }
+.project-technology-tag.is-link-group-active .project-technology-outline rect { stroke:#eeeeee; stroke-width:2; }

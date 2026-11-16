@@ -501,7 +501,42 @@ async function startApp() {
       copy.append(description);
       const tags = element('ul', undefined, 'project-tags');
       tags.setAttribute('aria-label', 'Technologies');
-      for (const tag of project.tags) tags.append(element('li', tag));
+      const technologyGroups=new Map();
+      for(const tag of project.tags){
+        const key=project.technologyLinks?.[tag] || `pending:${tag}`;
+        if(!technologyGroups.has(key))technologyGroups.set(key,[]);
+        technologyGroups.get(key).push(tag);
+      }
+      for(const tag of [...technologyGroups.values()].flat()){
+
+        const item=element('li',undefined,'project-technology-tag');
+        const url=project.technologyLinks?.[tag];
+        const control=url?link('',url,'project-technology-link'):element('button',undefined,'project-technology-link');
+        if(url){control.target='_blank';control.rel='noopener noreferrer';}else control.type='button';
+        const label=element('span',tag,'project-technology-label');label.dataset.label=tag;
+        const icon=element('span','↗','project-technology-link-icon');icon.setAttribute('aria-hidden','true');
+        const outline=document.createElementNS('http://www.w3.org/2000/svg','svg');
+        outline.classList.add('project-technology-outline');outline.setAttribute('aria-hidden','true');
+        const border=document.createElementNS('http://www.w3.org/2000/svg','rect');
+        border.setAttribute('x','1');border.setAttribute('y','1');border.setAttribute('rx','13');border.setAttribute('ry','13');
+        outline.append(border);
+        control.append(label,icon);item.append(outline,control);tags.append(item);
+      }
+      const highlightTechnologyGroup=control=>{
+        const url=control?.getAttribute('href');
+        for(const item of tags.children){
+          const candidate=item.querySelector('.project-technology-link');
+          item.classList.toggle('is-link-group-active',Boolean(control&&(url?candidate.getAttribute('href')===url:candidate===control)));
+        }
+      };
+      const technologyAt=node=>node instanceof Element?node.closest('.project-technology-link'):null;
+      tags.addEventListener('pointerover',event=>highlightTechnologyGroup(technologyAt(event.target)));
+      tags.addEventListener('pointerout',event=>{
+        const next=technologyAt(event.relatedTarget);
+        highlightTechnologyGroup(next&&tags.contains(next)?next:tags.contains(document.activeElement)?document.activeElement:null);
+      });
+      tags.addEventListener('focusin',event=>highlightTechnologyGroup(technologyAt(event.target)));
+      tags.addEventListener('focusout',event=>{const next=technologyAt(event.relatedTarget);highlightTechnologyGroup(next&&tags.contains(next)?next:null);});
       const technologies=element('div',undefined,'project-technologies');
       technologies.append(element('h3',page.projectTechnologyTitle,'project-description-title'),tags);
       copy.append(technologies);

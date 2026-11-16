@@ -468,7 +468,9 @@
     "ExperienceDateColumnWidth": "168px",
     "ExperienceToggleDuration": "420ms",
     "ExperienceToggleGap": "12px",
-    "ExperienceToggleChevronSize": "10px"
+    "ExperienceToggleChevronSize": "10px",
+    "ProjectTechnologyHoverDuration": "360ms",
+    "ProjectTechnologyHoverEase": "cubic-bezier(.22,.61,.36,1)"
   },
   "layoutReference": "https://aaftab.is-a.dev/",
   "effects": {
