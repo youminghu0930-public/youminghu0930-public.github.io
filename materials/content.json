@@ -118,8 +118,8 @@
           "description": "Explore synchronized views and movement measurements extracted from a swing."
         }
       ],
-      "image": "/materials/data/project-previews/golf-3d-banner-start.png",
-      "imageAlt": "True 3D golf banner with the reconstructed golfer, club motion, and two camera views",
+      "image": "/materials/data/project-previews/golf-3d-rotations-fitted.png",
+      "imageAlt": "3D golf reconstruction with absolute hip and shoulder rotations, X-factor readouts, rotation plots, and geometric overlays",
       "demoLabel": "Explore the demo ↗",
       "company": "Ideas Lab Formosa",
       "labels": [
@@ -129,8 +129,8 @@
       ],
       "banner": {
         "rendered": true,
-        "video": "/materials/data/project-previews/golf-3d-banner-full.mp4",
-        "poster": "/materials/data/project-previews/golf-3d-banner-start.png"
+        "video": "/materials/data/project-previews/golf-3d-rotations-trajectory.mp4",
+        "poster": "/materials/data/project-previews/golf-3d-rotations-fitted.png"
       }
     }
   ],

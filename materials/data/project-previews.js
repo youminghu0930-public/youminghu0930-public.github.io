@@ -23,6 +23,25 @@ export function installProjectPreviews(main, projects) {
   canvas.width=800;canvas.height=600;
   preview.append(image,canvas); main.append(preview);
   const banners=new Map();
+  const inlinePreviews=[];
+  // Inline previews use their own player so desktop hover playback stays independent.
+  const observer=new IntersectionObserver(entries=>{
+    for(const entry of entries) {
+      const item=inlinePreviews.find(item=>item.node===entry.target);
+      if(!item)continue;
+      item.visible=entry.isIntersecting;
+      updateInline(item);
+    }
+  },{threshold:.05});
+  function updateInline(item) {
+    if(getComputedStyle(item.node).display!=='none' && item.visible && !document.hidden) {
+      if(!item.player && item.config)item.player=createBannerPreview(item.canvas,item.config);
+      item.player?.play();
+    } else item.player?.pause();
+  }
+  function updateInlinePreviews(){inlinePreviews.forEach(updateInline);}
+  window.addEventListener('resize',updateInlinePreviews,{signal,passive:true});
+  document.addEventListener('visibilitychange',updateInlinePreviews,{signal});
   let activeBanner=null;
   let frame=0, point=null, current=null, row=null, spring=null, lastTime=0, portrait=false;
   function place(time) {
@@ -77,6 +96,19 @@ export function installProjectPreviews(main, projects) {
   image.addEventListener('load',()=>{if(point)schedule();},{signal});
   for(const project of projects) {
     const action = document.getElementById(project.id).querySelector('.project-row-link');
+    const inline=document.createElement('div');
+    inline.className='project-inline-preview';
+    inline.style.setProperty('--project-preview-aspect',String(project.previewAspectRatio || 4/3));
+    const poster=document.createElement('img');
+    poster.src=project.banner?.poster || project.image;
+    poster.alt=project.imageAlt || `${project.title} preview`;
+    poster.loading='lazy';poster.decoding='async';
+    const inlineCanvas=document.createElement('canvas');
+    inlineCanvas.className='project-preview-canvas';inlineCanvas.hidden=true;
+    inlineCanvas.setAttribute('aria-hidden','true');
+    inline.append(poster,inlineCanvas);action.prepend(inline);
+    inlinePreviews.push({node:inline,canvas:inlineCanvas,config:project.banner,player:null,visible:false});
+    observer.observe(inline);
     action.addEventListener('pointermove', event => {
       if(event.pointerType!=='mouse' || !matchMedia('(hover:hover) and (pointer:fine)').matches) return;
       if(current!==project.id) {
@@ -99,5 +131,5 @@ export function installProjectPreviews(main, projects) {
   window.addEventListener('scroll',hide,{signal,passive:true});
   window.addEventListener('resize',hide,{signal});
   window.addEventListener('blur',hide,{signal});
-  return ()=>{hide();for(const banner of banners.values())banner.destroy();controller.abort();preview.remove();};
+  return ()=>{hide();observer.disconnect();for(const item of inlinePreviews){item.player?.destroy();item.node.remove();}for(const banner of banners.values())banner.destroy();controller.abort();preview.remove();};
 }

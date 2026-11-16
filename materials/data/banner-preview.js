@@ -11,7 +11,9 @@ export function createBannerPreview(canvas, config) {
   const usable=p=>p && Number.isFinite(p[0]) && Number.isFinite(p[1]) && (p[0]!==0 || p[1]!==0) && (p.length<3 || p[2]>=0);
   function draw() {
     if(!timing || disposed)return;
-    canvas.width=800;canvas.height=Math.round(800/(config.aspectRatio || 4/3));
+    const targetHeight=Math.round(800/(config.aspectRatio || 4/3));
+    if(canvas.width!==800)canvas.width=800;
+    if(canvas.height!==targetHeight)canvas.height=targetHeight;
     const height=canvas.height;
     context.fillStyle='#080808';context.fillRect(0,0,800,height);
     const fit=800/timing.width;
@@ -99,7 +101,8 @@ function createRenderedBannerPreview(canvas,config) {
     if(disposed)return;
     const media=video.readyState>=2?video:poster;
     if(media===video || poster.complete && poster.naturalWidth) {
-      canvas.width=800;canvas.height=600;
+      if(canvas.width!==800)canvas.width=800;
+      if(canvas.height!==600)canvas.height=600;
       const width=media.videoWidth || media.naturalWidth,height=media.videoHeight || media.naturalHeight;
       const scale=800/width;
       context.fillStyle='#080808';context.fillRect(0,0,800,600);
