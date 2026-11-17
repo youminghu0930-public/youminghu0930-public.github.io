@@ -110,6 +110,14 @@ export function installSkillsAccordion(root, {setScrollPosition} = {}) {
     }, {signal});
     toggle.addEventListener('click', event => {
       clearTimeout(closeTimer);
+      // The explicit icon always toggles, even after a manual dismissal or during cooldown.
+      if (event.target instanceof Element && event.target.closest('.skills-toggle-icon')) {
+        clearTimeout(expandTimer);
+        if (supportsHover()) setHovered(row);
+        if (openRow === row) { dismissedRow = row; collapse(row); }
+        else { dismissedRow = null; expand(row); }
+        return;
+      }
       if (event.detail && supportsHover()) {
         setHovered(row);
         if (openRow === row) {

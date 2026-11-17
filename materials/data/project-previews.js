@@ -24,7 +24,8 @@ export function installProjectPreviews(main, projects) {
     const frame=item.media.querySelector('iframe');
     if(frame){frame.tabIndex=mobile.matches?-1:0;frame.style.pointerEvents=mobile.matches||frame.dataset.ready!=='true'?'none':'';}
     const heading=item.action.querySelector('.project-heading'),company=heading.querySelector('.project-company'),headingTitle=heading.querySelector('h2');
-    item.editorial.hidden=mobile.matches;item.writeup.hidden=mobile.matches;
+    company.hidden=true;
+    item.editorial.hidden=mobile.matches;item.writeup.hidden=mobile.matches;item.editorialActions.hidden=mobile.matches;
     if(mobile.matches){
       item.action.insertBefore(heading,item.wrapper);
       item.action.insertBefore(copy,item.editorial);
@@ -38,15 +39,40 @@ export function installProjectPreviews(main, projects) {
       item.action.insertBefore(item.wrapper,item.editorial);
       if(item.qa)item.writeupInner.append(item.qa);
       item.editorialActions.append(item.readToggle,item.open);
+      item.action.append(item.writeup,item.editorialActions);
     }
     updateWriteup(item);
   }
-  function updateWriteup(item){
-    item.writeup.classList.toggle('is-open',item.writeupExpanded);
-    item.writeup.inert=!item.writeupExpanded;
-    item.writeup.setAttribute('aria-hidden',String(!item.writeupExpanded));
+  function updateWriteup(item,animate=false){
+    const panel=item.writeup;
+    const from=panel.getBoundingClientRect().height;
+    const fromOpacity=Number(getComputedStyle(panel).opacity);
+    item.writeupAnimation?.cancel();item.writeupAnimation=null;
+    panel.classList.toggle('is-open',item.writeupExpanded);
+    panel.inert=!item.writeupExpanded;
+    panel.setAttribute('aria-hidden',String(!item.writeupExpanded));
     item.readToggle.setAttribute('aria-expanded',String(item.writeupExpanded));
     item.readLabel.textContent=item.writeupExpanded?'Close the write-up':'Read the write-up';
+    if(!animate||mobile.matches||matchMedia('(prefers-reduced-motion:reduce)').matches)return;
+    const natural=item.writeupInner.getBoundingClientRect().height;
+    const to=item.writeupExpanded?natural:0;
+    if(Math.abs(to-from)<.5)return;
+    const style=getComputedStyle(panel);
+    const value=style.getPropertyValue(item.writeupExpanded?'--project-writeup-duration':'--project-writeup-collapse-duration').trim();
+    const base=(parseFloat(value)||(item.writeupExpanded?820:950))*(value.endsWith('s')&&!value.endsWith('ms')?1000:1);
+    // Short reversals still need breathing room; do not accelerate them into a snap.
+    const distance=Math.min(1,Math.abs(to-from)/Math.max(1,natural));
+    const duration=Math.max(item.writeupExpanded?280:340,base*Math.sqrt(distance));
+    const frames=[{height:`${from}px`,opacity:fromOpacity,offset:0}];
+    // Keep closing text legible as the panel begins to contract.
+    if(!item.writeupExpanded)frames.push({opacity:fromOpacity,offset:.2});
+    frames.push({height:`${to}px`,opacity:item.writeupExpanded?1:0,offset:1});
+    const animation=panel.animate(frames,{duration,easing:style.getPropertyValue('--project-writeup-ease').trim()||'ease-in-out',fill:'both'});
+    item.writeupAnimation=animation;
+    animation.onfinish=()=>{
+      if(item.writeupAnimation!==animation)return;
+      item.writeupAnimation=null;animation.cancel();
+    };
   }
   function finishExpansion(item){
     if(!item.wrapper.classList.contains('is-animating'))return;
@@ -260,21 +286,14 @@ export function installProjectPreviews(main, projects) {
       highlights.forEach((node,index)=>{node.style.setProperty('--project-highlight-duration',`${duration*widths[index]/longest}ms`);node.style.setProperty('--project-marker-share',String(Math.max(.001,widths[index]/longest)));});
       const editorial=action.querySelector('.project-editorial-copy');
       if(!mobile.matches&&editorial&&!editorial.hidden){
-        const heading=action.querySelector('.project-heading'),title=heading.querySelector('h2'),company=heading.querySelector('.project-company');
+        const heading=action.querySelector('.project-heading'),title=heading.querySelector('h2');
         const origin=editorial.getBoundingClientRect().top;
-        const samples=highlights.map(node=>{
-          const rect=node.getBoundingClientRect(),description=node.closest('.project-description');
-          const offset=Number.parseFloat(description?.style.translate.split(' ').at(-1))||0;
-          return {node,top:rect.top-origin-offset,height:Math.max(1,rect.height)};
-        });
-        const headingHeight=Math.max(1,heading.offsetHeight),end=Math.max(headingHeight,...samples.map(sample=>sample.top+sample.height));
-        editorial.style.setProperty('--project-heading-sweep-scale',String(end/headingHeight));
-        const titleDuration=parseFloat(getComputedStyle(editorial).getPropertyValue('--project-title-stage-duration'))||600;
-        editorial.style.setProperty('--project-desktop-sweep-duration',`${end/headingHeight*titleDuration}ms`);
-        for(const [node,offset,height]of [[title.querySelector('.project-title-text'),title.offsetTop,title.offsetHeight],[company,company.offsetTop,company.offsetHeight]]){
-          node.style.setProperty('--project-ink-start',String(offset/end));node.style.setProperty('--project-ink-scale',String(end/Math.max(1,height)));
-        }
-        for(const sample of samples){sample.node.style.setProperty('--project-marker-start',String(sample.top/end));sample.node.style.setProperty('--project-marker-scale',String(end/sample.height));}
+        const previewTop=`${Math.round((title.getBoundingClientRect().top-origin)*100)/100}px`;
+        if(action.style.getPropertyValue('--project-preview-title-top')!==previewTop)action.style.setProperty('--project-preview-title-top',previewTop);
+        const headingHeight=Math.max(1,heading.offsetHeight);
+        const titleText=title.querySelector('.project-title-text');
+        titleText.style.setProperty('--project-ink-start',String(title.offsetTop/headingHeight));
+        titleText.style.setProperty('--project-ink-scale',String(headingHeight/Math.max(1,title.offsetHeight)));
       }
     };
     action.addEventListener('pointerenter',sizeHighlightTimings,{signal});
@@ -282,7 +301,8 @@ export function installProjectPreviews(main, projects) {
     document.fonts.ready.then(()=>{if(!signal.aborted)sizeHighlightTimings();});
     sizeHighlightTimings();
 
-    headerObserver.observe(action);headerObserver.observe(action.querySelector('.project-heading'));headerObserver.observe(action.querySelector('.project-copy'));
+    // Q&A height changes do not affect the header; observe only its actual content.
+    headerObserver.observe(action.querySelector('.project-heading'));headerObserver.observe(action.querySelector('.project-copy'));
     sizeHeader();
     const trigger=document.createElement('button');trigger.type='button';trigger.className='project-expand-trigger';
     trigger.setAttribute('aria-label',`Expand ${project.title}`);
@@ -292,17 +312,17 @@ export function installProjectPreviews(main, projects) {
     const editorialActions=document.createElement('div');editorialActions.className='project-editorial-actions';editorial.append(editorialActions);
     const readToggle=document.createElement('button');readToggle.type='button';readToggle.className='project-writeup-toggle';
     const readLabel=document.createElement('span');readLabel.textContent='Read the write-up';
-    const readArrow=document.createElement('span');readArrow.className='action-arrow';readArrow.textContent='→';readArrow.setAttribute('aria-hidden','true');readToggle.append(readLabel,readArrow);
+    const readArrow=document.createElement('span');readArrow.className='project-writeup-chevron';readArrow.setAttribute('aria-hidden','true');readToggle.append(readArrow,readLabel);
     const writeup=document.createElement('div');writeup.className='project-writeup';writeup.id=`${project.id}-writeup`;
     const writeupInner=document.createElement('div');writeupInner.className='project-writeup-inner';writeup.append(writeupInner);
     readToggle.setAttribute('aria-controls',writeup.id);action.append(editorial,writeup);
     const item={action,wrapper,canvas,media,tools,inline,open,qa:inline.querySelector('.project-preview-qa'),trigger,title,headerObserver,setHeaderExpanded,name:project.title,panCleanup,config:project.banner,player:null,visible:false,expanded:false,editorial,editorialActions,writeup,writeupInner,readToggle,readLabel,writeupExpanded:false};
-    readToggle.addEventListener('click',()=>{item.writeupExpanded=!item.writeupExpanded;updateWriteup(item);scheduleRowLayout();},{signal});
+    readToggle.addEventListener('click',()=>{resetMagnet();item.writeupExpanded=!item.writeupExpanded;updateWriteup(item,true);},{signal});
     items.push(item);arrangeProject(item);update(item);observer.observe(action);
     wrapper.addEventListener('transitionend',event=>{if(event.target===wrapper&&event.propertyName==='grid-template-rows')finishExpansion(item);},{signal});
     trigger.addEventListener('click',event=>{event.stopPropagation();if(item.expanded){setInfoOpen(false);resetMagnet();}item.expanded=!item.expanded;update(item);},{signal});
     title.addEventListener('click',event=>{event.stopPropagation();item.expanded=!item.expanded;setInfoOpen(false);resetMagnet();update(item);if(!item.expanded)trigger.focus({preventScroll:true});},{signal});
-    action.addEventListener('keydown',event=>{if(event.key==='Escape'&&!mobile.matches&&item.writeupExpanded){item.writeupExpanded=false;updateWriteup(item);readToggle.focus();}},{signal});
+    action.addEventListener('keydown',event=>{if(event.key==='Escape'&&!mobile.matches&&item.writeupExpanded){resetMagnet();item.writeupExpanded=false;updateWriteup(item,true);readToggle.focus({preventScroll:true});}},{signal});
 
   }
   let rowLayoutFrame=0;
@@ -333,7 +353,10 @@ export function installProjectPreviews(main, projects) {
     }
   };
   const scheduleRowLayout=()=>{if(!rowLayoutFrame)rowLayoutFrame=requestAnimationFrame(syncRowLayout);};
-  const rowLayoutObserver=new ResizeObserver(scheduleRowLayout);
+  const rowLayoutObserver=new ResizeObserver(()=>{
+    for(const item of items)if(item.writeupAnimation&&item.writeupExpanded)updateWriteup(item,true);
+    scheduleRowLayout();
+  });
   for(const item of items){
     rowLayoutObserver.observe(item.action.querySelector('.project-heading h2'));
     const qa=item.action.querySelector('.project-preview-qa');if(qa)rowLayoutObserver.observe(qa);
@@ -381,5 +404,5 @@ export function installProjectPreviews(main, projects) {
   const refresh=()=>{for(const item of items){arrangeProject(item);update(item);}scheduleRowLayout();scheduleCenterHighlight();};
   mobile.addEventListener('change',refresh,{signal});
   document.addEventListener('visibilitychange',refresh,{signal});
-  return ()=>{cancelAnimationFrame(centerFrame);centerObserver.disconnect();filterObserver.disconnect();cancelAnimationFrame(rowLayoutFrame);rowLayoutObserver.disconnect();observer.disconnect();controller.abort();for(const item of items){clearTimeout(item.expansionTimer);item.player?.destroy();item.panCleanup();item.headerObserver.disconnect();item.wrapper.remove();item.tools.remove();item.trigger.remove();item.qa?.remove();item.open.remove();item.action.classList.remove('is-preview-expanded','is-center-highlighted','has-native-scroll-highlight');}};
+  return ()=>{cancelAnimationFrame(centerFrame);centerObserver.disconnect();filterObserver.disconnect();cancelAnimationFrame(rowLayoutFrame);rowLayoutObserver.disconnect();observer.disconnect();controller.abort();for(const item of items){clearTimeout(item.expansionTimer);item.writeupAnimation?.cancel();item.player?.destroy();item.panCleanup();item.headerObserver.disconnect();item.wrapper.remove();item.tools.remove();item.trigger.remove();item.qa?.remove();item.open.remove();item.action.classList.remove('is-preview-expanded','is-center-highlighted','has-native-scroll-highlight');}};
 }

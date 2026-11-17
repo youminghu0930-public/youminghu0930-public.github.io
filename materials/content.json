@@ -44,7 +44,7 @@
       "id": "golf-2d",
       "navigationTitle": "Golf-Swing-Analysis",
       "title": "Smooth-Swing-Tracking",
-      "summary": "Built for real-world golf analysis, our pipeline brings multiple models and processing techniques together for the industry’s most accurate golf-swing tracking and smooth, visually compelling results.",
+      "summary": "Smooth, accurate joint and club tracking for real-world golf analysis.",
       "url": "https://youminghu0930-public.github.io/golf-swing-analysis-poc/",
       "linkLabel": "Explore 2D analysis →",
       "number": "01",
@@ -123,7 +123,7 @@
         "url": "https://www.instagram.com/reel/Dc9nDsgqrfi/"
       },
       "summaryHighlights": [
-        "the industry’s most accurate golf-swing tracking"
+        "joint and club tracking"
       ],
       "technologyLinks": {
         "Sports-specific pose estimation": "https://youminghu0930-public.github.io/improving-golf-swing-pose-estimation/",
@@ -134,6 +134,13 @@
         "Multi-model integration": "https://youminghu0930-public.github.io/integrating-golfer-club-detection-models/"
       },
       "qa": [
+        {
+          "question": "What does it do?",
+          "answer": "Built for real-world golf analysis, our pipeline brings multiple models and processing techniques together for the industry’s most accurate golf-swing tracking and smooth, visually compelling results.",
+          "highlights": [
+            "the industry’s most accurate golf-swing tracking"
+          ]
+        },
         {
           "question": "Why is it important?",
           "answer": "Without measurable feedback, golfers can struggle to identify what needs to change. Quantitative motion analysis gives them a clear basis for adjusting their swing and improving more efficiently.",
@@ -178,7 +185,7 @@
       "id": "golf-3d",
       "navigationTitle": "Golf-True-3D",
       "title": "Golf-True-3D",
-      "summary": "Turn a single swing into a clear, visually engaging 3D reconstruction you can inspect from every angle. Our single-shot approach lets you visually check the results without a separate, complicated camera-calibration process.",
+      "summary": "Explore your golf swing in 3D, without complicated camera calibration.",
       "url": "https://youminghu0930-public.github.io/golf-true-3d-product/",
       "linkLabel": "Explore True 3D →",
       "number": "02",
@@ -227,8 +234,7 @@
         "url": "https://youtu.be/P3YksJdejog?si=eyQjC6Fgo7AuV4_v"
       },
       "summaryHighlights": [
-        "single-shot approach",
-        "without a separate, complicated camera-calibration process"
+        "golf swing in 3D"
       ],
       "technologyLinks": {
         "Multi-view geometry": "https://youminghu0930-public.github.io/golf-swing-3d-reconstruction/",
@@ -239,6 +245,14 @@
         "Calibration-free 3D reconstruction": "https://youminghu0930-public.github.io/golf-swing-3d-reconstruction/"
       },
       "qa": [
+        {
+          "question": "What does it do?",
+          "answer": "Turn a single swing into a clear, visually engaging 3D reconstruction you can inspect from every angle. Our single-shot approach lets you visually check the results without a separate, complicated camera-calibration process.",
+          "highlights": [
+            "single-shot approach",
+            "without a separate, complicated camera-calibration process"
+          ]
+        },
         {
           "question": "Why is it important?",
           "answer": "Perspective distortion can skew 2D measurements. Reconstructing the swing in 3D enables more accurate angle measurements and clearer guidance for improvement.",
@@ -320,7 +334,7 @@
       "accentLastWord": false,
       "terminalDot": false,
       "showBreadcrumb": false,
-      "showCurrentWork": true,
+      "showCurrentWork": false,
       "actions": [
         {
           "label": "View my work",
@@ -368,7 +382,7 @@
       "accentLastWord": true,
       "terminalDot": true,
       "showBreadcrumb": false,
-      "showCurrentWork": false
+      "showCurrentWork": true
     }
   },
   "experience": {

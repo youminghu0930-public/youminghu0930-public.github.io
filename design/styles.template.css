@@ -1139,7 +1139,7 @@ html[data-skills-expanding=true] { overflow-anchor:none; scroll-behavior:auto; }
 .project-qa-item { margin:0; padding:{{ProjectQaItemGap}} 0; border-top:1px solid var(--border); }
 .project-qa-item:last-child { padding-bottom:0; }
 .project-qa-question { margin:0 0 {{ProjectQaQuestionGap}}; }
-.project-qa-answer { font-size:{{ProjectDescriptionTitleSize}}; overflow-wrap:anywhere; }
+.project-qa-answer { font-size:{{ProjectSummarySize}}; overflow-wrap:anywhere; }
 @media(width > {{mobileBreakpoint}}) {
  .project-preview-qa { grid-column:2; grid-row:1; margin-top:0; align-self:start; }
  .project-qa-item:first-child { padding-top:0; border-top:0; }
@@ -1260,27 +1260,27 @@ html[data-skills-expanding=true] { overflow-anchor:none; scroll-behavior:auto; }
  .project-editorial-actions { display:flex; align-items:center; justify-content:flex-end; flex-wrap:wrap; gap:16px; }
  .project-writeup-toggle { display:inline-flex; align-items:center; gap:{{ProjectOpenLinkGap}}; margin:0; padding:0; border:0; border-radius:0; background:transparent; color:{{HeadingColor}}; font-family:inherit; font-size:{{ProjectOpenLinkSize}}; font-weight:{{ProjectOpenLinkWeight}}; line-height:{{ProjectCreditRowHeight}}; cursor:pointer; }
  .project-writeup-toggle:hover,.project-writeup-toggle:focus-visible { color:var(--accent); }
- .project-writeup { grid-area:writeup; display:grid; grid-template-rows:0fr; opacity:0; min-width:0; transition:grid-template-rows {{ProjectPreviewExpandDuration}} ease,opacity {{ProjectPreviewExpandDuration}} ease; }
- .project-writeup.is-open { grid-template-rows:1fr; opacity:1; }
+ .project-writeup { --project-writeup-duration:{{ProjectWriteupDuration}}; --project-writeup-collapse-duration:{{ProjectWriteupCollapseDuration}}; --project-writeup-ease:{{ProjectWriteupEase}}; grid-area:writeup; display:block; height:0; overflow:hidden; opacity:0; min-width:0; }
+ .project-writeup.is-open { height:auto; opacity:1; }
  .project-writeup-inner { min-height:0; overflow:hidden; }
  .portfolio-shell .works-page .project-writeup .project-preview-qa { margin:32px 0 0; }
 }
 @media(prefers-reduced-motion:reduce) { .project-writeup { transition:none; } }
 
-/* A single desktop sweep fills the title, then continues into its text markers. */
+/* Desktop title and description highlights share the same hover clock. */
 @property --project-desktop-progress { syntax:'<number>'; inherits:true; initial-value:0; }
 @media(min-width:calc({{mobileBreakpoint}} + 1px)) {
- .project-editorial-copy { --project-desktop-progress:0; --project-title-stage-duration:{{ProjectTitleFillDuration}}; transition:--project-desktop-progress var(--project-desktop-sweep-duration,1000ms) linear; }
+ .project-editorial-copy { --project-desktop-progress:0; transition:--project-desktop-progress {{ProjectTitleFillDuration}} linear; }
  .project-row-link:hover .project-editorial-copy { --project-desktop-progress:1; }
  .project-row-link .project-heading::before,
- .project-row-link:hover .project-heading::before { clip-path:inset(0 0 calc(100% - clamp(0%,calc(var(--project-desktop-progress)*var(--project-heading-sweep-scale,1)*100%),100%)) 0); transition:none; }
+ .project-row-link:hover .project-heading::before { clip-path:inset(0 0 calc(100% - clamp(0%,calc(var(--project-desktop-progress)*100%),100%)) 0); transition:none; }
  .portfolio-shell .works-page .project-row-link .project-heading .project-title-text,
  .portfolio-shell .works-page .project-row-link:hover .project-heading .project-title-text,
  .portfolio-shell .works-page .project-row-link .project-heading .project-company,
  .portfolio-shell .works-page .project-row-link:hover .project-heading .project-company { --project-desktop-ink-cut:clamp(.001%,calc((var(--project-desktop-progress) - var(--project-ink-start,0))*var(--project-ink-scale,1)*100%),99.999%); background:linear-gradient(to bottom,var(--button-text) var(--project-desktop-ink-cut),var(--project-original-ink,{{HeadingColor}}) var(--project-desktop-ink-cut)); background-clip:text; -webkit-background-clip:text; -webkit-text-fill-color:transparent; color:transparent; transition:none; }
  .project-heading .project-company { --project-original-ink:var(--muted); }
  .portfolio-shell .works-page .project-row-link .project-summary-highlight,
- .portfolio-shell .works-page .project-row-link:hover .project-summary-highlight { --project-desktop-marker-fill:clamp(0%,calc((var(--project-desktop-progress) - var(--project-marker-start,1))*var(--project-marker-scale,1)*100%),100%); --project-desktop-marker-ink:clamp(.001%,var(--project-desktop-marker-fill),99.999%); background-image:linear-gradient(to bottom,var(--button-text) var(--project-desktop-marker-ink),{{HeadingColor}} var(--project-desktop-marker-ink)),linear-gradient(var(--accent),var(--accent)); background-position:left top; background-size:100% 100%,100% var(--project-desktop-marker-fill); background-clip:text,border-box; -webkit-background-clip:text,border-box; color:transparent; -webkit-text-fill-color:transparent; transition:none; }
+ .portfolio-shell .works-page .project-row-link:hover .project-summary-highlight { --project-desktop-marker-fill:clamp(0%,calc(var(--project-desktop-progress)*100%),100%); --project-desktop-marker-ink:clamp(.001%,var(--project-desktop-marker-fill),99.999%); background-image:linear-gradient(to bottom,var(--button-text) var(--project-desktop-marker-ink),{{HeadingColor}} var(--project-desktop-marker-ink)),linear-gradient(var(--accent),var(--accent)); background-position:left top; background-size:100% 100%,100% var(--project-desktop-marker-fill); background-clip:text,border-box; -webkit-background-clip:text,border-box; color:transparent; -webkit-text-fill-color:transparent; transition:none; }
 }
 @media(prefers-reduced-motion:reduce) { .project-editorial-copy { transition:none; } }
 
@@ -1319,3 +1319,73 @@ html[data-skills-expanding=true] { overflow-anchor:none; scroll-behavior:auto; }
 :where(:disabled,[aria-disabled="true"],[inert])::after { cursor:default!important; }
 
 .portfolio-shell .project-technology-link::before { content:''; position:absolute; inset:-1px; border-radius:inherit; }
+
+/* Center the write-up affordance beneath the complete desktop project. */
+.project-editorial-actions[hidden] { display:none; }
+@media(min-width:calc({{mobileBreakpoint}} + 1px)) {
+ .portfolio-shell .works-page .project-row-link { grid-template-areas:"preview editorial" "writeup writeup" "actions actions"; }
+ .portfolio-shell .works-page .project:nth-child(even) .project-row-link { grid-template-areas:"editorial preview" "writeup writeup" "actions actions"; }
+ .portfolio-shell .works-page .project-editorial-actions { grid-area:actions; position:relative; isolation:isolate; justify-content:center; margin-top:16px; padding:4px 0 0; }
+ .project-editorial-actions::before,.project-editorial-actions::after { content:''; display:block; flex:1 1 0; max-width:128px; height:1px; pointer-events:none; opacity:.65; transition:opacity 240ms ease; }
+ .project-editorial-actions::before { background:linear-gradient(to right,transparent,rgb(255 255 255 / 24%)); }
+ .project-editorial-actions::after { background:linear-gradient(to left,transparent,rgb(255 255 255 / 24%)); }
+ .project-editorial-actions:has(.project-writeup-toggle:hover)::before,.project-editorial-actions:has(.project-writeup-toggle:hover)::after,
+ .project-editorial-actions:focus-within::before,.project-editorial-actions:focus-within::after { opacity:1; }
+ .project-editorial-actions .project-writeup-toggle { position:relative; display:inline-flex; flex-direction:row; align-items:center; justify-content:center; gap:12px; min-width:0; min-height:40px; padding:4px 8px; border:0; border-radius:0; box-shadow:none; font-size:14px; line-height:1.5; color:{{HeadingColor}}; background:transparent; }
+ .project-editorial-actions .project-writeup-toggle:hover,.project-editorial-actions .project-writeup-toggle:focus-visible { color:var(--accent); background:transparent; }
+ .project-writeup-chevron { display:block; width:10px; height:10px; flex:none; color:var(--accent); border-right:1.5px solid currentColor; border-bottom:1.5px solid currentColor; rotate:45deg; transition:rotate 300ms ease,translate 300ms ease; }
+ .project-writeup-toggle[aria-expanded="true"] .project-writeup-chevron { rotate:225deg; }
+ .project-writeup-toggle:hover .project-writeup-chevron { translate:0 2px; }
+ .project-writeup-toggle[aria-expanded="true"]:hover .project-writeup-chevron { translate:0 -2px; }
+}
+@media(prefers-reduced-motion:reduce) { .project-writeup-chevron { transition:none; } }
+
+@media(min-width:calc({{mobileBreakpoint}} + 1px)) {
+ /* Keep preview and title aligned as the heading content changes. */
+ .portfolio-shell .works-page .project-row-link .project-preview-expansion { margin-top:var(--project-preview-title-top,8px); }
+}
+.project-filter-button { transition:color 280ms ease,background-color 280ms ease,border-color 280ms ease; }
+
+.portfolio-shell .works-page .project-company[hidden] { display:none; }
+@media(min-width:calc({{mobileBreakpoint}} + 1px)) {
+ .portfolio-shell .works-page .project-row-link { padding-top:16px; padding-bottom:12px; }
+ .portfolio-shell .works-page .project-heading { padding-block:8px; }
+ .portfolio-shell .works-page .project-editorial-actions { margin-top:8px; padding-top:0; }
+}
+
+/* Short project introductions; the detailed explanation lives in the write-up. */
+.project-qa-question { font-size:{{ProjectSummarySize}}; }
+.project-qa-answer { max-width:74ch; }
+@media(min-width:calc({{mobileBreakpoint}} + 1px)) {
+ .portfolio-shell .works-page .projects { max-width:none; margin-inline:auto; }
+ .portfolio-shell .works-page .project-row-link { grid-template-columns:minmax(0,min(44%,512px)) minmax(0,1fr); }
+ .portfolio-shell .works-page .project:nth-child(even) .project-row-link { grid-template-columns:minmax(0,1fr) minmax(0,min(44%,512px)); }
+ .portfolio-shell .works-page .project-row-link .project-preview-media { aspect-ratio:16 / 9; }
+ .portfolio-shell .works-page .project-copy { gap:16px; }
+}
+
+/* Desktop write-ups read as a narrow question column beside the answer. */
+@media(min-width:calc({{mobileBreakpoint}} + 1px)) {
+ .project-qa-item { display:grid; grid-template-columns:minmax(160px,24%) minmax(0,1fr); column-gap:32px; align-items:center; }
+ .project-qa-question { margin:0; }
+ .project-qa-answer { min-width:0; max-width:none; }
+}
+
+/* A quiet hover band keeps the question and answer visually grouped. */
+@media(hover:hover) and (pointer:fine) {
+ .project-qa-item { transition:background-color 220ms ease; }
+ .project-qa-item:hover { background-color:rgb(255 255 255 / 4%); }
+}
+@media(prefers-reduced-motion:reduce) { .project-qa-item { transition:none; } }
+
+/* Editorial write-up rows: a clear question silhouette and a quieter answer. */
+@media(min-width:calc({{mobileBreakpoint}} + 1px)) {
+ .project-preview-qa .project-qa-item { grid-template-columns:minmax(180px,30%) minmax(0,1fr); column-gap:{{ProjectQaColumnGap}}; min-height:112px; padding-block:{{ProjectQaRowPadding}}; }
+ .project-preview-qa .project-qa-item:first-child { border-top:1px solid var(--border); padding-top:{{ProjectQaRowPadding}}; }
+ .project-preview-qa .project-qa-question { color:{{HeadingColor}}; font-size:{{ProjectQaHeadingSize}}; font-weight:600; line-height:1.25; letter-spacing:-.025em; }
+ .project-preview-qa .project-qa-answer { color:var(--muted); }
+}
+
+/* Ornaments are small draggable toys; their surrounding landing stays scrollable. */
+.portfolio-shell .hero-ornament { touch-action:none; user-select:none; -webkit-user-select:none; }
+.portfolio-shell .hero-ornament[data-dragging="true"],.portfolio-shell .hero-ornament[data-dragging="true"] * { cursor:grabbing!important; }

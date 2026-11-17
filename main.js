@@ -56,9 +56,15 @@ function installScrollMotion(main) {
     // Read all bounds before writing, subtracting our own offset to avoid feedback.
     const bounds = items.map(item => {
       const rect = item.node.getBoundingClientRect();
-      return {top:rect.top - item.offset, bottom:rect.bottom - item.offset};
+      const writeup = !mobile.matches && item.node.matches('.project-row-link')
+        ? item.node.querySelector('.project-writeup') : null;
+      // Opening Q&A changes document flow, not the summary's entrance threshold.
+      const revealHeight = rect.height - (writeup?.getBoundingClientRect().height || 0);
+      return {top:rect.top - item.offset, bottom:rect.bottom - item.offset, revealHeight};
     });
     items.forEach((item, index) => {
+      // Filtering owns the row's reveal; a changing height must not drive a second fade.
+      if (item.node.closest('.projects[data-filtering="true"]')) return;
       const projectFragment=main.classList.contains('works-page')&&item.node.closest('.project');
       const projectRow=item.node.matches('.project-row-link');
       // Desktop editorial rows move as a group so their internal gaps cannot drift.
@@ -98,7 +104,7 @@ function installScrollMotion(main) {
       const isWorks = main.classList.contains('works-page');
       // Finish each project fragment once its full bounds enter the viewport.
       // This also works for the final row without depending on document height.
-      const projectFinish = height - (rect.bottom - rect.top);
+      const projectFinish = height - rect.revealHeight;
       const finishTop = isWorks
         ? (item.node.closest('.project') ? Math.max(viewportFinish, projectFinish) : viewportFinish)
         : Math.max(viewportFinish, rect.top + scrollY - maxScroll);
@@ -523,7 +529,7 @@ async function startApp() {
         remainder=remainder.slice(index+phrase.length);
       }
       summary.append(document.createTextNode(remainder));
-      description.append(element('h3',page.projectDescriptionTitle,'project-description-title'),summary);
+      description.append(summary);
       copy.append(description);
       const tags = element('ul', undefined, 'project-tags');
       tags.setAttribute('aria-label', 'Technologies');
@@ -564,7 +570,7 @@ async function startApp() {
       tags.addEventListener('focusin',event=>highlightTechnologyGroup(technologyAt(event.target)));
       tags.addEventListener('focusout',event=>{const next=technologyAt(event.relatedTarget);highlightTechnologyGroup(next&&tags.contains(next)?next:null);});
       const technologies=element('div',undefined,'project-technologies');
-      technologies.append(element('h3',page.projectTechnologyTitle,'project-description-title'),tags);
+      technologies.append(tags);
       copy.append(technologies);
       const arrow = link('↗', project.url, 'project-row-arrow');
       arrow.setAttribute('aria-label', `Open ${project.title}`);

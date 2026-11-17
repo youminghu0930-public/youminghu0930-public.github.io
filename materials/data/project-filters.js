@@ -75,9 +75,10 @@ export function createProjectFilters(projects, cards, onChange = () => {}) {
       animation.onfinish=()=>{
         if(transitions.get(card)!==animation)return;
         transitions.delete(card);card.hidden=!matches;animation.cancel();
-        if(!transitions.size)onChange();
+        if(!transitions.size){delete cards.dataset.filtering;onChange();}
       };
     }
+    if(animations.length)cards.dataset.filtering='true';else delete cards.dataset.filtering;
     const start=document.timeline.currentTime;
     for(const animation of animations){animation.play();animation.startTime=start;}
     for (const [tag, button] of buttons) {

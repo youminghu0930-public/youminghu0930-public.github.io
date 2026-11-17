@@ -7,7 +7,7 @@ export function installOrnamentScene({hero,createOrnament,kinds,design}) {
   layer.className='landing-ornament-scene';
   const items=kinds.map((kind,index)=>{
     const button=createOrnament(kind);layer.append(button);
-    return {button,index,x:null,y:null,localY:null,exitX:null,exitY:null};
+    return {button,index,x:null,y:null,localY:null,exitX:null,exitY:null,manual:null,dragging:false,suppressClick:false,clickTimer:0,bounceX:0,bounceY:0,bounceVX:0,bounceVY:0};
   });
   hero.append(layer);
   let frame=0,lastTime=0,disposed=false,exiting=false;
@@ -40,7 +40,11 @@ export function installOrnamentScene({hero,createOrnament,kinds,design}) {
       // Once there is insufficient visible room, the section carries the items
       // offscreen naturally; they never cross its bottom edge into the stripe.
       let target;
-      if(!exiting) {
+      if(item.manual) {
+        const inset=size/2+8;
+        target={x:area.left+clamp(item.manual.x*area.width,inset,Math.max(inset,area.width-inset)),
+          y:area.top+clamp(item.manual.y*area.height,inset,Math.max(inset,area.height-inset))};
+      } else if(!exiting) {
         target={x:clamp(item.index?heading.right+radius*.65:heading.left-radius*.6,left,right),
           y:clamp(item.index?heading.bottom+radius*.45:heading.top-radius*.6,bounds.top+radius+8,Math.max(bounds.top+radius+8,bottom))};
         if(mobile.matches) {
@@ -76,7 +80,7 @@ export function installOrnamentScene({hero,createOrnament,kinds,design}) {
       const verticalFactor=settings.ornamentTempoTopFactor+(settings.ornamentTempoBottomFactor-settings.ornamentTempoTopFactor)*tempoLevel;
       const response=settings.ornamentSceneResponseMs*verticalFactor*(1-settings.ornamentTempoEdgeBoost*edgeProximity);
       const blend=reduced.matches?1:1-Math.exp(-delta/response);
-      if(item.x===null){item.x=x;item.y=y;}
+      if(item.x===null||item.manual){item.x=x;item.y=y;}
       else {item.x+=(x-item.x)*blend;item.y+=(y-item.y)*blend;}
       if(Math.hypot(x-item.x,y-item.y)>.25)moving=true;
       item.size=size;item.radius=radius;
@@ -84,22 +88,90 @@ export function installOrnamentScene({hero,createOrnament,kinds,design}) {
     }
     // Move the whole pair upward together as the stripe approaches. Independent
     // clamps collapsed their separation; a shared offset preserves it exactly.
-    const lowest=Math.max(...items.map(item=>item.y+item.radius+8));
+    const automatic=items.filter(item=>!item.manual);
+    const lowest=automatic.length?Math.max(...automatic.map(item=>item.y+item.radius+8)):bounds.bottom;
     const distance=lowest-bounds.bottom;
     const softness=settings.ornamentExitSoftness;
     const exitOffset=(distance+Math.hypot(distance,softness))/2;
     for(const item of items) {
-      const displayY=item.y-exitOffset;
-      item.button.style.translate=`${item.x-area.left-item.size/2}px ${displayY-area.top-item.size/2}px`;
+      if(reduced.matches||item.dragging) {
+        item.bounceX=item.bounceY=item.bounceVX=item.bounceVY=0;
+      } else {
+        const dt=delta/1000,stiffness=settings.ornamentSpringStiffness,damping=settings.ornamentSpringDamping;
+        item.bounceVX+=(-stiffness*item.bounceX-damping*item.bounceVX)*dt;
+        item.bounceVY+=(-stiffness*item.bounceY-damping*item.bounceVY)*dt;
+        item.bounceX=clamp(item.bounceX+item.bounceVX*dt,-settings.ornamentSpringMaxOffset,settings.ornamentSpringMaxOffset);
+        item.bounceY=clamp(item.bounceY+item.bounceVY*dt,-settings.ornamentSpringMaxOffset,settings.ornamentSpringMaxOffset);
+        if(Math.hypot(item.bounceX,item.bounceY)>.05||Math.hypot(item.bounceVX,item.bounceVY)>.5)moving=true;
+        else item.bounceX=item.bounceY=item.bounceVX=item.bounceVY=0;
+      }
+      let displayX=item.x+item.bounceX,displayY=(item.manual?item.y:item.y-exitOffset)+item.bounceY;
+      if(item.manual){
+        const inset=item.size/2+8;
+        displayX=clamp(displayX,area.left+inset,Math.max(area.left+inset,area.right-inset));
+        displayY=clamp(displayY,area.top+inset,Math.max(area.top+inset,area.bottom-inset));
+      }
+      item.button.style.translate=`${displayX-area.left-item.size/2}px ${displayY-area.top-item.size/2}px`;
     }
     if(moving)schedule();else lastTime=0;
   }
   function schedule(){if(!frame&&!disposed)frame=requestAnimationFrame(draw);}
+  // Capture only ornament gestures; the rest of the landing keeps normal scrolling.
+  for(const item of items) {
+    const {button}=item;
+    let press=null;
+    button.addEventListener('pointerdown',event=>{
+      if(press||!event.isPrimary||(event.pointerType==='mouse'&&event.button!==0))return;
+      clearTimeout(item.clickTimer);item.suppressClick=false;
+      const rect=button.getBoundingClientRect();
+      if(item.manual){
+        const area=layer.getBoundingClientRect();
+        item.x=rect.left+rect.width/2;item.y=rect.top+rect.height/2;
+        item.manual={x:(item.x-area.left)/Math.max(1,area.width),y:(item.y-area.top)/Math.max(1,area.height)};
+      }
+      item.bounceX=item.bounceY=item.bounceVX=item.bounceVY=0;
+      press={id:event.pointerId,x:event.clientX,y:event.clientY,lastX:event.clientX,lastY:event.clientY,lastTime:event.timeStamp,vx:0,vy:0,
+        offsetX:event.clientX-rect.left-rect.width/2,offsetY:event.clientY-rect.top-rect.height/2};
+      button.setPointerCapture(event.pointerId);
+    },{signal:controller.signal});
+    button.addEventListener('pointermove',event=>{
+      if(!press||press.id!==event.pointerId)return;
+      if(!item.dragging&&Math.hypot(event.clientX-press.x,event.clientY-press.y)<5)return;
+      const dt=Math.max(8,event.timeStamp-press.lastTime)/1000;
+      press.vx=press.vx*.4+(event.clientX-press.lastX)/dt*.6;
+      press.vy=press.vy*.4+(event.clientY-press.lastY)/dt*.6;
+      press.lastX=event.clientX;press.lastY=event.clientY;press.lastTime=event.timeStamp;
+      item.dragging=true;item.suppressClick=true;button.dataset.dragging='true';
+      const area=layer.getBoundingClientRect(),inset=button.offsetWidth/2+8;
+      const maxY=Math.max(inset,area.height-inset);
+      const minY=Math.min(maxY,Math.max(inset,80-area.top+inset));
+      const x=clamp(event.clientX-press.offsetX-area.left,inset,Math.max(inset,area.width-inset));
+      const y=clamp(event.clientY-press.offsetY-area.top,minY,maxY);
+      item.manual={x:x/Math.max(1,area.width),y:y/Math.max(1,area.height)};
+      schedule();
+    },{signal:controller.signal});
+    const release=event=>{
+      if(!press||press.id!==event.pointerId)return;
+      if(item.dragging&&event.type==='pointerup'&&!reduced.matches&&event.timeStamp-press.lastTime<100){
+        item.bounceVX=clamp(press.vx*.3,-240,240);item.bounceVY=clamp(press.vy*.3,-240,240);
+      }
+      press=null;item.dragging=false;delete button.dataset.dragging;schedule();
+      if(button.hasPointerCapture(event.pointerId))button.releasePointerCapture(event.pointerId);
+      // The release's synthetic click follows pointerup; suppress only that click.
+      item.clickTimer=setTimeout(()=>{item.suppressClick=false;},0);
+    };
+    for(const type of ['pointerup','pointercancel','lostpointercapture'])button.addEventListener(type,release,{signal:controller.signal});
+    button.addEventListener('click',event=>{
+      if(!item.suppressClick)return;
+      event.preventDefault();event.stopImmediatePropagation();item.suppressClick=false;
+    },{capture:true,signal:controller.signal});
+    button.addEventListener('dragstart',event=>event.preventDefault(),{signal:controller.signal});
+  }
   window.addEventListener('scroll',schedule,{passive:true,signal:controller.signal});
   window.addEventListener('resize',schedule,{signal:controller.signal});
   document.addEventListener('visibilitychange',schedule,{signal:controller.signal});
   reduced.addEventListener('change',schedule,{signal:controller.signal});
   const observer=new ResizeObserver(schedule);observer.observe(hero);
   schedule();
-  return {destroy(){disposed=true;cancelAnimationFrame(frame);controller.abort();observer.disconnect();items.forEach(item=>item.button.destroy());layer.remove();}};
+  return {destroy(){disposed=true;cancelAnimationFrame(frame);controller.abort();observer.disconnect();items.forEach(item=>{clearTimeout(item.clickTimer);item.button.destroy();});layer.remove();}};
 }

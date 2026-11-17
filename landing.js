@@ -343,7 +343,8 @@ function createOrnamentPatch(paths, expansion, cornerRadius = 3) {
 export function createOrnament(kind) {
   const button = element('button', undefined, `hero-ornament ornament-${kind}`);
   button.type = 'button';
-  button.setAttribute('aria-label', `Animate ${kind === 'star' ? 'star' : 'lightning bolt'}`);
+  button.setAttribute('aria-label', `Play with the ${kind === 'star' ? 'star' : 'lightning bolt'}`);
+  button.title = 'Click for sparks; drag to move';
   const path = kind === 'star'
     ? 'M48 7 C58 7 57 24 65 31 C73 39 89 38 89 48 C89 58 72 57 65 65 C57 73 58 89 48 89 C38 89 39 72 31 65 C23 57 7 58 7 48 C7 38 24 39 31 31 C39 23 38 7 48 7Z'
     : 'M62 8 C69 2 74 7 71 15 L60 36 C57 42 59 45 65 47 L76 50 C83 52 83 58 77 63 L34 96 C26 102 20 96 24 87 L34 65 C37 59 35 56 29 54 L20 51 C12 48 14 42 20 37 L62 8Z';
@@ -476,15 +477,17 @@ export function createOrnament(kind) {
     ], {duration:design.effects.ornamentShakeDuration, easing:'ease-in-out'});
     queueShimmer(design.effects.ornamentShakeDuration+design.effects.ornamentShimmerPause);
   }
-  button.addEventListener('pointerenter', event => { if (event.pointerType === 'mouse') shake(); });
-  button.addEventListener('click', event => { if (event.pointerType !== 'mouse') shake(); });
+  button.addEventListener('pointerenter', event => {
+    if (event.pointerType === 'mouse' && button.dataset.dragging !== 'true') shake();
+  });
+  button.addEventListener('click', shake);
   const observer = new IntersectionObserver(entries => {
     visible = entries[0].isIntersecting;
     if(visible) queueShimmer(); else pauseEffects();
   });
   observer.observe(button);
   const timer = setInterval(() => {
-    if (visible && !document.hidden && animation?.playState !== 'running') shake();
+    if (visible && !document.hidden && button.dataset.dragging !== 'true' && animation?.playState !== 'running') shake();
   }, design.effects.ornamentWobbleInterval);
   const stopMotion = () => { if (motion.matches) pauseEffects(); else queueShimmer(); };
   const onVisibility = () => { if(document.hidden) pauseEffects(); else queueShimmer(); };
