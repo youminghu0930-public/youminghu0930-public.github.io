@@ -1218,3 +1218,26 @@ html[data-skills-expanding=true] { overflow-anchor:none; scroll-behavior:auto; }
  .portfolio-shell .project-row-link .project-summary-highlight[data-marker-ink="light"] { color:#eeeeee; -webkit-text-fill-color:#eeeeee; }
  .portfolio-shell .project-row-link .project-summary-highlight[data-marker-ink="dark"] { color:var(--button-text); -webkit-text-fill-color:var(--button-text); }
 }
+
+.project-preview-swipe-surface { display:none; }
+@media(max-width:1000px) {
+ .portfolio-shell .project-preview-swipe-surface { display:block; position:absolute; inset:0; z-index:2; background:transparent; pointer-events:auto; touch-action:pan-y pinch-zoom; }
+}
+
+/* Native view timelines stay attached to fast compositor-driven mobile swipes. */
+@property --project-scroll-progress { syntax:'<number>'; inherits:true; initial-value:0; }
+@keyframes project-mobile-scroll-progress {
+ 0% { --project-scroll-progress:0; background-color:transparent; }
+ .001% { background-color:rgb(255 255 255 / 3%); }
+ 100% { --project-scroll-progress:1; background-color:rgb(255 255 255 / 3%); }
+}
+@media(max-width:1000px) {
+ .project-row-link.has-native-scroll-highlight { timeline-scope:--project-title-scroll; animation:project-mobile-scroll-progress 1s linear both; animation-timeline:--project-title-scroll; animation-range:entry 50% exit 50%; }
+ .has-native-scroll-highlight .project-heading h2 { view-timeline:--project-title-scroll block; view-timeline-inset:25% 25%; }
+ .has-native-scroll-highlight .project-heading::before,
+ .has-native-scroll-highlight:hover .project-heading::before { clip-path:inset(0 0 calc(100% - var(--project-scroll-progress)*100%) 0); }
+ .portfolio-shell .has-native-scroll-highlight .project-heading .project-title-text,
+ .portfolio-shell .has-native-scroll-highlight .project-heading a.project-mobile-title-link:hover { --project-native-ink-cut:clamp(.001px,calc(var(--project-scroll-progress)*var(--project-heading-height) - var(--project-title-offset)),calc(var(--project-title-height) - .001px)); background:linear-gradient(to bottom,var(--button-text) var(--project-native-ink-cut),#eeeeee var(--project-native-ink-cut)); background-clip:text; -webkit-background-clip:text; color:transparent; -webkit-text-fill-color:transparent; transition:none; }
+ .has-native-scroll-highlight .project-summary-highlight,
+ .has-native-scroll-highlight:hover .project-summary-highlight { --project-native-marker-fill:calc(min(1,calc(var(--project-scroll-progress)/var(--project-marker-share,1)))*100%); --project-native-marker-ink:clamp(.001%,var(--project-native-marker-fill),99.999%); background-image:linear-gradient(to right,var(--button-text) var(--project-native-marker-ink),#eeeeee var(--project-native-marker-ink)),linear-gradient(var(--accent),var(--accent)); background-size:100% 100%,var(--project-native-marker-fill) 100%; background-clip:text,border-box; -webkit-background-clip:text,border-box; color:transparent; -webkit-text-fill-color:transparent; transition:none; }
+}

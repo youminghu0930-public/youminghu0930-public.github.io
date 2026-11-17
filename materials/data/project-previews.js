@@ -6,9 +6,12 @@ export function installProjectPreviews(main, projects) {
   const controller=new AbortController();
   const {signal}=controller;
   const mobile=matchMedia(`(max-width: ${design.mobileBreakpoint})`);
+  const nativeScrollHighlight=typeof CSS.registerProperty==='function'&&CSS.supports('animation-timeline','view()')&&CSS.supports('timeline-scope','--project-title-scroll')&&CSS.supports('animation-range','entry 50% exit 50%');
   const items=[];
   function arrangeProject(item){
     const copy=item.action.querySelector('.project-copy');
+    item.action.classList.toggle('has-native-scroll-highlight',mobile.matches&&nativeScrollHighlight);
+    if(mobile.matches&&nativeScrollHighlight){delete item.action.dataset.titleInk;for(const marker of item.action.querySelectorAll('.project-summary-highlight'))delete marker.dataset.markerInk;}
     const text=item.action.querySelector('.project-title-text');
     if(mobile.matches&&text.tagName!=='A'){
       const link=document.createElement('a');link.className='project-title-text project-mobile-title-link';
@@ -19,7 +22,8 @@ export function installProjectPreviews(main, projects) {
     }
     item.open.hidden=mobile.matches;
     item.media.toggleAttribute('data-lenis-prevent',!mobile.matches);
-    const frame=item.media.querySelector('iframe');if(frame)frame.tabIndex=mobile.matches?-1:0;
+    const frame=item.media.querySelector('iframe');
+    if(frame){frame.tabIndex=mobile.matches?-1:0;frame.style.pointerEvents=mobile.matches||frame.dataset.ready!=='true'?'none':'';}
     if(mobile.matches){
       item.action.insertBefore(item.wrapper,copy);
       if(item.qa)item.action.append(item.qa);
@@ -76,7 +80,7 @@ export function installProjectPreviews(main, projects) {
           const visibility=visible=>iframe.contentWindow?.postMessage({type:'preview-visibility',visible:visible&&iframe.dataset.ready==='true'},location.origin);
           const ready=event=>{
             if(event.origin!==location.origin||event.source!==iframe.contentWindow||event.data?.type!=='preview-ready')return;
-            iframe.dataset.ready='true';iframe.style.opacity='1';iframe.style.pointerEvents='';
+            iframe.dataset.ready='true';iframe.style.opacity='1';iframe.style.pointerEvents=mobile.matches?'none':'';
             visibility(item.visible&&item.renderedExpanded&&!document.hidden&&!item.wrapper.classList.contains('is-animating'));
           };
           window.addEventListener('message',ready,{signal});
@@ -116,6 +120,12 @@ export function installProjectPreviews(main, projects) {
       poster.style.display='none';
     }
     media.setAttribute('data-lenis-prevent','');media.append(poster,canvas);
+    if(project.banner?.interactive){
+      // A real parent-page hit surface also blocks iOS iframe gesture routing.
+      // It has no handlers or pointer capture, so vertical swipes stay native.
+      const swipeSurface=document.createElement('div');swipeSurface.className='project-preview-swipe-surface';
+      swipeSurface.setAttribute('aria-hidden','true');media.append(swipeSurface);
+    }
     const tools=document.createElement('div');tools.className='project-preview-tools';
     const open=document.createElement('a');open.href=project.url;open.target='_blank';open.rel='noopener noreferrer';
     open.className='action-primary project-open-link';open.textContent='View project';
@@ -206,6 +216,10 @@ export function installProjectPreviews(main, projects) {
       const width=action.offsetWidth;
       if(headerLocked&&!mobile.matches&&width===headerWidth)return;
       headerWidth=width;
+      const heading=action.querySelector('.project-heading'),headingTitle=heading.querySelector('h2');
+      action.style.setProperty('--project-heading-height',`${heading.offsetHeight}px`);
+      action.style.setProperty('--project-title-height',`${headingTitle.offsetHeight}px`);
+      action.style.setProperty('--project-title-offset',`${headingTitle.offsetTop}px`);
       const nodes=[...action.querySelectorAll(mobile.matches?'.project-heading':'.project-heading,.project-copy')];
       const top=mobile.matches?Math.min(...nodes.map(node=>node.offsetTop)):0;
       const bottom=Math.max(...nodes.map(node=>node.offsetTop+node.offsetHeight));
@@ -228,7 +242,7 @@ export function installProjectPreviews(main, projects) {
       const widths=highlights.map(node=>{const range=document.createRange();range.selectNodeContents(node);return [...range.getClientRects()].reduce((sum,rect)=>sum+rect.width,0);});
       const longest=Math.max(1,...widths);
       const duration=Math.min(design.effects.projectHighlightMaxDuration,longest/design.effects.projectHighlightPixelsPerSecond*1000);
-      highlights.forEach((node,index)=>node.style.setProperty('--project-highlight-duration',`${duration*widths[index]/longest}ms`));
+      highlights.forEach((node,index)=>{node.style.setProperty('--project-highlight-duration',`${duration*widths[index]/longest}ms`);node.style.setProperty('--project-marker-share',String(Math.max(.001,widths[index]/longest)));});
     };
     const headerObserver=new ResizeObserver(()=>{sizeHeader();sizeHighlightTimings();});
     document.fonts.ready.then(()=>{if(!signal.aborted)sizeHighlightTimings();});
@@ -311,7 +325,7 @@ export function installProjectPreviews(main, projects) {
       highlights.forEach((node,index)=>{const fill=Math.min(1,progress*longest/durations[index]);node.style.setProperty('--project-marker-fill',`${fill*100}%`);node.dataset.markerInk=fill<=0?'light':fill>=1?'dark':'split';});
     }
   };
-  const scheduleCenterHighlight=()=>{if(!centerFrame)centerFrame=requestAnimationFrame(highlightCenter);};
+  const scheduleCenterHighlight=()=>{if(mobile.matches&&nativeScrollHighlight)return;if(!centerFrame)centerFrame=requestAnimationFrame(highlightCenter);};
   const centerObserver=new ResizeObserver(scheduleCenterHighlight);
   for(const item of items)centerObserver.observe(item.action);
   const filterObserver=new MutationObserver(scheduleCenterHighlight);
@@ -324,5 +338,5 @@ export function installProjectPreviews(main, projects) {
   const refresh=()=>{for(const item of items){arrangeProject(item);update(item);}scheduleRowLayout();scheduleCenterHighlight();};
   mobile.addEventListener('change',refresh,{signal});
   document.addEventListener('visibilitychange',refresh,{signal});
-  return ()=>{cancelAnimationFrame(centerFrame);centerObserver.disconnect();filterObserver.disconnect();cancelAnimationFrame(rowLayoutFrame);rowLayoutObserver.disconnect();observer.disconnect();controller.abort();for(const item of items){clearTimeout(item.expansionTimer);item.player?.destroy();item.panCleanup();item.headerObserver.disconnect();item.wrapper.remove();item.tools.remove();item.trigger.remove();item.qa?.remove();item.open.remove();item.action.classList.remove('is-preview-expanded','is-center-highlighted');}};
+  return ()=>{cancelAnimationFrame(centerFrame);centerObserver.disconnect();filterObserver.disconnect();cancelAnimationFrame(rowLayoutFrame);rowLayoutObserver.disconnect();observer.disconnect();controller.abort();for(const item of items){clearTimeout(item.expansionTimer);item.player?.destroy();item.panCleanup();item.headerObserver.disconnect();item.wrapper.remove();item.tools.remove();item.trigger.remove();item.qa?.remove();item.open.remove();item.action.classList.remove('is-preview-expanded','is-center-highlighted','has-native-scroll-highlight');}};
 }
