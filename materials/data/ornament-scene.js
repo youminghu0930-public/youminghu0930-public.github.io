@@ -1,4 +1,5 @@
 import { installOrnamentDrag } from './ornament-drag.js';
+import { createOrnamentCollisionWorld } from './ornament-collisions.js';
 
 // Repositioning ornaments belong to the landing's coordinate space, not the page.
 export function installOrnamentScene({hero,createOrnament,kinds,design}) {
@@ -13,7 +14,16 @@ export function installOrnamentScene({hero,createOrnament,kinds,design}) {
     return {button,mover,index,x:null,y:null,localY:null,exitX:null,exitY:null};
   });
   hero.append(layer);
-  for(const item of items)item.drag=installOrnamentDrag({button:item.mover});
+  const collisionWorld=createOrnamentCollisionWorld();
+  for(const item of items)item.drag=installOrnamentDrag({button:item.mover,settings,collisionWorld,getRadius:()=>item.button.offsetWidth*.6,
+    getAreaTop:()=>layer.getBoundingClientRect().top,
+    getBounds:()=>{
+      const area=layer.getBoundingClientRect(),size=item.button.offsetWidth;
+      const angle=(parseFloat(getComputedStyle(item.button).rotate)||0)*Math.PI/180;
+      const inset=Math.max(0,(Math.abs(Math.cos(angle))+Math.abs(Math.sin(angle))-1)*size/2)+8;
+      return {x:[inset,Math.max(inset,area.width-size-inset)],y:[inset,Math.max(inset,area.height-size-inset)]};
+    }
+  });
   let frame=0,lastTime=0,disposed=false,exiting=false;
   const controller=new AbortController();
   const clamp=(v,min,max)=>Math.max(min,Math.min(max,v));

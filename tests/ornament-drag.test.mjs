@@ -39,4 +39,21 @@ test('relocation carries a complete ornament through catches, reversals, and rel
   const recovered=x();fire('pointerup',100,100,37120);step(37220);
   assert(x()<recovered,'a new pickup must recover from a missed release and follow the new direction');
   drag.destroy();
+
+  let areaTop=0;
+  const bounded=installOrnamentDrag({button:wrapper,getBounds:()=>({x:[0,300],y:[0,300]}),getAreaTop:()=>areaTop});
+  bounded.draw(260,150);
+  fire('pointerdown',260,150,40000);fire('pointermove',280,150,40020);fire('pointerup',280,150,40020);
+  step(40120);const afterImpact=x();assert(afterImpact<300,'wall must contain the ornament');
+  step(40220);assert(x()<afterImpact,'wall collision must reverse momentum');
+  step(60000);
+  const y=()=>parseFloat(wrapper.style.translate.split(' ')[1]);
+  const restY=y();areaTop=-40;windowEvents.get('scroll')();
+  assert(y()>restY,'scroll must produce a visible lag/spring response');
+  step(60100);assert.notEqual(y(),restY,'spring should settle gradually');
+  step(70000);assert(Math.abs(y()-restY)<.1,'scroll spring must return to its resting position');
+  fire('pointerdown',100,100,71000);fire('pointermove',1000,100,71020);assert.equal(x(),300);
+  fire('pointermove',999,100,71040);assert.equal(x(),299,'reversing at a wall must respond immediately');
+  fire('pointerup',999,100,71040);step(71140);assert(x()<299,'release away from a wall must retain momentum');
+  bounded.destroy();
 });
