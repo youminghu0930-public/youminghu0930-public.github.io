@@ -41,11 +41,13 @@ test('relocation carries a complete ornament through catches, reversals, and rel
   drag.destroy();
 
   let areaTop=0;
-  const bounded=installOrnamentDrag({button:wrapper,getBounds:()=>({x:[0,300],y:[0,300]}),getAreaTop:()=>areaTop});
+  const wallImpacts=[];
+  const bounded=installOrnamentDrag({button:wrapper,onImpact:hit=>wallImpacts.push(hit),getBounds:()=>({x:[0,300],y:[0,300]}),getAreaTop:()=>areaTop});
   bounded.draw(260,150);
   fire('pointerdown',260,150,40000);fire('pointermove',280,150,40020);fire('pointerup',280,150,40020);
   step(40120);const afterImpact=x();assert(afterImpact<300,'wall must contain the ornament');
   step(40220);assert(x()<afterImpact,'wall collision must reverse momentum');
+  assert(wallImpacts.some(hit=>hit.speed>60&&hit.nx===1),'right wall must emit impact feedback at the contact point');
   step(60000);
   const y=()=>parseFloat(wrapper.style.translate.split(' ')[1]);
   const restY=y();areaTop=-40;windowEvents.get('scroll')();

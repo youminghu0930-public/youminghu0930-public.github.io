@@ -1,9 +1,9 @@
 // Relocation owns only this outer wrapper. The ornament inside is untouched.
-export function installOrnamentDrag({button:wrapper,getBounds=()=>null,getAreaTop=()=>0,settings={},collisionWorld=null,getRadius=()=>44}) {
+export function installOrnamentDrag({button:wrapper,getBounds=()=>null,getAreaTop=()=>0,settings={},collisionWorld=null,getRadius=()=>44,onImpact=()=>{}}) {
   const controller=new AbortController(),signal=controller.signal;
   const reduced=matchMedia('(prefers-reduced-motion: reduce)');
   let position={x:0,y:0},manual=false,press=null,velocity={x:0,y:0};
-  let frame=0,lastTime=0,suppressClick=false,inTick=false;
+  let frame=0,lastTime=0,suppressClick=false,inTick=false,simulationTime=null;
   let scrollOffset=0,scrollVelocity=0,areaTop=getAreaTop(),initialized=false;
   const restitution=settings.ornamentBounceRestitution??.72;
   const stiffness=settings.ornamentSpringStiffness??65,damping=settings.ornamentSpringDamping??9;
@@ -17,6 +17,13 @@ export function installOrnamentDrag({button:wrapper,getBounds=()=>null,getAreaTo
     const tempo=clamp((settings.ornamentTempoTopFactor??.28)+((settings.ornamentTempoBottomFactor??2.8)-(settings.ornamentTempoTopFactor??.28))*Math.pow(level,settings.ornamentTempoCurve??1.7),.45,2.4);
     return {tempo,gain:(.4+.9*level)*(.75+.25*edge)};
   }
+  function wallImpact(axis,edge){
+    const nx=axis==='x'?(edge==='min'?-1:1):0,ny=axis==='y'?(edge==='min'?-1:1):0;
+    const bounds=getBounds(),radius=getRadius(),half=(wrapper.offsetWidth??radius*2)/2;
+    const x=axis==='x'?bounds.x[edge==='min'?0:1]:clamp(position.x,...bounds.x);
+    const y=axis==='y'?bounds.y[edge==='min'?0:1]:clamp(position.y+scrollOffset,...bounds.y);
+    onImpact({kind:'wall',impactTime:simulationTime??performance.now(),speed:Math.abs(velocity[axis]),nx,ny,x:x+half+nx*radius,y:y+half+ny*radius});
+  }
   function contain(bounce=false){
     const bounds=getBounds();if(!bounds)return;
     for(const axis of ['x','y']){
@@ -24,8 +31,8 @@ export function installOrnamentDrag({button:wrapper,getBounds=()=>null,getAreaTo
       if(max<=min){position[axis]=min;velocity[axis]=0;continue;}
       if(!bounce){position[axis]=clamp(position[axis],min,max);continue;}
       while(position[axis]<min||position[axis]>max){
-        if(position[axis]<min){position[axis]=min+(min-position[axis])*restitution;velocity[axis]=Math.abs(velocity[axis])*restitution;}
-        else{position[axis]=max-(position[axis]-max)*restitution;velocity[axis]=-Math.abs(velocity[axis])*restitution;}
+        if(position[axis]<min){wallImpact(axis,'min');position[axis]=min+(min-position[axis])*restitution;velocity[axis]=Math.abs(velocity[axis])*restitution;}
+        else{wallImpact(axis,'max');position[axis]=max-(position[axis]-max)*restitution;velocity[axis]=-Math.abs(velocity[axis])*restitution;}
       }
     }
   }
@@ -44,14 +51,16 @@ export function installOrnamentDrag({button:wrapper,getBounds=()=>null,getAreaTo
     const steps=Math.max(1,Math.ceil(elapsed/stepSize)),dt=elapsed/steps;
     const {tempo}=verticalResponse();
     for(let i=0;i<steps;i++){
+      simulationTime=now-(steps-i-1)*dt*1000;
       const decay=Math.exp(-dt/.75);
       position.x+=velocity.x*.75*(1-decay);
       position.y+=velocity.y*.75*(1-decay);
       velocity.x*=decay;velocity.y*=decay;contain(true);
       scrollVelocity+=(-stiffness/(tempo*tempo)*scrollOffset-damping/tempo*scrollVelocity)*dt;
       scrollOffset+=scrollVelocity*dt;
-      collisionWorld?.resolve(api);
+      collisionWorld?.resolve(api,simulationTime);
     }
+    simulationTime=null;
     if(Math.abs(scrollOffset)<.05&&Math.abs(scrollVelocity)<.5)scrollOffset=scrollVelocity=0;
     paint();inTick=false;
     if((Math.hypot(velocity.x,velocity.y)>.1||scrollOffset||scrollVelocity)&&!reduced.matches)frame=requestAnimationFrame(tick);
@@ -127,6 +136,7 @@ export function installOrnamentDrag({button:wrapper,getBounds=()=>null,getAreaTo
         inverseMass:press?0:1/(radius*radius)};
     },
     collide(hit){
+      if(hit.impactSpeed)onImpact({kind:'ornament',impactTime:hit.impactTime,speed:hit.impactSpeed,nx:hit.nx,ny:hit.ny});
       if(press)return;
       manual=true;
       position.x+=hit.dx;position.y+=scrollOffset+hit.dy;scrollOffset=scrollVelocity=0;

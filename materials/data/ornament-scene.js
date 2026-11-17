@@ -1,5 +1,6 @@
 import { installOrnamentDrag } from './ornament-drag.js';
 import { createOrnamentCollisionWorld } from './ornament-collisions.js';
+import { installOrnamentImpact } from './ornament-impact.js';
 
 // Repositioning ornaments belong to the landing's coordinate space, not the page.
 export function installOrnamentScene({hero,createOrnament,kinds,design}) {
@@ -11,11 +12,12 @@ export function installOrnamentScene({hero,createOrnament,kinds,design}) {
   const items=kinds.map((kind,index)=>{
     const button=createOrnament(kind),mover=document.createElement('div');
     mover.className='landing-ornament-mover';mover.append(button);layer.append(mover);
-    return {button,mover,index,x:null,y:null,localY:null,exitX:null,exitY:null};
+    const impact=installOrnamentImpact(mover,layer);
+    return {button,mover,impact,index,x:null,y:null,localY:null,exitX:null,exitY:null};
   });
   hero.append(layer);
   const collisionWorld=createOrnamentCollisionWorld();
-  for(const item of items)item.drag=installOrnamentDrag({button:item.mover,settings,collisionWorld,getRadius:()=>item.button.offsetWidth*.6,
+  for(const item of items)item.drag=installOrnamentDrag({button:item.mover,settings,collisionWorld,onImpact:item.impact.trigger,getRadius:()=>item.button.offsetWidth*.6,
     getAreaTop:()=>layer.getBoundingClientRect().top,
     getBounds:()=>{
       const area=layer.getBoundingClientRect(),size=item.button.offsetWidth;
@@ -90,5 +92,5 @@ export function installOrnamentScene({hero,createOrnament,kinds,design}) {
   reduced.addEventListener('change',schedule,{signal:controller.signal});
   const observer=new ResizeObserver(schedule);observer.observe(hero);
   schedule();
-  return {destroy(){disposed=true;cancelAnimationFrame(frame);controller.abort();observer.disconnect();items.forEach(item=>{item.drag.destroy();item.button.destroy();});layer.remove();}};
+  return {destroy(){disposed=true;cancelAnimationFrame(frame);controller.abort();observer.disconnect();items.forEach(item=>{item.drag.destroy();item.impact.destroy();item.button.destroy();});layer.remove();}};
 }

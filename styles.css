@@ -1393,3 +1393,8 @@ html[data-skills-expanding=true] { overflow-anchor:none; scroll-behavior:auto; }
 .landing-ornament-mover { position:absolute; top:0; left:0; pointer-events:auto; touch-action:none; user-select:none; -webkit-user-select:none; cursor:grab; }
 .portfolio-shell .landing-ornament-mover .hero-ornament { position:relative; top:0; left:0; right:auto; bottom:auto; cursor:inherit; }
 .landing-ornament-mover[data-dragging="true"] { cursor:grabbing; }
+
+/* Wall bursts anchor to the scene; ornament collisions travel with the wrapper. */
+.ornament-impact { position:absolute; z-index:4; width:0; height:0; pointer-events:none; }
+.ornament-impact-flash { position:absolute; opacity:0; width:12px; height:12px; border-radius:50%; background:radial-gradient(circle,#edfff2 0%,rgb(0 240 80 / 45%) 25%,transparent 70%); }
+.ornament-impact-spark { position:absolute; opacity:0; width:5px; height:1px; border-radius:2px; background:#edfff2; box-shadow:0 0 2px rgb(0 240 80 / 40%); }

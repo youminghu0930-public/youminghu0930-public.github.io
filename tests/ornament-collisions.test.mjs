@@ -26,7 +26,8 @@ test('complete wrappers exchange momentum and scroll response varies with height
   globalThis.window={addEventListener(type,f){const list=windowEvents.get(type)||[];list.push(f);windowEvents.set(type,list)}};
   const wrapper=()=>({offsetWidth:40,style:{},dataset:{},events:new Map(),addEventListener(t,f){this.events.set(t,f)},setPointerCapture(){},hasPointerCapture(){return false}});
   const a=wrapper(),b=wrapper(),world=createOrnamentCollisionWorld();
-  const options={getBounds:()=>({x:[0,1000],y:[0,600]}),getAreaTop:()=>areaTop,getRadius:()=>20,collisionWorld:world};
+  const impacts=[];
+  const options={onImpact:hit=>impacts.push(hit),getBounds:()=>({x:[0,1000],y:[0,600]}),getAreaTop:()=>areaTop,getRadius:()=>20,collisionWorld:world};
   const da=installOrnamentDrag({button:a,...options}),db=installOrnamentDrag({button:b,...options});
   const fire=(target,type,x,y,time)=>{now=time;const e={type,clientX:x,clientY:y,timeStamp:time,pointerId:1,isPrimary:true,pointerType:'mouse',button:0,preventDefault(){}};if(target)target.events.get(type)(e);else for(const f of windowEvents.get(type)||[])f(e)};
   const step=()=>{now+=1000/120;const pending=[...frames.values()];frames.clear();pending.forEach(f=>f(now))};
@@ -35,6 +36,7 @@ test('complete wrappers exchange momentum and scroll response varies with height
   fire(a,'pointerdown',100,100,0);fire(null,'pointermove',200,100,100);fire(null,'pointerup',200,100,100);
   for(let i=0;i<60;i++)step();
   assert(x(b)>330,'struck ornament must receive momentum and move');
+  assert(impacts.some(hit=>hit.speed>60&&Math.abs(hit.nx)>.9),'marble collision must emit directional impact feedback');
   assert(x(b)-x(a)>=39,'ornaments must separate after impact');
   da.destroy();db.destroy();
   // New world, with one ornament near the ceiling and one near the floor.
