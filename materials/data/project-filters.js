@@ -68,8 +68,8 @@ export function createProjectFilters(projects, cards, onChange = () => {}) {
       card.hidden=false;
       const targetHeight=matches ? card.getBoundingClientRect().height : 0;
       const animation=card.animate([
-        {height:`${height}px`,opacity,overflow:'clip'},
-        {height:`${targetHeight}px`,opacity:matches?1:0,overflow:'clip'}
+        {height:`${height}px`,opacity,overflow:'clip',boxSizing:'border-box',borderTopWidth:getComputedStyle(card).borderTopWidth},
+        {height:`${targetHeight}px`,opacity:matches?1:0,overflow:'clip',boxSizing:'border-box',borderTopWidth:matches?getComputedStyle(card).borderTopWidth:'0px'}
       ],{duration:design.effects.projectFilterTransitionDuration,easing:'cubic-bezier(.4,0,.2,1)',fill:'both'});
       animation.pause();
       transitions.set(card,animation);

@@ -69,6 +69,9 @@ function installScrollMotion(main) {
         item.node.style.removeProperty('translate');
         item.node.style.removeProperty('opacity');
         item.offset=0;item.opacity=1;item.initialized=true;
+        // Filtering owns the final position; do not restore an older reveal target afterward.
+        item.scrollPosition=`${scrollY}:${innerWidth}:${height}`;
+        item.scrollTarget=[0,1];
         return;
       }
       const projectFragment=main.classList.contains('works-page')&&item.node.closest('.project');
