@@ -1386,10 +1386,9 @@ html[data-skills-expanding=true] { overflow-anchor:none; scroll-behavior:auto; }
  .project-preview-qa .project-qa-answer { color:var(--muted); }
 }
 
-/* Ornaments are small draggable toys; their surrounding landing stays scrollable. */
-.portfolio-shell .hero-ornament { touch-action:none; user-select:none; -webkit-user-select:none; }
-.portfolio-shell .hero-ornament[data-dragging="true"],.portfolio-shell .hero-ornament[data-dragging="true"] * { cursor:grabbing!important; }
-
-/* The button owns the complete ornament gesture; animated artwork never steals it. */
-.hero-ornament .ornament-visual,.hero-ornament .ornament-visual * { pointer-events:none; }
-.hero-ornament::before { content:''; position:absolute; inset:-6px; }
+/* Permanent soft green glow; all original ornament layers travel together. */
+.portfolio-shell .hero-ornament .ornament-art { filter:{{OrnamentGlow}} drop-shadow(0 0 12px rgb(0 240 80 / 58%)); }
+.portfolio-shell .hero-ornament:focus { outline:none; }
+.landing-ornament-mover { position:absolute; top:0; left:0; pointer-events:auto; touch-action:none; user-select:none; -webkit-user-select:none; cursor:grab; }
+.portfolio-shell .landing-ornament-mover .hero-ornament { position:relative; top:0; left:0; right:auto; bottom:auto; cursor:inherit; }
+.landing-ornament-mover[data-dragging="true"] { cursor:grabbing; }

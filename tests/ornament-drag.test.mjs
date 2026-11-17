@@ -1,0 +1,42 @@
+import {readFile} from 'node:fs/promises';
+import assert from 'node:assert/strict';
+import test from 'node:test';
+const source=await readFile(new URL('../materials/data/ornament-drag.js',import.meta.url),'utf8');
+const {installOrnamentDrag}=await import(`data:text/javascript;base64,${Buffer.from(source).toString('base64')}`);
+
+test('relocation carries a complete ornament through catches, reversals, and release',()=>{
+  let now=0,next=0;const frames=new Map(),events=new Map(),windowEvents=new Map();
+  Object.defineProperty(globalThis,'performance',{configurable:true,value:{now:()=>now}});
+  globalThis.requestAnimationFrame=f=>{frames.set(++next,f);return next};
+  globalThis.cancelAnimationFrame=id=>frames.delete(id);
+  globalThis.matchMedia=()=>({matches:false,addEventListener(){}});
+  globalThis.window={addEventListener(type,f){windowEvents.set(type,f)}};
+  const wrapper={style:{},dataset:{},addEventListener(type,f){events.set(type,f)},setPointerCapture(){},hasPointerCapture(){return false}};
+  const drag=installOrnamentDrag({button:wrapper});
+  const fire=(type,x,y,time)=>{
+    now=time;(windowEvents.get(type)||events.get(type))({type,clientX:x,clientY:y,timeStamp:time,pointerId:1,isPrimary:true,pointerType:'mouse',button:0,preventDefault(){}});
+  };
+  const step=time=>{now=time;const pending=[...frames.values()];frames.clear();pending.forEach(f=>f(time))};
+  const x=()=>parseFloat(wrapper.style.translate);
+  drag.draw(100,100);
+  fire('pointerdown',100,100,0);fire('pointermove',180,100,40);
+  assert.equal(x(),180,'wrapper must follow the pointer directly');
+  fire('pointerup',180,100,40);step(140);assert(x()>180,'release must coast');
+  const catchX=x();fire('pointerdown',catchX,100,140);
+  assert.equal(frames.size,0,'pickup must cancel the old animation immediately');
+  fire('pointermove',catchX-30,100,160);assert.equal(x(),catchX-30);
+  drag.draw(500,500);assert.equal(x(),catchX-30,'scene positioning must not fight a held object');
+  fire('pointermove',catchX+10,100,180);fire('pointerup',catchX+10,100,180);
+  const releaseX=x();step(200);assert(x()>releaseX,'latest rightward reversal must replace leftward velocity');
+  step(30000);assert.equal(frames.size,0,'friction must eventually stop the animation');
+  fire('pointerdown',100,100,31000);fire('pointermove',100.5,100,36000);fire('pointerup',100.5,100,36000);
+  const tiny=x();step(36100);assert(x()>tiny,'a gentle flick after holding must retain momentum');
+  fire('pointerdown',100,100,36200);fire('pointermove',150,100,36220);fire('pointercancel',150,100,36220);
+  assert.equal(frames.size,0,'cancel must not launch a throw');
+  // A swallowed release must never leave all future pickups ignored.
+  fire('pointerdown',100,100,37000);fire('pointermove',120,100,37020);
+  fire('pointerdown',120,100,37100);fire('pointermove',100,100,37120);
+  const recovered=x();fire('pointerup',100,100,37120);step(37220);
+  assert(x()<recovered,'a new pickup must recover from a missed release and follow the new direction');
+  drag.destroy();
+});

@@ -172,6 +172,7 @@ export function installPointerEffects(hero) {
   }
   function resolveTarget(node) {
     if (!(node instanceof Element)) return null;
+    if(node.closest('.hero-ornament'))return null;
     const projectTitle=node.closest('a.project-title-text');
     if(projectTitle)return projectTitle.closest('.project-row-link')?.querySelector('.project-heading') || null;
     const marked = node.closest('[data-cursor-target]');
