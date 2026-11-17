@@ -218,6 +218,7 @@ export function installPointerEffects(hero) {
   function hide() { cancelAnimationFrame(trackingFrame); trackingFrame = 0; cancelAnimationFrame(touchFrame); touchStrength = 0; resetMagnets(); clearTimeout(releaseTimer); touchId = null; stopFlights(); cursor.hidden = true; pointer = null; setTarget(null); draw(); }
   function move(event) {
     if (event.pointerType === 'touch') return;
+    if (document.documentElement.dataset.cursorDebugCorners === 'off') { hide(); return; }
     if (!fine.matches || reduced.matches) { hide(); return; }
     pointer = {x:event.clientX, y:event.clientY};
     updateMagnets(event.clientX, event.clientY);

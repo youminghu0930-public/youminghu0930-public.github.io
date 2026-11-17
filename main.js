@@ -656,3 +656,8 @@ startApp().catch(error => {
   message.setAttribute('role', 'alert');
   document.querySelector('#app').replaceChildren(message);
 });
+
+// Local-only diagnostics for cursor differences that cannot be reproduced headlessly.
+if (['localhost','127.0.0.1'].includes(location.hostname) && new URLSearchParams(location.search).get('cursor-debug') === '1') {
+  import('./materials/data/cursor-diagnostics.js').then(({installCursorDiagnostics}) => installCursorDiagnostics());
+}
