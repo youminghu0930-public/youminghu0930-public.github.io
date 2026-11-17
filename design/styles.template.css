@@ -972,7 +972,7 @@ html[data-skills-expanding=true] { overflow-anchor:none; scroll-behavior:auto; }
 
 /* Paired camera views remain centered inside the common preview height. */
 .project-preview-pair { position:absolute; inset:0; display:grid; grid-template-columns:repeat(var(--preview-view-count,3),minmax(0,1fr)); width:100%; height:100%; }
-.project-preview-pane { position:relative; flex:1; min-width:0; height:100%; overflow:hidden; cursor:grab; touch-action:none; }
+.project-preview-pane { position:relative; flex:1; min-width:0; height:100%; overflow:hidden; cursor:pointer; touch-action:none; }
 .project-preview-pane .project-vector-preview { display:block; width:100%; height:100%; object-fit:contain; filter:brightness(.48) blur(3px); transition:filter 500ms ease; }
 .project-preview-pane.is-dragging { cursor:grabbing; }
 .project-preview-pane.is-active .project-vector-preview { filter:none; }
@@ -1240,3 +1240,82 @@ html[data-skills-expanding=true] { overflow-anchor:none; scroll-behavior:auto; }
  .has-native-scroll-highlight .project-summary-highlight,
  .has-native-scroll-highlight:hover .project-summary-highlight { --project-native-marker-fill:calc(min(1,calc(var(--project-scroll-progress)/var(--project-marker-share,1)))*100%); --project-native-marker-ink:clamp(.001%,var(--project-native-marker-fill),99.999%); background-image:linear-gradient(to right,var(--button-text) var(--project-native-marker-ink),{{HeadingColor}} var(--project-native-marker-ink)),linear-gradient(var(--accent),var(--accent)); background-size:100% 100%,var(--project-native-marker-fill) 100%; background-clip:text,border-box; -webkit-background-clip:text,border-box; color:transparent; -webkit-text-fill-color:transparent; transition:none; }
 }
+
+/* Desktop Works: alternate the existing previews and project information. */
+.project-editorial-copy[hidden],.project-writeup[hidden] { display:none; }
+@media(min-width:calc({{mobileBreakpoint}} + 1px)) {
+ .portfolio-shell .works-page .project-row-link { display:grid; grid-template-columns:minmax(0,1fr) minmax(0,1fr); grid-template-areas:"preview editorial" "writeup writeup"; grid-template-rows:auto auto; align-items:center; column-gap:clamp(32px,5vw,80px); row-gap:0; padding-top:24px; padding-bottom:24px; }
+ .portfolio-shell .works-page .project:nth-child(even) .project-row-link { grid-template-areas:"editorial preview" "writeup writeup"; }
+ .project-editorial-copy { grid-area:editorial; display:flex; flex-direction:column; gap:20px; min-width:0; }
+ .portfolio-shell .works-page .project-heading { display:flex; flex-direction:column; gap:12px; height:auto; min-height:0; }
+ .portfolio-shell .works-page .project-heading h2 { position:static; inset:auto; transform:none; margin:0; padding:0; }
+ .portfolio-shell .works-page .project-heading .project-company { position:static; inset:auto; margin:0; padding:0; }
+ .portfolio-shell .works-page .project-title-chevron { display:none; }
+ .portfolio-shell .works-page .project-copy { height:auto; min-height:0; }
+ .portfolio-shell .works-page .project-preview-expansion { grid-area:preview; display:block; align-self:center; margin:0; opacity:1; overflow:visible; }
+ .portfolio-shell .works-page .project-inline-preview { display:block; grid-template-rows:none; width:100%; }
+ .portfolio-shell .works-page .project-preview-media { height:auto; max-height:none; aspect-ratio:16 / 10; }
+ .portfolio-shell .works-page .project-preview-tools { display:flex; justify-content:center; margin-top:{{ProjectCreditGap}}; }
+ .portfolio-shell .works-page .project-footage-credit { margin:0; }
+ .project-editorial-actions { display:flex; align-items:center; justify-content:flex-end; flex-wrap:wrap; gap:16px; }
+ .project-writeup-toggle { display:inline-flex; align-items:center; gap:{{ProjectOpenLinkGap}}; margin:0; padding:0; border:0; border-radius:0; background:transparent; color:{{HeadingColor}}; font-family:inherit; font-size:{{ProjectOpenLinkSize}}; font-weight:{{ProjectOpenLinkWeight}}; line-height:{{ProjectCreditRowHeight}}; cursor:pointer; }
+ .project-writeup-toggle:hover,.project-writeup-toggle:focus-visible { color:var(--accent); }
+ .project-writeup { grid-area:writeup; display:grid; grid-template-rows:0fr; opacity:0; min-width:0; transition:grid-template-rows {{ProjectPreviewExpandDuration}} ease,opacity {{ProjectPreviewExpandDuration}} ease; }
+ .project-writeup.is-open { grid-template-rows:1fr; opacity:1; }
+ .project-writeup-inner { min-height:0; overflow:hidden; }
+ .portfolio-shell .works-page .project-writeup .project-preview-qa { margin:32px 0 0; }
+}
+@media(prefers-reduced-motion:reduce) { .project-writeup { transition:none; } }
+
+/* A single desktop sweep fills the title, then continues into its text markers. */
+@property --project-desktop-progress { syntax:'<number>'; inherits:true; initial-value:0; }
+@media(min-width:calc({{mobileBreakpoint}} + 1px)) {
+ .project-editorial-copy { --project-desktop-progress:0; --project-title-stage-duration:{{ProjectTitleFillDuration}}; transition:--project-desktop-progress var(--project-desktop-sweep-duration,1000ms) linear; }
+ .project-row-link:hover .project-editorial-copy { --project-desktop-progress:1; }
+ .project-row-link .project-heading::before,
+ .project-row-link:hover .project-heading::before { clip-path:inset(0 0 calc(100% - clamp(0%,calc(var(--project-desktop-progress)*var(--project-heading-sweep-scale,1)*100%),100%)) 0); transition:none; }
+ .portfolio-shell .works-page .project-row-link .project-heading .project-title-text,
+ .portfolio-shell .works-page .project-row-link:hover .project-heading .project-title-text,
+ .portfolio-shell .works-page .project-row-link .project-heading .project-company,
+ .portfolio-shell .works-page .project-row-link:hover .project-heading .project-company { --project-desktop-ink-cut:clamp(.001%,calc((var(--project-desktop-progress) - var(--project-ink-start,0))*var(--project-ink-scale,1)*100%),99.999%); background:linear-gradient(to bottom,var(--button-text) var(--project-desktop-ink-cut),var(--project-original-ink,{{HeadingColor}}) var(--project-desktop-ink-cut)); background-clip:text; -webkit-background-clip:text; -webkit-text-fill-color:transparent; color:transparent; transition:none; }
+ .project-heading .project-company { --project-original-ink:var(--muted); }
+ .portfolio-shell .works-page .project-row-link .project-summary-highlight,
+ .portfolio-shell .works-page .project-row-link:hover .project-summary-highlight { --project-desktop-marker-fill:clamp(0%,calc((var(--project-desktop-progress) - var(--project-marker-start,1))*var(--project-marker-scale,1)*100%),100%); --project-desktop-marker-ink:clamp(.001%,var(--project-desktop-marker-fill),99.999%); background-image:linear-gradient(to bottom,var(--button-text) var(--project-desktop-marker-ink),{{HeadingColor}} var(--project-desktop-marker-ink)),linear-gradient(var(--accent),var(--accent)); background-position:left top; background-size:100% 100%,100% var(--project-desktop-marker-fill); background-clip:text,border-box; -webkit-background-clip:text,border-box; color:transparent; -webkit-text-fill-color:transparent; transition:none; }
+}
+@media(prefers-reduced-motion:reduce) { .project-editorial-copy { transition:none; } }
+
+/* Desktop project rhythm: matching edges and deliberate 8/16/24px gaps. */
+@media(min-width:calc({{mobileBreakpoint}} + 1px)) {
+ .portfolio-shell .works-page .project-row-link { align-items:start; column-gap:48px; }
+ .portfolio-shell .works-page .project-row-link .project-preview-expansion { align-self:start; margin:0; transition:none; }
+ .portfolio-shell .works-page .project-editorial-copy { gap:16px; }
+ .portfolio-shell .works-page .project-heading { gap:8px; }
+ .portfolio-shell .works-page .project-copy { padding:0 {{ProjectTitleBadgePadding}}; box-sizing:border-box; gap:24px; }
+ .portfolio-shell .works-page .project-description-title { margin-bottom:8px; }
+ .portfolio-shell .works-page .project-editorial-actions { padding:0 {{ProjectTitleBadgePadding}}; }
+ .portfolio-shell .works-page .project-preview-tools { margin-top:8px; padding:0; }
+ .portfolio-shell .works-page .project-writeup .project-preview-qa { margin-top:24px; }
+ .project-writeup-toggle { translate:var(--magnet-x,0px) var(--magnet-y,0px); transition:{{NavHoverTransition}},{{ButtonMagnetTransition}}; }
+ .portfolio-shell .project-heading a.project-title-text { cursor:pointer; }
+}
+@media(prefers-reduced-motion:reduce) { .project-writeup-toggle { translate:none; transition:none; } }
+
+/* Keep the complete desktop title badge a native clickable link surface. */
+@media(min-width:calc({{mobileBreakpoint}} + 1px)) {
+ .portfolio-shell .works-page .project-heading a.project-title-text { position:static; cursor:pointer; }
+ .portfolio-shell .works-page .project-heading a.project-title-text::before { content:''; position:absolute; inset:0; z-index:2; cursor:pointer; }
+}
+
+/* Clickability controls the native hand; corner framing is independent. */
+/* Native pointer ownership belongs to the control, independently of corner animations.
+   Include descendants and decorative pseudo-elements so SVG/text/borders agree. */
+:where(a[href],button,[role="button"],summary,input[type="button"],input[type="submit"],input[type="reset"],input[type="checkbox"],input[type="radio"]):not(:disabled):not([aria-disabled="true"]),
+:where(a[href],button,[role="button"],summary):not(:disabled):not([aria-disabled="true"]) *,
+:where(a[href],button,[role="button"],summary):not(:disabled):not([aria-disabled="true"])::before,
+:where(a[href],button,[role="button"],summary):not(:disabled):not([aria-disabled="true"])::after { cursor:pointer!important; }
+:where(:disabled,[aria-disabled="true"],[inert]),
+:where(:disabled,[aria-disabled="true"],[inert]) *,
+:where(:disabled,[aria-disabled="true"],[inert])::before,
+:where(:disabled,[aria-disabled="true"],[inert])::after { cursor:default!important; }
+
+.portfolio-shell .project-technology-link::before { content:''; position:absolute; inset:-1px; border-radius:inherit; }

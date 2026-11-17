@@ -27,7 +27,7 @@ function installScrollMotion(main) {
   const media = matchMedia('(prefers-reduced-motion: reduce)');
   const mobile = matchMedia(`(max-width: ${design.mobileBreakpoint})`);
   const settings = design.effects;
-  const items = Array.from(main.querySelectorAll('.landing-content, .project-index, .project-copy > *, .project-heading > *, .project-visual > *, .project-detail > *, .project-qa-item, .project-preview-media, .project-footage-credit, .experience-heading > *, .experience-period, .experience-copy > *, .skills-heading > *')).map(node => ({node, offset:0, opacity:1, initialized:false, order:node.matches('.experience-copy > *, .experience-heading > *, .project-copy > *') ? Array.from(node.parentElement.children).indexOf(node) : 0}));
+  const items = Array.from(main.querySelectorAll('.landing-content, .project-row-link, .project-index, .project-copy > *, .project-heading > *, .project-visual > *, .project-detail > *, .project-qa-item, .project-preview-media, .project-footage-credit, .experience-heading > *, .experience-period, .experience-copy > *, .skills-heading > *')).map(node => ({node, offset:0, opacity:1, initialized:false, order:node.matches('.experience-copy > *, .experience-heading > *, .project-copy > *') ? Array.from(node.parentElement.children).indexOf(node) : 0}));
   const timelineRails = Array.from(main.querySelectorAll('.experience-rail'));
   const markers = Array.from(main.querySelectorAll('.experience-marker'));
   let frame = 0;
@@ -59,7 +59,11 @@ function installScrollMotion(main) {
       return {top:rect.top - item.offset, bottom:rect.bottom - item.offset};
     });
     items.forEach((item, index) => {
-      if (media.matches) {
+      const projectFragment=main.classList.contains('works-page')&&item.node.closest('.project');
+      const projectRow=item.node.matches('.project-row-link');
+      // Desktop editorial rows move as a group so their internal gaps cannot drift.
+      const inactiveProjectMotion=projectFragment&&(mobile.matches?projectRow:!projectRow);
+      if (media.matches||inactiveProjectMotion) {
         item.node.style.removeProperty('translate');
         item.node.style.removeProperty('opacity');
         item.offset = 0;

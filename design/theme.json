@@ -597,6 +597,7 @@
     "mobileProjectRevealStart": 1,
     "mobileProjectRevealEnd": 0.88,
     "mobileProjectRevealDistance": 12,
-    "mobileProjectMinOpacity": 0.6
+    "mobileProjectMinOpacity": 0.6,
+    "projectTitleCursorPadding": 8
   }
 }

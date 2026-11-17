@@ -145,7 +145,7 @@ export function installPointerEffects(hero) {
   function position() {
     if (!pointer) return;
     const rect = targetBounds();
-    const padding = target?.closest('.breadcrumbs') ? options.breadcrumbCursorPadding : target ? options.cursorButtonPadding : 0;
+    const padding = target?.matches('.project-heading') ? (options.projectTitleCursorPadding ?? 8) : target?.closest('.breadcrumbs') ? options.breadcrumbCursorPadding : target ? options.cursorButtonPadding : 0;
     // Position is assigned directly: no easing or trailing interpolation.
     cursor.style.transform = `translate3d(${rect ? rect.left + rect.width / 2 : pointer.x}px, ${rect ? rect.top + rect.height / 2 : pointer.y}px, 0)`;
     frame.style.width = rect ? `${rect.width + padding * 2}px` : '';
@@ -164,12 +164,18 @@ export function installPointerEffects(hero) {
       for (const corner of corners) corner.style.borderColor = nextColor;
     }
   }
+  const clickableSelector='a[href],button,[role="button"],summary,input[type="button"],input[type="submit"],input[type="reset"],input[type="checkbox"],input[type="radio"]';
+  function clickableAt(node){
+    if(!(node instanceof Element))return null;
+    const control=node.closest(clickableSelector);
+    return control&&!control.matches(':disabled')&&!control.closest('[hidden],[inert],[aria-disabled="true"]')?control:null;
+  }
   function resolveTarget(node) {
     if (!(node instanceof Element)) return null;
-    const technology=node.closest('.project-technology-link');
-    if(technology)return technology.closest('.project-row-link')?.querySelector('.project-expand-trigger') || null;
+    const projectTitle=node.closest('a.project-title-text');
+    if(projectTitle)return projectTitle.closest('.project-row-link')?.querySelector('.project-heading') || null;
     const marked = node.closest('[data-cursor-target]');
-    const control = node.closest('a[href], button, [role="button"], [role="scrollbar"]');
+    const control = clickableAt(node) || node.closest('[role="scrollbar"]');
     // Skill headings frame the entire expandable card; links inside it frame themselves.
     const next = control?.matches('.skills-toggle') ? marked || control : control || marked;
     return next?.matches(':disabled') || next?.closest('[hidden], [inert], [aria-disabled="true"]') ? null : next;
