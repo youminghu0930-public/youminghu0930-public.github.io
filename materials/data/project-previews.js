@@ -289,15 +289,15 @@ export function installProjectPreviews(main, projects) {
   const highlightCenter=()=>{
     centerFrame=0;
     const viewport=window.visualViewport;
-    const top=viewport?.offsetTop || 0,height=viewport?.height || innerHeight,center=top+height/2;
+    const top=viewport?.offsetTop || 0,height=viewport?.height || innerHeight;
     for(const item of items){
       let progress=0;
       const bounds=item.action.getBoundingClientRect();
       const title=item.action.querySelector('h2').getBoundingClientRect();
       if(mobile.matches&&!item.action.closest('[hidden],[inert],[aria-hidden="true"]')&&bounds.bottom>top&&bounds.top<top+height){
         const titleCenter=title.top+title.height/2;
-        const finishCenter=top+height*.08+title.height/2;
-        progress=Math.max(0,Math.min(1,(center-titleCenter)/Math.max(1,center-finishCenter)));
+        const startCenter=top+height*.75,finishCenter=top+height*.25;
+        progress=Math.max(0,Math.min(1,(startCenter-titleCenter)/Math.max(1,startCenter-finishCenter)));
       }
       item.action.classList.toggle('is-center-highlighted',progress>0);
       item.action.style.setProperty('--project-title-fill',`${progress*100}%`);
