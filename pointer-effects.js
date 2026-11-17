@@ -9,6 +9,9 @@ export function installPointerEffects(hero) {
   const canvas = hero?.querySelector('.hero-dots');
   const ctx = canvas?.getContext('2d');
   const stripe = hero?.parentElement?.querySelector('.landing-stripe');
+  const binaryBackground=Boolean(hero?.closest('.works-page'));
+  const binaryCells=new Map();
+  let binaryFrame=0,binaryLastTime=0;
   const cursor = document.createElement('div');
   cursor.className = 'pointer-diamond';
   cursor.setAttribute('aria-hidden', 'true');
@@ -103,6 +106,11 @@ export function installPointerEffects(hero) {
   const muted = palette.getPropertyValue('--muted').trim();
   function draw() {
     if (!ctx) return;
+    cancelAnimationFrame(binaryFrame);binaryFrame=0;
+    const now=performance.now();
+    const blend=1-Math.exp(-Math.min(64,now-(binaryLastTime||now-16.67))/90);
+    binaryLastTime=now;
+    let binarySettling=false;
     const rect = canvas.getBoundingClientRect();
     const ratio = Math.min(devicePixelRatio || 1, 2);
     const width = Math.round(rect.width * ratio), height = Math.round(rect.height * ratio);
@@ -115,7 +123,7 @@ export function installPointerEffects(hero) {
     const inside = pointer && (pointer.touch || fine.matches) && !reduced.matches
       && pointer.x >= rect.left && pointer.x < rect.right
       && pointer.y >= bounds.top && pointer.y < interactionBottom;
-    const influenceRadius = pointer?.touch ? options.touchDotInfluenceRadius : options.dotInfluenceRadius;
+    const influenceRadius = pointer?.touch ? options.touchDotInfluenceRadius : binaryBackground ? options.binaryInfluenceRadius : options.dotInfluenceRadius;
     for (let y = options.dotSpacing / 2; y < rect.height; y += options.dotSpacing) {
       for (let x = options.dotSpacing / 2; x < rect.width; x += options.dotSpacing) {
         const dx = inside ? x - (pointer.x - rect.left) : 0;
@@ -123,12 +131,43 @@ export function installPointerEffects(hero) {
         const distance = Math.hypot(dx, dy);
         const t = inside ? Math.max(0, 1 - distance / influenceRadius) : 0;
         // Smoothstep gives a soft boundary and avoids a sharp central pinch.
-        const influence = t * t * (3 - 2 * t) * (pointer?.touch ? touchStrength : 1);
+        let influence = t * t * (3 - 2 * t) * (pointer?.touch ? touchStrength : 1);
+        let visibility=influence,magnification=influence;
+        if(binaryBackground){
+          const key=`${x}:${y}`,previous=binaryCells.get(key)||{visibility:0,conversion:0,magnification:0};
+          const strength=pointer?.touch?touchStrength:1;
+          // A broad readable core, with smooth fading confined to the outer rim.
+          const visibilityT=inside?Math.max(0,Math.min(1,(1-distance/influenceRadius)/(1-options.binaryVisibilityCore))):0;
+          visibility=visibilityT*visibilityT*(3-2*visibilityT)*strength;
+          const magnificationRadius=pointer?.touch?Math.min(options.touchDotInfluenceRadius,options.binaryMagnificationRadius):options.binaryMagnificationRadius;
+          const magnificationT=inside?Math.max(0,1-distance/magnificationRadius):0;
+          magnification=magnificationT*magnificationT*(3-2*magnificationT)*strength;
+          const conversionRadius=pointer?.touch?Math.min(options.touchDotInfluenceRadius,options.binaryConversionRadius):options.binaryConversionRadius;
+          const conversionT=inside?Math.max(0,1-distance/conversionRadius):0;
+          const conversion=conversionT*conversionT*(3-2*conversionT)*(pointer?.touch?touchStrength:1);
+          const smooth=(from,to)=>{
+            const next=reduced.matches?0:from+(to-from)*blend;
+            binarySettling ||= !reduced.matches&&Math.abs(next-to)>.002;
+            return reduced.matches?0:Math.abs(next-to)<.002?to:next;
+          };
+          visibility=smooth(previous.visibility,visibility);
+          influence=smooth(previous.conversion,conversion);
+          magnification=smooth(previous.magnification||0,magnification);
+          binaryCells.set(key,{visibility,conversion:influence,magnification});
+        }
         const displacement = pointer?.touch ? options.touchDotDisplacement : options.dotDisplacement;
-        const offset = influence * displacement * Math.min(1, distance / influenceRadius);
+        const offset = (binaryBackground?magnification:influence) * displacement * Math.min(1, distance / influenceRadius);
         const px = x + (distance ? dx / distance * offset : 0);
         const py = y + (distance ? dy / distance * offset : 0);
         const radius = options.dotRadius * (1 + influence * options.dotEnlargement);
+        if(binaryBackground){
+          ctx.font=`${11*(1+magnification*options.dotEnlargement)}px monospace`;
+          ctx.textAlign='center';ctx.textBaseline='middle';
+          ctx.globalAlpha=(options.binaryBaseOpacity+(options.binaryHoverZeroOpacity-options.binaryBaseOpacity)*visibility)*(1-influence);ctx.fillStyle=muted;
+          ctx.fillText('0',px,py);
+          if(influence>0){ctx.globalAlpha=options.dotHighlightOpacity*influence;ctx.fillStyle=accent;ctx.fillText('1',px,py);}
+          continue;
+        }
         // Crossfade dot colors too; switching to accent at first contact would pop.
         ctx.globalAlpha = options.dotBaseOpacity * (1 - influence);
         ctx.fillStyle = muted;
@@ -141,6 +180,7 @@ export function installPointerEffects(hero) {
       }
     }
     ctx.globalAlpha = 1;
+    if(binaryBackground&&binarySettling&&!signal.aborted)binaryFrame=requestAnimationFrame(draw);
   }
   function position() {
     if (!pointer) return;
@@ -284,5 +324,5 @@ export function installPointerEffects(hero) {
   const observer = new ResizeObserver(() => { position(); draw(); });
   if (hero) observer.observe(hero);
   hide();
-  return () => { cancelAnimationFrame(trackingFrame); cancelAnimationFrame(touchFrame); resetMagnets(); clearTimeout(releaseTimer); stopFlights(); controller.abort(); stateObserver.disconnect(); observer.disconnect(); targetObserver.disconnect(); cursor.remove(); };
+  return () => { cancelAnimationFrame(binaryFrame);binaryCells.clear(); cancelAnimationFrame(trackingFrame); cancelAnimationFrame(touchFrame); resetMagnets(); clearTimeout(releaseTimer); stopFlights(); controller.abort(); stateObserver.disconnect(); observer.disconnect(); targetObserver.disconnect(); cursor.remove(); };
 }
