@@ -54,6 +54,8 @@ export function createProjectFilters(projects, cards, onChange = () => {}) {
         below:rect.top>=innerHeight,changed:transitions.has(card) || card.hidden===matches};
     });
     const animations=[];
+    // Set ownership before any hidden-state/layout changes notify observers.
+    if(initialized&&changes.some(change=>change.changed&&!change.below))cards.dataset.filtering='true';
     for(const change of changes) {
       const {card,matches,previous,height,opacity,below,changed}=change;
       previous?.cancel();transitions.delete(card);

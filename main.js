@@ -63,8 +63,14 @@ function installScrollMotion(main) {
       return {top:rect.top - item.offset, bottom:rect.bottom - item.offset, revealHeight};
     });
     items.forEach((item, index) => {
-      // Filtering owns the row's reveal; a changing height must not drive a second fade.
-      if (item.node.closest('.projects[data-filtering="true"]')) return;
+      // The filter animates the outer card. Clear any earlier scroll-reveal
+      // fade/offset instead of freezing it on a row moving into the viewport.
+      if (item.node.closest('.projects[data-filtering="true"]')) {
+        item.node.style.removeProperty('translate');
+        item.node.style.removeProperty('opacity');
+        item.offset=0;item.opacity=1;item.initialized=true;
+        return;
+      }
       const projectFragment=main.classList.contains('works-page')&&item.node.closest('.project');
       const projectRow=item.node.matches('.project-row-link');
       // Desktop editorial rows move as a group so their internal gaps cannot drift.

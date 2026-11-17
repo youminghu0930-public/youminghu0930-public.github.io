@@ -1381,9 +1381,10 @@ html[data-skills-expanding=true] { overflow-anchor:none; scroll-behavior:auto; }
 
 /* Editorial write-up rows: a clear question silhouette and a quieter answer. */
 @media(min-width:calc(1000px + 1px)) {
- .project-preview-qa .project-qa-item { grid-template-columns:minmax(180px,30%) minmax(0,1fr); column-gap:40px; min-height:112px; padding-block:32px; }
+ .portfolio-shell .works-page .project-writeup .project-preview-qa { width:100%; max-width:none; margin-inline:auto; }
+ .project-preview-qa .project-qa-item { grid-template-columns:minmax(280px,44%) minmax(0,1fr); column-gap:32px; min-height:112px; padding-block:32px; }
  .project-preview-qa .project-qa-item:first-child { border-top:1px solid var(--border); padding-top:32px; }
- .project-preview-qa .project-qa-question { color:#eeeeee; font-size:clamp(1.25rem, 1.7vw, 1.5rem); font-weight:600; line-height:1.25; letter-spacing:-.025em; }
+ .project-preview-qa .project-qa-question { color:#eeeeee; font-size:clamp(1.75rem, 2.4vw, 2.125rem); font-weight:600; line-height:1.25; letter-spacing:-.025em; }
  .project-preview-qa .project-qa-answer { color:var(--muted); }
 }
 
@@ -1398,3 +1399,19 @@ html[data-skills-expanding=true] { overflow-anchor:none; scroll-behavior:auto; }
 .ornament-impact { position:absolute; z-index:4; width:0; height:0; pointer-events:none; }
 .ornament-impact-flash { position:absolute; opacity:0; width:12px; height:12px; border-radius:50%; background:radial-gradient(circle,#edfff2 0%,rgb(0 240 80 / 45%) 25%,transparent 70%); }
 .ornament-impact-spark { position:absolute; opacity:0; width:5px; height:1px; border-radius:2px; background:#edfff2; box-shadow:0 0 2px rgb(0 240 80 / 40%); }
+
+/* Match the Q&A hover band across the full initial project row. */
+@media(min-width:calc(1000px + 1px)) and (hover:hover) and (pointer:fine) {
+ .portfolio-shell .works-page .project-row-link { isolation:isolate; }
+ .portfolio-shell .works-page .project-row-link::after { content:''; position:absolute; top:0; left:0; right:0; height:var(--project-intro-height,0px); z-index:-1; pointer-events:none; background:rgb(255 255 255 / 4%); opacity:0; transition:opacity 220ms ease; }
+ .portfolio-shell .works-page .project-row-link:hover:not(:has(.project-writeup:hover,.project-editorial-actions:hover))::after { opacity:1; }
+}
+@media(prefers-reduced-motion:reduce) { .portfolio-shell .works-page .project-row-link::after { transition:none; } }
+
+/* Numbered editorial questions, with a quiet decorative gutter. */
+.project-preview-qa .project-qa-question { display:grid; grid-template-columns:24px minmax(0,1fr); column-gap:20px; align-items:baseline; }
+.project-qa-number { font-family:"Geist Mono", ui-monospace, monospace; font-size:12px; font-weight:400; line-height:1.4; letter-spacing:0; color:var(--muted); }
+@media(max-width:1000px) {
+ .project-preview-qa .project-qa-question { font-size:clamp(1.35rem,5vw,1.75rem); line-height:1.2; column-gap:12px; }
+ .project-preview-qa .project-qa-answer { margin-left:36px; }
+}

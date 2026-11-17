@@ -231,9 +231,13 @@ export function installProjectPreviews(main, projects) {
     if(project.qa?.length){
       const qa=document.createElement('dl');qa.className='project-preview-qa';
       qa.setAttribute('aria-label',`${project.title} questions and answers`);
-      for(const entry of project.qa){
+      for(const [qaIndex,entry] of project.qa.entries()){
         const item=document.createElement('div');item.className='project-qa-item';
-        const question=document.createElement('dt');question.className='project-qa-question';question.textContent=entry.question;
+        const question=document.createElement('dt');question.className='project-qa-question';
+        const number=document.createElement('span');number.className='project-qa-number';
+        number.setAttribute('aria-hidden','true');number.textContent=String(qaIndex+1).padStart(2,'0');
+        const questionText=document.createElement('span');questionText.className='project-qa-question-text';questionText.textContent=entry.question;
+        question.append(number,questionText);
         const answer=document.createElement('dd');answer.className='project-qa-answer';
         let remaining=entry.answer;
         for(const phrase of entry.highlights || []){
@@ -345,6 +349,9 @@ export function installProjectPreviews(main, projects) {
       item.action.style.setProperty('--project-mobile-copy-height',`${Math.ceil(copyHeight)}px`);
       item.action.style.setProperty('--project-title-half-height',`${item.action.querySelector('.project-heading h2').offsetHeight/2}px`);
       if(!mobile.matches){
+        const introduction=[item.wrapper,item.editorial].filter(Boolean);
+        const introHeight=Math.max(0,...introduction.map(node=>node.offsetTop+node.offsetHeight))+12;
+        item.action.style.setProperty('--project-intro-height',`${Math.ceil(introHeight)}px`);
         const content=item.action.querySelector('.project-copy');
         const naturalHeight=[...content.children].reduce((sum,node)=>sum+node.offsetHeight,0)+Math.max(0,content.childElementCount-1)*parseFloat(getComputedStyle(content).rowGap);
         content.classList.toggle('is-content-tight',naturalHeight>cellHeight+1);
@@ -359,6 +366,8 @@ export function installProjectPreviews(main, projects) {
   });
   for(const item of items){
     rowLayoutObserver.observe(item.action.querySelector('.project-heading h2'));
+    rowLayoutObserver.observe(item.wrapper);
+    if(item.editorial)rowLayoutObserver.observe(item.editorial);
     const qa=item.action.querySelector('.project-preview-qa');if(qa)rowLayoutObserver.observe(qa);
     for(const node of item.action.querySelector('.project-copy').children)rowLayoutObserver.observe(node);
   }
