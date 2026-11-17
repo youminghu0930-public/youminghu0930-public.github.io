@@ -1190,3 +1190,16 @@ html[data-skills-expanding=true] { overflow-anchor:none; scroll-behavior:auto; }
 .portfolio-shell .project-heading a.project-mobile-title-link,
 .portfolio-shell .project-heading a.project-mobile-title-link:hover { display:block; width:100%; position:relative; z-index:1; pointer-events:auto; margin:0; padding:0; border:0; border-radius:0; background:transparent; box-shadow:none; color:inherit; font:inherit; letter-spacing:inherit; text-decoration:none; transition:color 600ms ease; }
 .project-mobile-title-link::after { content:'↗'; display:inline-block; margin-left:.25em; font-size:.5em; vertical-align:middle; }
+
+/* Mobile highlights follow swipe position instead of a timed hover animation. */
+@media(max-width:1000px) {
+ .project-row-link .project-heading::before,
+ .project-row-link:hover .project-heading::before,
+ .project-row-link.is-center-highlighted .project-heading::before { clip-path:inset(0 0 calc(100% - var(--project-title-fill,0%)) 0); transition:none; }
+ .project-row-link .project-title-text,
+ .portfolio-shell .project-heading a.project-mobile-title-link,
+ .portfolio-shell .project-heading a.project-mobile-title-link:hover { background:linear-gradient(to bottom,var(--button-text) var(--project-title-ink-cut,0px),#eeeeee var(--project-title-ink-cut,0px)); background-clip:text; -webkit-background-clip:text; color:transparent; -webkit-text-fill-color:transparent; transition:none; }
+ .project-row-link .project-summary-highlight,
+ .project-row-link:hover .project-summary-highlight,
+ .project-row-link.is-center-highlighted .project-summary-highlight { background-image:linear-gradient(to right,var(--button-text) var(--project-marker-fill,0%),#eeeeee var(--project-marker-fill,0%)),linear-gradient(var(--accent),var(--accent)); background-size:100% 100%,var(--project-marker-fill,0%) 100%; background-clip:text,border-box; -webkit-background-clip:text,border-box; -webkit-text-fill-color:transparent; color:transparent; transition:none; }
+}

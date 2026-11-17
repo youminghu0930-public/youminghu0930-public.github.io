@@ -288,18 +288,24 @@ export function installProjectPreviews(main, projects) {
     centerFrame=0;
     const viewport=window.visualViewport;
     const top=viewport?.offsetTop || 0,height=viewport?.height || innerHeight,center=top+height/2;
-    let nearest=null,distance=Infinity;
-    if(mobile.matches)for(const item of items){
-      if(item.action.closest('[hidden],[inert],[aria-hidden="true"]'))continue;
+    for(const item of items){
+      let progress=0;
       const bounds=item.action.getBoundingClientRect();
-      if(!bounds.height||bounds.bottom<=top||bounds.top>=top+height)continue;
-      const preview=item.media.getBoundingClientRect();
-      const previewCenter=preview.top+preview.height/2;
-      if(previewCenter>center)continue;
-      const delta=center-previewCenter;
-      if(delta<distance){nearest=item;distance=delta;}
+      const title=item.action.querySelector('h2').getBoundingClientRect();
+      if(mobile.matches&&!item.action.closest('[hidden],[inert],[aria-hidden="true"]')&&bounds.bottom>top&&bounds.top<top+height){
+        const titleCenter=title.top+title.height/2;
+        const finishCenter=top+height*.08+title.height/2;
+        progress=Math.max(0,Math.min(1,(center-titleCenter)/Math.max(1,center-finishCenter)));
+      }
+      item.action.classList.toggle('is-center-highlighted',progress>0);
+      item.action.style.setProperty('--project-title-fill',`${progress*100}%`);
+      const heading=item.action.querySelector('.project-heading').getBoundingClientRect();
+      item.action.style.setProperty('--project-title-ink-cut',`${progress*heading.height-(title.top-heading.top)}px`);
+      const highlights=[...item.action.querySelectorAll('.project-summary-highlight')];
+      const durations=highlights.map(node=>parseFloat(node.style.getPropertyValue('--project-highlight-duration'))||1);
+      const longest=Math.max(1,...durations);
+      highlights.forEach((node,index)=>node.style.setProperty('--project-marker-fill',`${Math.min(1,progress*longest/durations[index])*100}%`));
     }
-    for(const item of items)item.action.classList.toggle('is-center-highlighted',item===nearest);
   };
   const scheduleCenterHighlight=()=>{if(!centerFrame)centerFrame=requestAnimationFrame(highlightCenter);};
   const centerObserver=new ResizeObserver(scheduleCenterHighlight);
