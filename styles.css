@@ -1390,3 +1390,7 @@ html[data-skills-expanding=true] { overflow-anchor:none; scroll-behavior:auto; }
 /* Ornaments are small draggable toys; their surrounding landing stays scrollable. */
 .portfolio-shell .hero-ornament { touch-action:none; user-select:none; -webkit-user-select:none; }
 .portfolio-shell .hero-ornament[data-dragging="true"],.portfolio-shell .hero-ornament[data-dragging="true"] * { cursor:grabbing!important; }
+
+/* The button owns the complete ornament gesture; animated artwork never steals it. */
+.hero-ornament .ornament-visual,.hero-ornament .ornament-visual * { pointer-events:none; }
+.hero-ornament::before { content:''; position:absolute; inset:-6px; }

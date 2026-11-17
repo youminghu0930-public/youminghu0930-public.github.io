@@ -616,6 +616,41 @@ async function startApp() {
       title.focus({preventScroll:true});
     }
   }
+  let routeRequest=0,pendingExit=null;
+  function cancelPageExit(){
+    routeRequest++;
+    if(!pendingExit)return;
+    pendingExit.animation?.cancel();
+    pendingExit.main.inert=pendingExit.wasInert;
+    pendingExit=null;
+  }
+  async function navigatePage(pathname,scroll={x:0,y:0},{push=true}={}){
+    const route=pathname.split('/').filter(Boolean)[0]||'home';
+    if(route===currentRoute){cancelPageExit();menu.close();return;}
+    const request=++routeRequest;
+    if(!pendingExit){
+      const main=app.querySelector('main');
+      const wasInert=main.inert;
+      const animation=reducedMotion.matches?null:main.animate([{opacity:1},{opacity:0}],{
+        duration:design.effects.pageExitDuration,easing:'ease-in-out',fill:'forwards'
+      });
+      main.inert=true;
+      pendingExit={main,wasInert,animation,finished:animation?.finished.catch(()=>{})||Promise.resolve()};
+    }
+    const exit=pendingExit;
+    await exit.finished;
+    if(request!==routeRequest)return;
+    try{
+      if(push){
+        history.replaceState({...history.state,scroll:{x:scrollX,y:scrollY}},'',location.href);
+        history.pushState({scroll},'',pathname);
+      }
+      renderRoute({scroll});
+    }finally{
+      exit.animation?.cancel();exit.main.inert=exit.wasInert;
+      if(pendingExit===exit)pendingExit=null;
+    }
+  }
   app.addEventListener('click', event => {
     if (event.defaultPrevented || event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
     const anchor = event.target.closest('a');
@@ -624,14 +659,12 @@ async function startApp() {
     if (url.origin !== location.origin || url.search || url.hash) return;
     if (!navigation.some(item => item.url === url.pathname)) return;
     event.preventDefault();
-    if (url.pathname === location.pathname) { menu.close(); return; }
-    history.replaceState({...history.state, scroll:{x:scrollX,y:scrollY}}, '', location.href);
-    history.pushState({scroll:{x:0,y:0}}, '', url.pathname);
-    renderRoute();
+    void navigatePage(url.pathname);
   });
-  window.addEventListener('popstate', event => renderRoute({scroll:event.state?.scroll || {x:0,y:0}}));
+  window.addEventListener('popstate', event => {void navigatePage(location.pathname,event.state?.scroll||{x:0,y:0},{push:false});});
   history.scrollRestoration = 'manual';
   window.addEventListener('pagehide', () => {
+    cancelPageExit();
     cleanup();
     smoothScroll?.destroy();
     scrollLockObserver.disconnect();
