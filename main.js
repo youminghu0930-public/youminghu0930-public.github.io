@@ -25,6 +25,7 @@ function link(label, url, className) {
 }
 function installScrollMotion(main) {
   const media = matchMedia('(prefers-reduced-motion: reduce)');
+  const mobile = matchMedia(`(max-width: ${design.mobileBreakpoint})`);
   const settings = design.effects;
   const items = Array.from(main.querySelectorAll('.landing-content, .project-index, .project-copy > *, .project-heading > *, .project-visual > *, .project-detail > *, .project-qa-item, .project-preview-media, .project-footage-credit, .experience-heading > *, .experience-period, .experience-copy > *, .skills-heading > *')).map(node => ({node, offset:0, opacity:1, initialized:false, order:node.matches('.experience-copy > *, .experience-heading > *, .project-copy > *') ? Array.from(node.parentElement.children).indexOf(node) : 0}));
   const timelineRails = Array.from(main.querySelectorAll('.experience-rail'));
@@ -67,6 +68,21 @@ function installScrollMotion(main) {
         return;
       }
       const rect = bounds[index];
+      if(mobile.matches&&main.classList.contains('works-page')&&item.node.closest('.project')){
+        const viewport=window.visualViewport;
+        const viewportTop=viewport?.offsetTop||0,viewportHeight=viewport?.height||height;
+        const start=viewportTop+viewportHeight*settings.mobileProjectRevealStart;
+        const finish=viewportTop+viewportHeight*settings.mobileProjectRevealEnd;
+        const entering=ease(clamp((start-rect.top)/Math.max(1,start-finish)));
+        // Follow the swipe directly, without a second lagging animation clock.
+        // Once revealed, content leaves through normal scrolling, not an early fade.
+        item.offset=(1-entering)*settings.mobileProjectRevealDistance;
+        item.opacity=settings.mobileProjectMinOpacity+(1-settings.mobileProjectMinOpacity)*entering;
+        item.initialized=true;
+        item.node.style.translate=`0 ${item.offset}px`;
+        item.node.style.opacity=String(item.opacity);
+        return;
+      }
       // Short pages still reveal fully, without an abrupt end-of-page override.
       // Long experience cards should not accumulate a delay for every label
       // and subsection. Their footer reveals at the normal viewport threshold.
@@ -107,6 +123,8 @@ function installScrollMotion(main) {
   window.addEventListener('scroll', schedule, {passive:true});
   window.addEventListener('resize', schedule);
   media.addEventListener('change', schedule);
+  mobile.addEventListener('change', schedule);
+  window.visualViewport?.addEventListener('resize',schedule);
   const observer = new ResizeObserver(schedule);
   observer.observe(main);
   schedule();
@@ -116,6 +134,8 @@ function installScrollMotion(main) {
     window.removeEventListener('scroll', schedule);
     window.removeEventListener('resize', schedule);
     media.removeEventListener('change', schedule);
+    mobile.removeEventListener('change', schedule);
+    window.visualViewport?.removeEventListener('resize',schedule);
     items.forEach(({node}) => { node.style.removeProperty('translate'); node.style.removeProperty('opacity'); });
   };
 }

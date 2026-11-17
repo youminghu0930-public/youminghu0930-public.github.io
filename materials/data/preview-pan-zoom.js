@@ -1,6 +1,8 @@
+import {design} from '../../design-settings.js';
 export function installPreviewPanZoom(media,signal,options={}) {
   const stage=document.createElement('div');stage.className='project-preview-stage';
   stage.append(...media.childNodes);media.append(stage);
+  const mobile=matchMedia(`(max-width: ${design.mobileBreakpoint})`);
   const points=new Map();let zoom=1,x=0,y=0;
   const draw=()=>{
     let centerOffset=0,scale=zoom;
@@ -22,8 +24,9 @@ export function installPreviewPanZoom(media,signal,options={}) {
   observer?.observe(media);draw();
   const distance=()=>{const [a,b]=[...points.values()];return Math.hypot(a.x-b.x,a.y-b.y);};
   const scaleBy=ratio=>{zoom=Math.max(1,Math.min(6,zoom*ratio));if(zoom===1){x=0;y=0;}draw();};
-  media.addEventListener('wheel',event=>{event.preventDefault();scaleBy(Math.exp(-event.deltaY*(event.ctrlKey?.01:.0015)));},{signal,passive:false});
+  media.addEventListener('wheel',event=>{if(mobile.matches)return;event.preventDefault();scaleBy(Math.exp(-event.deltaY*(event.ctrlKey?.01:.0015)));},{signal,passive:false});
   media.addEventListener('pointerdown',event=>{
+    if(mobile.matches)return;
     if(event.pointerType==='mouse'&&event.button!==0)return;
     points.set(event.pointerId,{x:event.clientX,y:event.clientY});media.setPointerCapture(event.pointerId);
     media.classList.add('is-dragging');
@@ -37,6 +40,7 @@ export function installPreviewPanZoom(media,signal,options={}) {
   },{signal});
   const release=event=>{points.delete(event.pointerId);if(!points.size)media.classList.remove('is-dragging');};
   for(const type of ['pointerup','pointercancel','lostpointercapture'])media.addEventListener(type,release,{signal});
-  media.addEventListener('dblclick',()=>{zoom=1;x=0;y=0;draw();},{signal});
+  media.addEventListener('dblclick',()=>{if(mobile.matches)return;zoom=1;x=0;y=0;draw();},{signal});
+  mobile.addEventListener('change',()=>{if(mobile.matches){for(const id of points.keys())if(media.hasPointerCapture(id))media.releasePointerCapture(id);points.clear();zoom=1;x=y=0;media.classList.remove('is-dragging');draw();}},{signal});
   return ()=>{points.clear();observer?.disconnect();};
 }

@@ -18,6 +18,8 @@ export function installProjectPreviews(main, projects) {
       const label=document.createElement('span');label.className='project-title-text';label.textContent=item.name;text.replaceWith(label);
     }
     item.open.hidden=mobile.matches;
+    item.media.toggleAttribute('data-lenis-prevent',!mobile.matches);
+    const frame=item.media.querySelector('iframe');if(frame)frame.tabIndex=mobile.matches?-1:0;
     if(mobile.matches){
       item.action.insertBefore(item.wrapper,copy);
       if(item.qa)item.action.append(item.qa);
@@ -65,7 +67,7 @@ export function installProjectPreviews(main, projects) {
         if(item.config.interactive) {
           const iframe=document.createElement('iframe');
           iframe.title='Interactive Golf True 3D preview';iframe.src=item.config.interactive;
-          iframe.className='project-interactive-frame';iframe.allow='autoplay';
+          iframe.className='project-interactive-frame';iframe.allow='autoplay';iframe.tabIndex=mobile.matches?-1:0;
           // Safari may suspend frame callbacks in a fully transparent iframe.
           // Keep the frame visible so initialization can finish; its own scene
           // draws only after geometry and metrics have been initialized.
@@ -300,11 +302,13 @@ export function installProjectPreviews(main, projects) {
       item.action.classList.toggle('is-center-highlighted',progress>0);
       item.action.style.setProperty('--project-title-fill',`${progress*100}%`);
       const heading=item.action.querySelector('.project-heading').getBoundingClientRect();
-      item.action.style.setProperty('--project-title-ink-cut',`${progress*heading.height-(title.top-heading.top)}px`);
+      const inkCut=progress*heading.height-(title.top-heading.top);
+      item.action.style.setProperty('--project-title-ink-cut',`${inkCut}px`);
+      item.action.dataset.titleInk=inkCut<=0?'light':inkCut>=title.height?'dark':'split';
       const highlights=[...item.action.querySelectorAll('.project-summary-highlight')];
       const durations=highlights.map(node=>parseFloat(node.style.getPropertyValue('--project-highlight-duration'))||1);
       const longest=Math.max(1,...durations);
-      highlights.forEach((node,index)=>node.style.setProperty('--project-marker-fill',`${Math.min(1,progress*longest/durations[index])*100}%`));
+      highlights.forEach((node,index)=>{const fill=Math.min(1,progress*longest/durations[index]);node.style.setProperty('--project-marker-fill',`${fill*100}%`);node.dataset.markerInk=fill<=0?'light':fill>=1?'dark':'split';});
     }
   };
   const scheduleCenterHighlight=()=>{if(!centerFrame)centerFrame=requestAnimationFrame(highlightCenter);};

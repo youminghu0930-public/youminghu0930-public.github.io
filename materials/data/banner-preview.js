@@ -50,6 +50,7 @@ function createPairedBannerPreview(canvas,config) {
   const media=canvas.closest('.project-preview-media');media.classList.add('has-paired-preview');
   canvas.parentElement.append(pair);canvas.hidden=true;
   let active=0,wanted=false,disposed=false;
+  const mobile=matchMedia(`(max-width: ${design.mobileBreakpoint})`);
   const players=[],panes=[],cleanups=[];
   const controller=new AbortController();
   const select=index=>{
@@ -69,6 +70,7 @@ function createPairedBannerPreview(canvas,config) {
     players.at(-1).prepare();
     let press=null;
     pane.addEventListener('pointerdown',event=>{
+      if(mobile.matches)return;
       if(event.pointerType==='mouse'&&event.button!==0)return;
       if(press){press.dragged=true;return;}
       press={id:event.pointerId,x:event.clientX,y:event.clientY,dragged:false};
@@ -77,6 +79,7 @@ function createPairedBannerPreview(canvas,config) {
       if(press&&Math.hypot(event.clientX-press.x,event.clientY-press.y)>5)press.dragged=true;
     },{signal:controller.signal});
     pane.addEventListener('pointerup',event=>{
+      if(mobile.matches){press=null;return;}
       if(!press||press.id!==event.pointerId)return;
       if(!press.dragged)select(index);
       press=null;

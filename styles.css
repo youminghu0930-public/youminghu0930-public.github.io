@@ -1203,3 +1203,18 @@ html[data-skills-expanding=true] { overflow-anchor:none; scroll-behavior:auto; }
  .project-row-link:hover .project-summary-highlight,
  .project-row-link.is-center-highlighted .project-summary-highlight { background-image:linear-gradient(to right,var(--button-text) var(--project-marker-fill,0%),#eeeeee var(--project-marker-fill,0%)),linear-gradient(var(--accent),var(--accent)); background-size:100% 100%,var(--project-marker-fill,0%) 100%; background-clip:text,border-box; -webkit-background-clip:text,border-box; -webkit-text-fill-color:transparent; color:transparent; transition:none; }
 }
+
+/* Mobile previews play passively so swipes always belong to the page. */
+@media(max-width:1000px) {
+ .portfolio-shell .project-preview-media,.portfolio-shell .project-preview-pane { touch-action:pan-y pinch-zoom; cursor:auto; }
+ .portfolio-shell .project-preview-media > iframe,.portfolio-shell .project-preview-pair { pointer-events:none!important; }
+ .portfolio-shell .project-preview-info { display:none; }
+}
+
+/* Solid endpoint colors avoid WebKit's zero-length text-gradient artifact. */
+@media(max-width:1000px) {
+ .portfolio-shell .project-row-link[data-title-ink="light"] .project-heading .project-title-text { background:none; color:#eeeeee; -webkit-text-fill-color:#eeeeee; }
+ .portfolio-shell .project-row-link[data-title-ink="dark"] .project-heading .project-title-text { background:none; color:var(--button-text); -webkit-text-fill-color:var(--button-text); }
+ .portfolio-shell .project-row-link .project-summary-highlight[data-marker-ink="light"] { color:#eeeeee; -webkit-text-fill-color:#eeeeee; }
+ .portfolio-shell .project-row-link .project-summary-highlight[data-marker-ink="dark"] { color:var(--button-text); -webkit-text-fill-color:var(--button-text); }
+}

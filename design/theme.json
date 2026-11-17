@@ -593,6 +593,10 @@
     "projectBannerLeftColor": "#3b82f6",
     "projectBannerRightColor": "#ef4444",
     "projectHighlightPixelsPerSecond": 500,
-    "projectHighlightMaxDuration": 700
+    "projectHighlightMaxDuration": 700,
+    "mobileProjectRevealStart": 1,
+    "mobileProjectRevealEnd": 0.88,
+    "mobileProjectRevealDistance": 12,
+    "mobileProjectMinOpacity": 0.6
   }
 }
