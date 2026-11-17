@@ -116,9 +116,18 @@ function installScrollMotion(main) {
         : Math.max(viewportFinish, rect.top + scrollY - maxScroll);
       const startTop = finishTop + height * (settings.scrollRevealStart - settings.scrollRevealEnd);
       const entering = ease(clamp((startTop - rect.top) / (startTop - finishTop)));
-      const leaving = ease(clamp(rect.bottom / (height * settings.scrollFadeExitRange)));
-      const targetOffset = (1 - entering) * settings.scrollRevealDistance - (1 - leaving) * settings.scrollExitDistance;
-      const targetOpacity = settings.scrollMinOpacity + (1 - settings.scrollMinOpacity) * entering * leaving;
+      const leaving = isWorks && projectRow && !mobile.matches ? 1 : ease(clamp(rect.bottom / (height * settings.scrollFadeExitRange)));
+      let targetOffset = (1 - entering) * settings.scrollRevealDistance - (1 - leaving) * settings.scrollExitDistance;
+      let targetOpacity = settings.scrollMinOpacity + (1 - settings.scrollMinOpacity) * entering * leaving;
+      // Accordion layout changes must not retrigger a neighbouring row's scroll motion.
+      if(isWorks && projectRow && !mobile.matches){
+        const position=`${scrollY}:${innerWidth}:${height}`;
+        if(item.scrollPosition===position && item.scrollTarget){
+          [targetOffset,targetOpacity]=item.scrollTarget;
+        }else{
+          item.scrollPosition=position;item.scrollTarget=[targetOffset,targetOpacity];
+        }
+      }
       if (!item.initialized) {
         item.offset = targetOffset;
         item.opacity = targetOpacity;

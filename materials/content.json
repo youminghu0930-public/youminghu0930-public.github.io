@@ -193,7 +193,6 @@
       "tags": [
         "Smooth Swing Tracking",
         "Calibration-free 3D reconstruction",
-        "Multi-view geometry",
         "Triangulation",
         "Time synchronization",
         "Kinematic analysis"
@@ -237,7 +236,6 @@
         "golf swing in 3D"
       ],
       "technologyLinks": {
-        "Multi-view geometry": "https://youminghu0930-public.github.io/golf-swing-3d-reconstruction/",
         "Smooth Swing Tracking": "https://youminghu0930-public.github.io/golf-swing-analysis-poc/",
         "Triangulation": "https://youminghu0930-public.github.io/golf-swing-3d-reconstruction/",
         "Time synchronization": "https://youminghu0930-public.github.io/two-event-time-sync/",

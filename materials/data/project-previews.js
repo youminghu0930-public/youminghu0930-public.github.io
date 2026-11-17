@@ -32,13 +32,15 @@ export function installProjectPreviews(main, projects) {
       heading.insertBefore(headingTitle,company);
       item.action.insertBefore(item.wrapper,copy);
       if(item.qa)item.action.append(item.qa);
-      item.action.append(item.open);
+
+      copy.append(item.open);
     }else{
       heading.insertBefore(company,headingTitle);
       item.editorial.prepend(heading,copy);
       item.action.insertBefore(item.wrapper,item.editorial);
       if(item.qa)item.writeupInner.append(item.qa);
-      item.editorialActions.append(item.readToggle,item.open);
+
+      item.editorial.insertBefore(item.open,copy);item.editorialActions.append(item.readToggle);
       item.action.append(item.writeup,item.editorialActions);
     }
     updateWriteup(item);
@@ -46,13 +48,13 @@ export function installProjectPreviews(main, projects) {
   function updateWriteup(item,animate=false){
     const panel=item.writeup;
     const from=panel.getBoundingClientRect().height;
-    const fromOpacity=Number(getComputedStyle(panel).opacity);
     item.writeupAnimation?.cancel();item.writeupAnimation=null;
     panel.classList.toggle('is-open',item.writeupExpanded);
     panel.inert=!item.writeupExpanded;
     panel.setAttribute('aria-hidden',String(!item.writeupExpanded));
     item.readToggle.setAttribute('aria-expanded',String(item.writeupExpanded));
-    item.readLabel.textContent=item.writeupExpanded?'Close the write-up':'Read the write-up';
+    item.readLabel.classList.toggle('is-expanded',item.writeupExpanded);
+    item.readToggle.setAttribute('aria-label',item.writeupExpanded?'Close':'Explore the thinking');
     if(!animate||mobile.matches||matchMedia('(prefers-reduced-motion:reduce)').matches)return;
     const natural=item.writeupInner.getBoundingClientRect().height;
     const to=item.writeupExpanded?natural:0;
@@ -63,11 +65,19 @@ export function installProjectPreviews(main, projects) {
     // Short reversals still need breathing room; do not accelerate them into a snap.
     const distance=Math.min(1,Math.abs(to-from)/Math.max(1,natural));
     const duration=Math.max(item.writeupExpanded?280:340,base*Math.sqrt(distance));
-    const frames=[{height:`${from}px`,opacity:fromOpacity,offset:0}];
-    // Keep closing text legible as the panel begins to contract.
-    if(!item.writeupExpanded)frames.push({opacity:fromOpacity,offset:.2});
-    frames.push({height:`${to}px`,opacity:item.writeupExpanded?1:0,offset:1});
-    const animation=panel.animate(frames,{duration,easing:style.getPropertyValue('--project-writeup-ease').trim()||'ease-in-out',fill:'both'});
+    const frames=[{height:`${from}px`,opacity:1},{height:`${to}px`,opacity:1}];
+    // Document-bottom scroll clamping uses whole CSS pixels. Match that grid
+    // so neighbouring rows and thin dividers do not oscillate by a subpixel.
+    if(CSS.supports('height','round(nearest, 1.5px, 1px)')){
+      for(const frame of frames){
+        frame['--project-writeup-height']=frame.height;
+        frame.height='round(nearest, var(--project-writeup-height), 1px)';
+      }
+    }
+    // Older WebKit lacks CSS round(); dense integer steps avoid fractional layout there too.
+    const pixelFrames=CSS.supports('height','round(nearest, 1.5px, 1px)')?frames:
+      Array.from({length:241},(_,index)=>({height:`${Math.round(from+(to-from)*index/240)}px`,opacity:1,offset:index/240,easing:'steps(1,end)'}));
+    const animation=panel.animate(pixelFrames,{duration,easing:style.getPropertyValue('--project-writeup-ease').trim()||'ease-in-out',fill:'both'});
     item.writeupAnimation=animation;
     animation.onfinish=()=>{
       if(item.writeupAnimation!==animation)return;
@@ -214,7 +224,7 @@ export function installProjectPreviews(main, projects) {
     let magnetX=0,magnetY=0;
     const resetMagnet=()=>{magnetX=magnetY=0;readToggle.style.setProperty('--magnet-x','0px');readToggle.style.setProperty('--magnet-y','0px');};
     action.addEventListener('pointermove',event=>{
-      if(mobile.matches)return;
+      if(mobile.matches||items.some(item=>item.action===action&&item.writeupAnimation))return;
       if(event.pointerType!=='mouse'||!matchMedia('(hover:hover) and (pointer:fine)').matches||matchMedia('(prefers-reduced-motion:reduce)').matches)return;
       const rect=readToggle.getBoundingClientRect();
       const offset=getComputedStyle(readToggle).translate.split(' ').map(value=>parseFloat(value)||0);
@@ -294,6 +304,9 @@ export function installProjectPreviews(main, projects) {
         const origin=editorial.getBoundingClientRect().top;
         const previewTop=`${Math.round((title.getBoundingClientRect().top-origin)*100)/100}px`;
         if(action.style.getPropertyValue('--project-preview-title-top')!==previewTop)action.style.setProperty('--project-preview-title-top',previewTop);
+        const previewHeight=action.querySelector('.project-preview-media').offsetHeight;
+        const editorialHeight=`${Math.round((parseFloat(previewTop)+previewHeight)*100)/100}px`;
+        if(action.style.getPropertyValue('--project-editorial-min-height')!==editorialHeight)action.style.setProperty('--project-editorial-min-height',editorialHeight);
         const headingHeight=Math.max(1,heading.offsetHeight);
         const titleText=title.querySelector('.project-title-text');
         titleText.style.setProperty('--project-ink-start',String(title.offsetTop/headingHeight));
@@ -315,7 +328,8 @@ export function installProjectPreviews(main, projects) {
     const editorial=document.createElement('div');editorial.className='project-editorial-copy';
     const editorialActions=document.createElement('div');editorialActions.className='project-editorial-actions';editorial.append(editorialActions);
     const readToggle=document.createElement('button');readToggle.type='button';readToggle.className='project-writeup-toggle';
-    const readLabel=document.createElement('span');readLabel.textContent='Read the write-up';
+    const readLabel=document.createElement('span');readLabel.className='project-writeup-label';readLabel.setAttribute('aria-hidden','true');
+    for(const [state,text] of [['closed','Explore the thinking'],['open','Close']]){const label=document.createElement('span');label.dataset.state=state;label.textContent=text;readLabel.append(label);}
     const readArrow=document.createElementNS('http://www.w3.org/2000/svg','svg');
     readArrow.classList.add('project-writeup-chevron');readArrow.setAttribute('viewBox','0 0 16 16');
     readArrow.setAttribute('aria-hidden','true');readArrow.setAttribute('focusable','false');
@@ -326,8 +340,32 @@ export function installProjectPreviews(main, projects) {
     readArrow.append(arrowPath);readToggle.append(readArrow,readLabel);
     const writeup=document.createElement('div');writeup.className='project-writeup';writeup.id=`${project.id}-writeup`;
     const writeupInner=document.createElement('div');writeupInner.className='project-writeup-inner';writeup.append(writeupInner);
+    const related=document.createElement('section');related.className='project-related';
+    const relatedHeading=document.createElement('h3');relatedHeading.textContent='Related subprojects';related.append(relatedHeading);
+    const groups=new Map();
+    for(const tag of project.tags || []){const url=project.technologyLinks?.[tag];if(!url)continue;if(!groups.has(url))groups.set(url,[]);groups.get(url).push(tag);}
+    const names={
+      'improving-golf-swing-pose-estimation':'Golf-specific pose estimation',
+      'integrating-golfer-club-detection-models':'Model training and integration',
+      'enhancing-blurry-club-recall':'Blurry club detection',
+      'trajectory-postprocessing':'Trajectory smoothing',
+      'golf-swing-3d-reconstruction':'Calibration-free reconstruction',
+      'two-event-time-sync':'Camera synchronization',
+      'pose-information-extraction':'Movement measurements'
+    };
+    for(const [url,tags] of groups){
+      const row=document.createElement('div');row.className='project-related-row';
+      const link=document.createElement('a');link.href=url;link.target='_blank';link.rel='noopener noreferrer';
+      link.textContent=(names[new URL(url).pathname.split('/').filter(Boolean).pop()] || tags[0])+' ↗';
+      const technologies=document.createElement('ul');technologies.className='project-related-technologies';technologies.setAttribute('aria-label','Technologies');
+      for(const tag of tags){const pill=document.createElement('li');pill.textContent=tag;technologies.append(pill);}
+      row.append(link,technologies);related.append(row);
+    }
+    const technologies=action.querySelector('.project-technologies');
+    if(groups.size)technologies.replaceWith(related);
+
     readToggle.setAttribute('aria-controls',writeup.id);action.append(editorial,writeup);
-    const item={action,wrapper,canvas,media,tools,inline,open,qa:inline.querySelector('.project-preview-qa'),trigger,title,headerObserver,setHeaderExpanded,name:project.title,panCleanup,config:project.banner,player:null,visible:false,expanded:false,editorial,editorialActions,writeup,writeupInner,readToggle,readLabel,writeupExpanded:false};
+    const item={action,wrapper,canvas,media,tools,inline,open,related,qa:inline.querySelector('.project-preview-qa'),trigger,title,headerObserver,setHeaderExpanded,name:project.title,panCleanup,config:project.banner,player:null,visible:false,expanded:false,editorial,editorialActions,writeup,writeupInner,readToggle,readLabel,writeupExpanded:false};
     readToggle.addEventListener('click',()=>{resetMagnet();item.writeupExpanded=!item.writeupExpanded;updateWriteup(item,true);},{signal});
     items.push(item);arrangeProject(item);update(item);observer.observe(action);
     wrapper.addEventListener('transitionend',event=>{if(event.target===wrapper&&event.propertyName==='grid-template-rows')finishExpansion(item);},{signal});
