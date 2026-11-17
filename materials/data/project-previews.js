@@ -316,7 +316,14 @@ export function installProjectPreviews(main, projects) {
     const editorialActions=document.createElement('div');editorialActions.className='project-editorial-actions';editorial.append(editorialActions);
     const readToggle=document.createElement('button');readToggle.type='button';readToggle.className='project-writeup-toggle';
     const readLabel=document.createElement('span');readLabel.textContent='Read the write-up';
-    const readArrow=document.createElement('span');readArrow.className='project-writeup-chevron';readArrow.setAttribute('aria-hidden','true');readToggle.append(readArrow,readLabel);
+    const readArrow=document.createElementNS('http://www.w3.org/2000/svg','svg');
+    readArrow.classList.add('project-writeup-chevron');readArrow.setAttribute('viewBox','0 0 16 16');
+    readArrow.setAttribute('aria-hidden','true');readArrow.setAttribute('focusable','false');
+    const arrowPath=document.createElementNS('http://www.w3.org/2000/svg','path');
+    arrowPath.setAttribute('d','M3 5.5 L8 10.5 L13 5.5');arrowPath.setAttribute('fill','none');
+    arrowPath.setAttribute('stroke','currentColor');arrowPath.setAttribute('stroke-width','1.5');
+    arrowPath.setAttribute('stroke-linecap','round');arrowPath.setAttribute('stroke-linejoin','round');
+    readArrow.append(arrowPath);readToggle.append(readArrow,readLabel);
     const writeup=document.createElement('div');writeup.className='project-writeup';writeup.id=`${project.id}-writeup`;
     const writeupInner=document.createElement('div');writeupInner.className='project-writeup-inner';writeup.append(writeupInner);
     readToggle.setAttribute('aria-controls',writeup.id);action.append(editorial,writeup);

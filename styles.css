@@ -1334,10 +1334,8 @@ html[data-skills-expanding=true] { overflow-anchor:none; scroll-behavior:auto; }
  .project-editorial-actions:focus-within::before,.project-editorial-actions:focus-within::after { opacity:1; }
  .project-editorial-actions .project-writeup-toggle { position:relative; display:inline-flex; flex-direction:row; align-items:center; justify-content:center; gap:12px; min-width:0; min-height:40px; padding:4px 8px; border:0; border-radius:0; box-shadow:none; font-size:14px; line-height:1.5; color:#eeeeee; background:transparent; }
  .project-editorial-actions .project-writeup-toggle:hover,.project-editorial-actions .project-writeup-toggle:focus-visible { color:var(--accent); background:transparent; }
- .project-writeup-chevron { display:block; width:10px; height:10px; flex:none; color:var(--accent); border-right:1.5px solid currentColor; border-bottom:1.5px solid currentColor; rotate:45deg; transition:rotate 300ms ease,translate 300ms ease; }
- .project-writeup-toggle[aria-expanded="true"] .project-writeup-chevron { rotate:225deg; }
- .project-writeup-toggle:hover .project-writeup-chevron { translate:0 2px; }
- .project-writeup-toggle[aria-expanded="true"]:hover .project-writeup-chevron { translate:0 -2px; }
+ .project-writeup-chevron { display:block; width:14px; height:14px; flex:none; color:var(--accent); transform-origin:center; rotate:0deg; transition:rotate 300ms ease; }
+ .project-writeup-toggle[aria-expanded="true"] .project-writeup-chevron { rotate:180deg; }
 }
 @media(prefers-reduced-motion:reduce) { .project-writeup-chevron { transition:none; } }
 
@@ -1374,8 +1372,8 @@ html[data-skills-expanding=true] { overflow-anchor:none; scroll-behavior:auto; }
 
 /* A quiet hover band keeps the question and answer visually grouped. */
 @media(hover:hover) and (pointer:fine) {
- .project-qa-item { transition:background-color 220ms ease; }
- .project-qa-item:hover { background-color:rgb(255 255 255 / 4%); }
+ .project-qa-item { transition:background-color 320ms cubic-bezier(.22,.61,.36,1); }
+ .project-qa-item:hover { background-color:rgb(255 255 255 / 4%); transition-duration:200ms; }
 }
 @media(prefers-reduced-motion:reduce) { .project-qa-item { transition:none; } }
 
@@ -1403,8 +1401,9 @@ html[data-skills-expanding=true] { overflow-anchor:none; scroll-behavior:auto; }
 /* Match the Q&A hover band across the full initial project row. */
 @media(min-width:calc(1000px + 1px)) and (hover:hover) and (pointer:fine) {
  .portfolio-shell .works-page .project-row-link { isolation:isolate; }
- .portfolio-shell .works-page .project-row-link::after { content:''; position:absolute; top:0; left:0; right:0; height:var(--project-intro-height,0px); z-index:-1; pointer-events:none; background:rgb(255 255 255 / 4%); opacity:0; transition:opacity 220ms ease; }
- .portfolio-shell .works-page .project-row-link:hover:not(:has(.project-writeup:hover,.project-editorial-actions:hover))::after { opacity:1; }
+ .portfolio-shell .works-page .project-row-link:hover { background:transparent; }
+ .portfolio-shell .works-page .project-row-link::after { content:''; position:absolute; top:0; left:0; right:0; height:var(--project-intro-height,0px); z-index:-1; pointer-events:none; background:rgb(255 255 255 / 4%); opacity:0; transition:opacity 320ms cubic-bezier(.22,.61,.36,1); }
+ .portfolio-shell .works-page .project-row-link:hover:not(:has(.project-writeup:hover,.project-editorial-actions:hover))::after { opacity:1; transition-duration:200ms; }
 }
 @media(prefers-reduced-motion:reduce) { .portfolio-shell .works-page .project-row-link::after { transition:none; } }
 
@@ -1415,3 +1414,9 @@ html[data-skills-expanding=true] { overflow-anchor:none; scroll-behavior:auto; }
  .project-preview-qa .project-qa-question { font-size:clamp(1.35rem,5vw,1.75rem); line-height:1.2; column-gap:12px; }
  .project-preview-qa .project-qa-answer { margin-left:36px; }
 }
+
+@media(hover:hover) and (pointer:fine) {
+ .project-qa-number { transition:color 320ms cubic-bezier(.22,.61,.36,1),font-weight 320ms cubic-bezier(.22,.61,.36,1); }
+ .project-qa-item:hover .project-qa-number { color:var(--accent); font-weight:700; transition-duration:200ms; }
+}
+@media(prefers-reduced-motion:reduce) { .project-qa-number { transition:none; } }
