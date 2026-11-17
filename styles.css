@@ -1504,3 +1504,24 @@ html[data-skills-expanding=true] { overflow-anchor:none; scroll-behavior:auto; }
 }
 
 @property --project-writeup-height { syntax:'<length>'; inherits:false; initial-value:0px; }
+
+/* Contact is a single viewport with a pointer-transparent light scene. */
+html:has(.contact-page),body:has(.contact-page) { height:100%; overflow:hidden; overscroll-behavior:none; }
+.portfolio-shell > main.contact-page { height:100dvh; min-height:0; padding-block:0; position:relative; }
+.contact-page .landing { height:100dvh; min-height:0; position:relative; z-index:1; }
+.contact-page .hero-dots,.contact-page .portfolio-footer { display:none; }
+.contact-page .contact-lasers { position:fixed; inset:0; width:100vw; height:100dvh; pointer-events:none; z-index:0; }
+.portfolio-shell .contact-page .landing .hero { padding-top:clamp(100px,25dvh,280px); padding-bottom:24px; }
+@media(max-width:1000px) {
+ .portfolio-shell .contact-page .landing .hero { padding-top:100px; padding-bottom:16px; }
+ .contact-page .landing-content { gap:16px; }
+}
+@media(max-height:600px) {
+ .portfolio-shell .contact-page .landing .hero { padding-top:80px; padding-bottom:8px; }
+ .portfolio-shell .contact-page h1 { font-size:clamp(40px,10dvh,80px); }
+ .contact-page .landing-content { gap:8px; }
+}
+.contact-lasers { position:fixed; inset:0; width:100vw; height:100dvh; pointer-events:none; z-index:-1; }
+.portfolio-shell > main.contact-page { position:relative; isolation:isolate; }
+.contact-page .hero-dots,.contact-page .portfolio-footer { display:none; }
+.portfolio-shell .contact-page .landing { height:100%; min-height:0; }

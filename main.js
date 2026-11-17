@@ -2,6 +2,7 @@ import Lenis from './materials/data/vendor/lenis/lenis.js';
 import { design } from './design-settings.js';
 import { createLanding, installLandingEntrance } from './landing.js';
 import { installPointerEffects } from './pointer-effects.js';
+import { installContactLasers } from './materials/data/contact-lasers.js';
 import { installSkillsAccordion } from './materials/data/skills-accordion.js';
 import { installNavigation } from './navigation.js';
 import { installProjectPreviews } from './materials/data/project-previews.js';
@@ -613,6 +614,7 @@ async function startApp() {
     if (old) old.replaceWith(main); else app.append(main);
     const stopEntrance = installLandingEntrance(landing, header, {animateHeader:initial});
     const stopPointer = installPointerEffects(landing.hero);
+    const stopContactLasers=route==='contact'?installContactLasers(main):()=>{};
     const stopSkills = installSkillsAccordion(main, {setScrollPosition:position => {
       if (smoothScroll) {
         smoothScroll.resize();
@@ -621,7 +623,7 @@ async function startApp() {
     }});
     const stopProjectPreviews = route === 'works' ? installProjectPreviews(main, projects) : () => {};
     const stopScrollMotion = installScrollMotion(main);
-    cleanup = () => { stopProjectPreviews(); stopSkills(); stopScrollMotion(); stopEntrance?.(); stopPointer?.(); landing.destroy(); };
+    cleanup = () => { stopContactLasers(); stopProjectPreviews(); stopSkills(); stopScrollMotion(); stopEntrance?.(); stopPointer?.(); landing.destroy(); };
     currentRoute = route;
     updateScrollbar();
     menu.close();
