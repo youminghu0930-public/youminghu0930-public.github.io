@@ -1524,3 +1524,6 @@ html:has(.contact-page),body:has(.contact-page) { height:100%; overflow:hidden; 
 .portfolio-shell > main.contact-page { position:relative; isolation:isolate; }
 .contact-page .hero-dots,.contact-page .portfolio-footer { display:none; }
 .portfolio-shell .contact-page .landing { height:100%; min-height:0; }
+
+/* Overall Contact background treatment; foreground typography stays crisp. */
+.portfolio-shell .contact-page .contact-lasers { opacity:{{ContactBackgroundOpacity}}; filter:blur({{ContactBackgroundBlur}}); }
