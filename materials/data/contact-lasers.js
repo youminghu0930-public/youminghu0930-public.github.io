@@ -202,21 +202,22 @@ void main(){
  // Keep rare particle flashes crisp rather than flattening them in the tone curve.
  float spark=clamp(flecks*sparkLight*3.,0.,1.);
  light=mix(light,vec3(.94,1.,.96),spark*.95);
- vec4 stars=texture2D(dotBackground,gl_FragCoord.xy/resolution);
- // Dots share the live and historical beam illumination and smoke transmission.
- float starLight=clamp(max(illuminationA,illuminationB),0.,1.);
- vec3 starColor=mix(stars.rgb, mix(beamColor,vec3(.86,1.,.91),.65),starLight);
- // Both the crisp body and its existing halo are behind the moving smoke.
- // Use optical depth rather than the much weaker visible-smoke brightness.
- float dotTransmission=exp(-density*14.-nearDensity*.85);
- vec2 dotStep=vec2(3.)/resolution;
- vec4 haloA=texture2D(dotBackground,uv+vec2(dotStep.x,0.));
- vec4 haloB=texture2D(dotBackground,uv-vec2(dotStep.x,0.));
- vec4 haloC=texture2D(dotBackground,uv+vec2(0.,dotStep.y));
- vec4 haloD=texture2D(dotBackground,uv-vec2(0.,dotStep.y));
- vec3 scatteredDots=(haloA.rgb*haloA.a+haloB.rgb*haloB.a+haloC.rgb*haloC.a+haloD.rgb*haloD.a)*.25;
- light+=starColor*stars.a*dotTransmission*(1.5+starLight*5.);
- light+=scatteredDots*(1.-dotTransmission)*.65;
+ // The home-style dot canvas supplies hover colour, magnification and glow.
+ // Treat that complete image as light behind the mist, independent of lasers.
+ vec4 dotImage=texture2D(dotBackground,uv);
+ vec3 dotLight=dotImage.rgb*dotImage.a;
+ float opticalDepth=density*8.+nearDensity*.45;
+ float dotTransmission=exp(-opticalDepth);
+ // Mist broadens a little of the same light instead of adding a separate halo
+ // above the smoke. Both paths remain attenuated by the moving density field.
+ vec2 scatterStep=vec2(2.+5.*(1.-dotTransmission))/resolution;
+ vec4 sampleA=texture2D(dotBackground,uv+vec2(scatterStep.x,0.));
+ vec4 sampleB=texture2D(dotBackground,uv-vec2(scatterStep.x,0.));
+ vec4 sampleC=texture2D(dotBackground,uv+vec2(0.,scatterStep.y));
+ vec4 sampleD=texture2D(dotBackground,uv-vec2(0.,scatterStep.y));
+ vec3 dotScatter=(sampleA.rgb*sampleA.a+sampleB.rgb*sampleB.a+sampleC.rgb*sampleC.a+sampleD.rgb*sampleD.a)*.25;
+ vec3 mistedDots=dotLight*dotTransmission*1.45+dotScatter*(1.-dotTransmission)*sqrt(dotTransmission)*.5;
+ light+=mistedDots*3.5;
  gl_FragColor=vec4(light,1.);
 }`;
 
