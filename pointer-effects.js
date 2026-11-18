@@ -112,7 +112,7 @@ export function installPointerEffects(hero) {
     binaryLastTime=now;
     let binarySettling=false;
     const rect = canvas.getBoundingClientRect();
-    const ratio = Math.min(devicePixelRatio || 1, 2);
+    const ratio = Math.min(devicePixelRatio || 1, hero.closest('.contact-page') ? 1 : 2);
     const width = Math.round(rect.width * ratio), height = Math.round(rect.height * ratio);
     if (canvas.width !== width || canvas.height !== height) { canvas.width = width; canvas.height = height; }
     ctx.setTransform(ratio, 0, 0, ratio, 0, 0);
@@ -160,8 +160,13 @@ export function installPointerEffects(hero) {
         const px = x + (distance ? dx / distance * offset : 0);
         const py = y + (distance ? dy / distance * offset : 0);
         const radius = options.dotRadius * (1 + influence * options.dotEnlargement);
+        if(influence>.01){
+          const glow=ctx.createRadialGradient(px,py,0,px,py,binaryBackground?8:6);
+          glow.addColorStop(0,'rgba(188,255,207,.32)');glow.addColorStop(.25,'rgba(65,255,125,.16)');glow.addColorStop(1,'rgba(65,255,125,0)');
+          ctx.globalAlpha=influence*influence;ctx.fillStyle=glow;ctx.fillRect(px-8,py-8,16,16);
+        }
         if(binaryBackground){
-          ctx.font=`${11*(1+magnification*options.dotEnlargement)}px monospace`;
+          ctx.font=`${(matchMedia('(max-width: 767px)').matches?9:11)*(1+magnification*options.dotEnlargement)}px monospace`;
           ctx.textAlign='center';ctx.textBaseline='middle';
           ctx.globalAlpha=(options.binaryBaseOpacity+(options.binaryHoverZeroOpacity-options.binaryBaseOpacity)*visibility)*(1-influence);ctx.fillStyle=muted;
           ctx.fillText('0',px,py);
@@ -180,6 +185,7 @@ export function installPointerEffects(hero) {
       }
     }
     ctx.globalAlpha = 1;
+    canvas.dataset.paintRevision=String((Number(canvas.dataset.paintRevision)||0)+1);
     if(binaryBackground&&binarySettling&&!signal.aborted)binaryFrame=requestAnimationFrame(draw);
   }
   function position() {

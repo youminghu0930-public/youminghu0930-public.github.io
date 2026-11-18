@@ -38,7 +38,7 @@
         {"label": "Public GitHub", "url": "https://github.com/youminghu0930-public", "icon": "/materials/data/skill-icons/github.svg"},
         {"label": "LinkedIn", "url": "https://www.linkedin.com/in/youming-hu-6506b5446", "icon": "/materials/data/skill-icons/linkedin.svg"}
       ],
-      "phone": "+886 981 224 068",
+      "phone": "(+886) 981-224-068",
       "email": "youminghu0930@gmail.com"
     },
     "breadcrumbLabel": "Breadcrumb",
@@ -53,6 +53,7 @@
       "id": "golf-2d",
       "navigationTitle": "Golf-Swing-Analysis",
       "title": "Smooth-Swing-Tracking",
+      "productDemoUrl": "https://lnkd.in/p/gm5qnRRg",
       "summary": "Smooth, accurate joint and club tracking for real-world golf analysis.",
       "url": "https://youminghu0930-public.github.io/golf-swing-analysis-poc/",
       "linkLabel": "Explore 2D analysis →",
@@ -194,6 +195,7 @@
       "id": "golf-3d",
       "navigationTitle": "Golf-True-3D",
       "title": "Golf-True-3D",
+      "productDemoUrl": "https://lnkd.in/p/gA8wCzfe",
       "summary": "Explore your golf swing in 3D, without complicated camera calibration.",
       "url": "https://youminghu0930-public.github.io/golf-true-3d-product/",
       "linkLabel": "Explore True 3D →",

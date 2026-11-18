@@ -1795,3 +1795,23 @@ html:has(.contact-page),body:has(.contact-page) { height:100%; overflow:hidden; 
  .contact-decorations .contact-location-intro { font-size:15px; }
  .contact-content-panel .contact-decorations .contact-live-clock { font-size:clamp(32px,9vw,42px); }
 }
+
+/* Contact inline details and restrained landing illumination. */
+.contact-content-panel .contact-field { grid-template-columns:11px 46px minmax(0,1fr); }
+.contact-inline-icon { display:inline-flex; width:1em; height:1em; font-size:11px; color:var(--muted); }
+.contact-inline-icon .skill-icon { width:1em; height:1em; }
+.portfolio-shell .contact-content-panel .contact-phone { color:{{HeadingColor}}; }
+.contact-content-panel .contact-decorations { margin-top:32px; }
+.contact-page .hero-dots { display:block; position:fixed; inset:0; width:100vw; height:100dvh; opacity:0; }
+.portfolio-shell .works-page .project-product-demo { display:inline-block; width:fit-content; margin-top:10px; padding:{{ProjectTechnologyPadding}}; border:1px solid var(--border); border-radius:{{ProjectTechnologyRadius}}; color:var(--muted); font-family:var(--font-mono,monospace); font-size:{{ProjectTechnologySize}}; line-height:1.5; text-decoration:none; cursor:pointer; transition:color .24s,border-color .24s,text-shadow .24s; }
+.portfolio-shell .works-page .project-product-demo:hover,.portfolio-shell .works-page .project-product-demo:focus-visible { color:{{HeadingColor}}; border-color:{{HeadingColor}}; text-shadow:.3px 0 currentColor,-.3px 0 currentColor; }
+@media(max-width:767px) {
+ .contact-content-panel .contact-field { grid-template-columns:10px 40px minmax(0,1fr); }
+ .contact-inline-icon { font-size:10px; }
+ .contact-content-panel .contact-decorations { margin-top:24px; }
+ .portfolio-shell .hero-ornament svg,.portfolio-shell .hero-ornament .ornament-art { filter:none; }
+ .landing-ornament-mover { isolation:isolate; transform:translateZ(0); backface-visibility:hidden; }
+ .landing-ornament-mover::before { content:""; position:absolute; inset:-20px; background:radial-gradient(ellipse,rgba(0,240,80,.18),rgba(0,240,80,.06) 40%,transparent 72%); pointer-events:none; z-index:-1; }
+}
+
+.portfolio-shell .works-page .project-product-demo:hover,.portfolio-shell .works-page .project-product-demo:focus-visible { font-weight:700; }

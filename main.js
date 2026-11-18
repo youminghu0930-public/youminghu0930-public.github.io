@@ -336,14 +336,14 @@ async function startApp() {
     const reach=makeSection('Get in touch','contact-reach-group');
     const addContact=(label,value,url,kind,path)=>{
       const row=element('div',undefined,'contact-field');
-      const tile=element('span',undefined,'skill-icon-tile');
+      const tile=element('span',undefined,'contact-inline-icon');
       const icon=document.createElementNS('http://www.w3.org/2000/svg','svg');icon.setAttribute('viewBox','0 0 24 24');icon.setAttribute('aria-hidden','true');icon.classList.add('skill-icon');
       const shape=document.createElementNS('http://www.w3.org/2000/svg','path');shape.setAttribute('d',path);shape.setAttribute('fill','none');shape.setAttribute('stroke','currentColor');shape.setAttribute('stroke-width','1.7');shape.setAttribute('stroke-linecap','round');shape.setAttribute('stroke-linejoin','round');icon.append(shape);tile.append(icon);
       row.append(tile,element('span',`${label}:`,'contact-field-label'),link(value,url,`contact-${kind}`));reach.append(row);
     };
     const email=page.contact?.email;if(email)addContact('Email',email,`mailto:${email}`,'email','M4 5h16v14H4z M4 6l8 7 8-7');
     const phone=page.contact?.phone;if(phone)addContact('Phone',phone,`tel:${phone.replace(/[^+0-9]/g,'')}`,'phone','M7 3H4c-1 0-1 1-1 2 0 8 8 16 16 16 1 0 2 0 2-1v-3l-5-2-2 2c-3-1-6-4-7-7l2-2-2-5z');
-    makeSection('Related work','contact-social-group').append(profiles);
+    makeSection('Related link','contact-social-group').append(profiles);
     const work=page.currentWork;
     const decorations=element('div',undefined,'contact-decorations');
     const locationIntro=element('p',undefined,'contact-location-intro');

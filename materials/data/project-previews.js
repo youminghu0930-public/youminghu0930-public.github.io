@@ -361,6 +361,8 @@ export function installProjectPreviews(main, projects) {
       for(const tag of tags){const pill=document.createElement('li');pill.textContent=tag;technologies.append(pill);}
       row.append(link,technologies);related.append(row);
     }
+    const demoUrl=project.productDemoUrl;
+    const demo=document.createElement('a');demo.className='project-product-demo';demo.href=demoUrl;demo.target='_blank';demo.rel='noopener noreferrer';demo.textContent='Watch product demo ↗';if(demoUrl)related.append(demo);
     const technologies=action.querySelector('.project-technologies');
     if(groups.size)technologies.replaceWith(related);
 

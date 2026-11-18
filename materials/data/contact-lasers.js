@@ -5,6 +5,7 @@ precision highp float;
 uniform vec2 resolution;
 uniform float aspect,time,sourceY;
 uniform vec3 beamColor;
+uniform sampler2D dotBackground;
 uniform vec4 trail[HISTORY_COUNT];
 uniform vec4 innerTrail[HISTORY_COUNT];
 float hash(vec3 p){p=fract(p*.3183099+vec3(.1,.2,.3));p*=17.;return fract(p.x*p.y*p.z*(p.x+p.y+p.z));}
@@ -201,6 +202,8 @@ void main(){
  // Keep rare particle flashes crisp rather than flattening them in the tone curve.
  float spark=clamp(flecks*sparkLight*3.,0.,1.);
  light=mix(light,vec3(.94,1.,.96),spark*.95);
+ vec4 stars=texture2D(dotBackground,gl_FragCoord.xy/resolution);
+ light+=stars.rgb*stars.a*exp(-density*2.5);
  gl_FragColor=vec4(light,1.);
 }`;
 
@@ -216,7 +219,13 @@ export function installContactLasers(main){
  if(!gl.getProgramParameter(program,gl.LINK_STATUS)){gl.deleteProgram(program);gl.deleteShader(vertex);gl.deleteShader(fragment);canvas.remove();return()=>{};}
  gl.useProgram(program);const buffer=gl.createBuffer();gl.bindBuffer(gl.ARRAY_BUFFER,buffer);gl.bufferData(gl.ARRAY_BUFFER,new Float32Array([-1,-1,3,-1,-1,3]),gl.STATIC_DRAW);
  const position=gl.getAttribLocation(program,'position');gl.enableVertexAttribArray(position);gl.vertexAttribPointer(position,2,gl.FLOAT,false,0,0);
- const uniforms=Object.fromEntries(['resolution','aspect','time','sourceY','beamColor','trail[0]','innerTrail[0]'].map(name=>[name,gl.getUniformLocation(program,name)]));
+ const uniforms=Object.fromEntries(['resolution','aspect','time','sourceY','beamColor','dotBackground','trail[0]','innerTrail[0]'].map(name=>[name,gl.getUniformLocation(program,name)]));
+ const dots=main.querySelector('.hero-dots'),dotTexture=gl.createTexture();let dotRevision=null;
+ gl.activeTexture(gl.TEXTURE0);gl.bindTexture(gl.TEXTURE_2D,dotTexture);
+ gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_MIN_FILTER,gl.LINEAR);gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_MAG_FILTER,gl.LINEAR);
+ gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_WRAP_S,gl.CLAMP_TO_EDGE);gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_WRAP_T,gl.CLAMP_TO_EDGE);
+ gl.texImage2D(gl.TEXTURE_2D,0,gl.RGBA,1,1,0,gl.RGBA,gl.UNSIGNED_BYTE,new Uint8Array(4));gl.uniform1i(uniforms.dotBackground,0);
+ // Upload only when the interactive dot field changes; smoke passes in front.
  // Resolve the actual theme accent once, including any CSS colour format.
  const swatch=document.createElement('canvas');swatch.width=swatch.height=1;
  const paint=swatch.getContext('2d');paint.fillStyle=getComputedStyle(main).getPropertyValue('--accent').trim()||'#00f050';paint.fillRect(0,0,1,1);
@@ -269,6 +278,9 @@ export function installContactLasers(main){
    values[i*4+2]=a?.age??3;values[i*4+3]=b?.age??3;
    const c=history.c[i-1],d=history.d[i-1];innerValues[i*4]=c?.angle??aim.c;innerValues[i*4+1]=d?.angle??aim.d;innerValues[i*4+2]=c?.age??3;innerValues[i*4+3]=d?.age??3;
   }
+  if(dots?.width&&dots?.height&&dotRevision!==dots.dataset.paintRevision){
+   gl.bindTexture(gl.TEXTURE_2D,dotTexture);gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL,true);gl.texImage2D(gl.TEXTURE_2D,0,gl.RGBA,gl.RGBA,gl.UNSIGNED_BYTE,dots);dotRevision=dots.dataset.paintRevision;
+  }
   gl.uniform2f(uniforms.resolution,canvas.width,canvas.height);gl.uniform1f(uniforms.aspect,innerWidth/innerHeight);gl.uniform1f(uniforms.time,elapsed);gl.uniform1f(uniforms.sourceY,sourceHeight);gl.uniform4fv(uniforms['trail[0]'],values);gl.uniform4fv(uniforms['innerTrail[0]'],innerValues);gl.drawArrays(gl.TRIANGLES,0,3);
   if(!reduced.matches)frame=requestAnimationFrame(draw);
  }
@@ -277,6 +289,6 @@ export function installContactLasers(main){
  window.addEventListener('resize',()=>{resize();start();},{passive:true,signal});document.addEventListener('visibilitychange',start,{signal});reduced.addEventListener('change',start,{signal});
  canvas.addEventListener('webglcontextlost',e=>{e.preventDefault();cancelAnimationFrame(frame);},{signal});
  canvas.addEventListener('webglcontextrestored',()=>{stop();restoredCleanup=installContactLasers(main);},{signal});
- function stop(){stripeObserver.disconnect();disposed=true;controller.abort();cancelAnimationFrame(frame);gl.deleteBuffer(buffer);gl.deleteProgram(program);gl.deleteShader(vertex);gl.deleteShader(fragment);canvas.remove();}
+ function stop(){stripeObserver.disconnect();disposed=true;controller.abort();cancelAnimationFrame(frame);gl.deleteTexture(dotTexture);gl.deleteBuffer(buffer);gl.deleteProgram(program);gl.deleteShader(vertex);gl.deleteShader(fragment);canvas.remove();}
  resize();start();return()=>{stop();restoredCleanup?.();};
 }
