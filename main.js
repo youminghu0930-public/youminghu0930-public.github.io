@@ -331,26 +331,28 @@ async function startApp() {
       control.append(tile,element('span',profile.label));profiles.append(control);
     }
     panel.querySelector('.hero-details')?.remove();
-    const makeSection=(label,className)=>{const group=element('div',undefined,`contact-group ${className}`);group.append(element('h2',label,'contact-group-label'));panel.append(group);return group;};
-    makeSection('Related links','contact-social-group').append(profiles);
+    const actual=element('div',undefined,'contact-actual');
+    const makeSection=(label,className)=>{const group=element('div',undefined,`contact-group ${className}`);group.append(element('h2',label,'contact-group-label'));actual.append(group);return group;};
     const reach=makeSection('Get in touch','contact-reach-group');
-    const email=page.contact?.email;
-    if(email){const field=element('div',undefined,'contact-field');field.append(link(email,`mailto:${email}`,'contact-email'));reach.append(field);}
-    const phone=page.contact?.phone;
-    if(phone){const field=element('div',undefined,'contact-field');field.append(link(phone,`tel:${phone.replace(/[^+0-9]/g,'')}`,'contact-phone'));reach.append(field);}
+    const addContact=(label,value,url,kind,path)=>{
+      const row=element('div',undefined,'contact-field');
+      const tile=element('span',undefined,'skill-icon-tile');
+      const icon=document.createElementNS('http://www.w3.org/2000/svg','svg');icon.setAttribute('viewBox','0 0 24 24');icon.setAttribute('aria-hidden','true');icon.classList.add('skill-icon');
+      const shape=document.createElementNS('http://www.w3.org/2000/svg','path');shape.setAttribute('d',path);shape.setAttribute('fill','none');shape.setAttribute('stroke','currentColor');shape.setAttribute('stroke-width','1.7');shape.setAttribute('stroke-linecap','round');shape.setAttribute('stroke-linejoin','round');icon.append(shape);tile.append(icon);
+      row.append(tile,element('span',`${label}:`,'contact-field-label'),link(value,url,`contact-${kind}`));reach.append(row);
+    };
+    const email=page.contact?.email;if(email)addContact('Email',email,`mailto:${email}`,'email','M4 5h16v14H4z M4 6l8 7 8-7');
+    const phone=page.contact?.phone;if(phone)addContact('Phone',phone,`tel:${phone.replace(/[^+0-9]/g,'')}`,'phone','M7 3H4c-1 0-1 1-1 2 0 8 8 16 16 16 1 0 2 0 2-1v-3l-5-2-2 2c-3-1-6-4-7-7l2-2-2-5z');
+    makeSection('Related work','contact-social-group').append(profiles);
     const work=page.currentWork;
-    const clockGroup=makeSection('My local time','contact-clock-group');
+    const decorations=element('div',undefined,'contact-decorations');
+    const locationIntro=element('p',undefined,'contact-location-intro');
+    locationIntro.append(element('strong',(work?.location||'Taiwan, Taipei, Zhongshan').toUpperCase()),element('span',' (UTC+8)','contact-location-zone'));
     const liveClock=element('time',undefined,'contact-live-clock');liveClock.dataset.zone=work?.timeZone||'Asia/Taipei';liveClock.setAttribute('aria-label','Current time in Taipei, UTC+8');
     liveClock.append(element('span','00:00:00','contact-clock-seconds'),element('span','.00','contact-clock-fraction'));
-    clockGroup.append(liveClock,element('span','Taipei · UTC+8','contact-clock-zone'));
-
+    decorations.append(locationIntro,liveClock);
     landing.hero.querySelector('.hero-status')?.remove();
-    const locationIntro=element('p',undefined,'contact-location-intro');
-    locationIntro.append(element('span','I’m currently based in','contact-location-caption'),element('strong',(work?.location||'Taiwan, Taipei, Zhongshan').toUpperCase()));
-    const clockCaption=element('div',undefined,'contact-clock-caption');
-    clockCaption.append(clockGroup.querySelector('.contact-group-label'),clockGroup.querySelector('.contact-clock-zone'));
-    clockGroup.prepend(clockCaption);
-    panel.prepend(locationIntro,clockGroup,reach);
+    panel.append(actual,decorations);
 
     content.append(panel);
   }

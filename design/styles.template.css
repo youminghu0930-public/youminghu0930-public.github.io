@@ -1761,3 +1761,37 @@ html:has(.contact-page),body:has(.contact-page) { height:100%; overflow:hidden; 
 .portfolio-shell .contact-content-panel .contact-group-label,
 .portfolio-shell .contact-content-panel .contact-clock-caption .contact-group-label,
 .contact-content-panel .contact-clock-zone { font-family:"Geist Mono",monospace; }
+
+/* Primary Contact values share the landing-title face; the clock stays extra heavy. */
+.contact-content-panel .contact-location-intro strong,
+.contact-content-panel .contact-live-clock,
+.portfolio-shell .contact-content-panel .contact-email,
+.portfolio-shell .contact-content-panel .contact-phone { font-family:{{TitleFontFamily}}; }
+.contact-content-panel .contact-live-clock { font-weight:900; }
+
+/* Actual contact content leads; location and clock form a separate decorative pair. */
+.contact-actual { display:flex; flex-direction:column; gap:22px; }
+.portfolio-shell .contact-content-panel .contact-group-label { color:{{HeadingColor}}; font-family:"Geist Mono",monospace; font-weight:700; font-size:10px; letter-spacing:.13em; text-transform:uppercase; }
+.contact-content-panel .contact-reach-group { gap:12px; }
+.contact-content-panel .contact-field { display:grid; grid-template-columns:28px 54px minmax(0,1fr); gap:10px; align-items:center; }
+.contact-content-panel .contact-field-label { font-family:"Geist Mono",monospace; color:var(--muted); font-size:11px; font-weight:400; letter-spacing:0; }
+.contact-field .skill-icon-tile { color:#292f2b; }
+.portfolio-shell .contact-content-panel .contact-phone,
+.portfolio-shell .contact-content-panel .contact-email { font-family:{{TitleFontFamily}}; font-size:clamp(20px,2.2vw,28px); font-weight:500; line-height:1.3; letter-spacing:-.025em; }
+.contact-decorations { display:flex; flex-direction:column; align-items:stretch; gap:10px; width:max-content; max-width:100%; margin-top:12px; }
+.contact-decorations .contact-location-intro { display:block; width:100%; margin:0; font-size:24px; white-space:nowrap; line-height:1.2; letter-spacing:-.025em; }
+.contact-decorations .contact-location-intro strong { font-family:{{TitleFontFamily}}; font-size:1em; font-weight:600; }
+.contact-location-zone { font-size:.55em; font-weight:400; color:var(--muted); letter-spacing:0; }
+.contact-content-panel .contact-decorations .contact-live-clock { width:100%; margin:0; font-size:clamp(44px,7.5vw,112px); line-height:1.05; }
+@media(max-width:{{mobileBreakpoint}}) {
+ .contact-actual { gap:18px; }
+ .contact-content-panel .contact-field { grid-template-columns:24px 40px minmax(0,1fr); gap:8px; }
+ .contact-field .skill-icon-tile { width:24px; height:24px; }
+ .contact-field .skill-icon { width:17px; height:17px; }
+ .contact-content-panel .contact-field-label { font-size:10px; }
+ .portfolio-shell .contact-content-panel .contact-email,
+ .portfolio-shell .contact-content-panel .contact-phone { font-size:clamp(14px,4.2vw,18px); }
+ .contact-decorations { width:100%; margin-top:8px; gap:8px; }
+ .contact-decorations .contact-location-intro { font-size:15px; }
+ .contact-content-panel .contact-decorations .contact-live-clock { font-size:clamp(32px,9vw,42px); }
+}

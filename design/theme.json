@@ -295,7 +295,7 @@
     "ContactBackgroundOpacity": "0.3",
     "ContactBackgroundBlur": "0px",
     "ContactPanelBackground": "rgb(12 12 12 / 38%)",
-    "ContactClockFontFamily": "\"Nunito\", system-ui, sans-serif",
+    "ContactClockFontFamily": "\"Geist Sans\", \"Noto Sans TC\", system-ui, sans-serif",
     "ContactClockFontWeight": "900",
     "ContactPanelBlur": "12px",
     "ContactPanelRadius": "24px",
