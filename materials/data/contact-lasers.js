@@ -203,7 +203,20 @@ void main(){
  float spark=clamp(flecks*sparkLight*3.,0.,1.);
  light=mix(light,vec3(.94,1.,.96),spark*.95);
  vec4 stars=texture2D(dotBackground,gl_FragCoord.xy/resolution);
- light+=stars.rgb*stars.a*exp(-density*2.5);
+ // Dots share the live and historical beam illumination and smoke transmission.
+ float starLight=clamp(max(illuminationA,illuminationB),0.,1.);
+ vec3 starColor=mix(stars.rgb, mix(beamColor,vec3(.86,1.,.91),.65),starLight);
+ // Both the crisp body and its existing halo are behind the moving smoke.
+ // Use optical depth rather than the much weaker visible-smoke brightness.
+ float dotTransmission=exp(-density*14.-nearDensity*.85);
+ vec2 dotStep=vec2(3.)/resolution;
+ vec4 haloA=texture2D(dotBackground,uv+vec2(dotStep.x,0.));
+ vec4 haloB=texture2D(dotBackground,uv-vec2(dotStep.x,0.));
+ vec4 haloC=texture2D(dotBackground,uv+vec2(0.,dotStep.y));
+ vec4 haloD=texture2D(dotBackground,uv-vec2(0.,dotStep.y));
+ vec3 scatteredDots=(haloA.rgb*haloA.a+haloB.rgb*haloB.a+haloC.rgb*haloC.a+haloD.rgb*haloD.a)*.25;
+ light+=starColor*stars.a*dotTransmission*(1.5+starLight*5.);
+ light+=scatteredDots*(1.-dotTransmission)*.65;
  gl_FragColor=vec4(light,1.);
 }`;
 

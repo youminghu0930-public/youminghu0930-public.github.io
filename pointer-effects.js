@@ -160,7 +160,7 @@ export function installPointerEffects(hero) {
         const px = x + (distance ? dx / distance * offset : 0);
         const py = y + (distance ? dy / distance * offset : 0);
         const radius = options.dotRadius * (1 + influence * options.dotEnlargement);
-        if(influence>.01){
+        if(influence>.01&&!binaryBackground){
           const glow=ctx.createRadialGradient(px,py,0,px,py,binaryBackground?8:6);
           glow.addColorStop(0,'rgba(188,255,207,.32)');glow.addColorStop(.25,'rgba(65,255,125,.16)');glow.addColorStop(1,'rgba(65,255,125,0)');
           ctx.globalAlpha=influence*influence;ctx.fillStyle=glow;ctx.fillRect(px-8,py-8,16,16);
@@ -168,9 +168,11 @@ export function installPointerEffects(hero) {
         if(binaryBackground){
           ctx.font=`${(matchMedia('(max-width: 767px)').matches?9:11)*(1+magnification*options.dotEnlargement)}px monospace`;
           ctx.textAlign='center';ctx.textBaseline='middle';
+          ctx.shadowColor=accent;ctx.shadowBlur=5*Math.max(visibility,influence);
           ctx.globalAlpha=(options.binaryBaseOpacity+(options.binaryHoverZeroOpacity-options.binaryBaseOpacity)*visibility)*(1-influence);ctx.fillStyle=muted;
           ctx.fillText('0',px,py);
           if(influence>0){ctx.globalAlpha=options.dotHighlightOpacity*influence;ctx.fillStyle=accent;ctx.fillText('1',px,py);}
+          ctx.shadowBlur=0;
           continue;
         }
         // Crossfade dot colors too; switching to accent at first contact would pop.

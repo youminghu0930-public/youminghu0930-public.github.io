@@ -1816,3 +1816,58 @@ html:has(.contact-page),body:has(.contact-page) { height:100%; overflow:hidden; 
 }
 
 .portfolio-shell .works-page .project-product-demo:hover,.portfolio-shell .works-page .project-product-demo:focus-visible { font-weight:700; }
+
+/* Contact uses three evenly paced editorial rows. */
+.contact-content-panel .contact-actual { gap:0; }
+.contact-content-panel .contact-group { padding:20px 0; border-bottom:1px solid var(--border); transition:background-color .25s; }
+.contact-content-panel .contact-group:hover,.contact-content-panel .contact-group:focus-within,.contact-content-panel .contact-decorations:hover { background:rgba(255,255,255,.025); }
+.contact-content-panel .contact-group-label { margin:0 0 14px; }
+.contact-content-panel .contact-reach-group { gap:10px; }
+.contact-content-panel .contact-social-group { gap:0; }
+.contact-content-panel .contact-profiles { margin-top:0; padding:0; }
+.contact-content-panel .contact-field { grid-template-columns:15px 46px minmax(0,1fr); align-items:baseline; column-gap:9px; }
+.contact-content-panel .contact-inline-icon { width:15px; height:15px; align-self:end; margin-bottom:3px; }
+.contact-content-panel .contact-inline-icon .skill-icon { width:15px; height:15px; }
+.contact-content-panel .contact-field-label { align-self:end; padding-bottom:2px; line-height:1.4; }
+.contact-content-panel .contact-decorations { margin-top:40px; padding-top:22px; border-top:1px solid var(--border); transition:background-color .25s; }
+.portfolio-shell .works-page .project-related > a.project-product-demo { background:transparent; background-image:none; color:var(--muted); border:1px solid rgb(160 160 160 / 45%); box-shadow:none; font-weight:400; text-shadow:none; }
+.portfolio-shell .works-page .project-related > a.project-product-demo:hover,
+.portfolio-shell .works-page .project-related > a.project-product-demo:focus-visible { background:transparent; color:#eeeeee; border-color:#eeeeee; font-weight:700; text-shadow:none; }
+@media(max-width:767px) {
+ .contact-content-panel .contact-group { padding:14px 0; }
+ .contact-content-panel .contact-group-label { margin-bottom:12px; }
+ .contact-content-panel .contact-field { grid-template-columns:14px 40px minmax(0,1fr); gap:7px; }
+ .contact-content-panel .contact-inline-icon,.contact-content-panel .contact-inline-icon .skill-icon { width:14px; height:14px; }
+ .contact-content-panel .contact-decorations { margin-top:28px; padding-top:16px; }
+}
+
+.contact-content-panel .contact-social-group { border-bottom:0; }
+.contact-content-panel .contact-reach-group > .contact-group-label { margin-bottom:2px; }
+
+/* Full-width editorial row highlights, including the panel gutters. */
+.portfolio-shell .contact-page .contact-content-panel { --contact-row-gutter:clamp(20px, 2.5vw, 32px); overflow:hidden; }
+.contact-content-panel .contact-group,.contact-content-panel .contact-decorations { position:relative; align-self:stretch; }
+.contact-content-panel .contact-group::before,.contact-content-panel .contact-decorations::before { content:""; position:absolute; inset:0 calc(-1 * var(--contact-row-gutter)); background:rgba(255,255,255,.035); opacity:0; pointer-events:none; transition:opacity .25s; }
+.contact-content-panel .contact-group:hover,.contact-content-panel .contact-group:focus-within,.contact-content-panel .contact-decorations:hover { background:transparent; }
+.contact-content-panel .contact-group:hover::before,.contact-content-panel .contact-group:focus-within::before,.contact-content-panel .contact-decorations:hover::before { opacity:1; }
+.portfolio-shell .contact-content-panel .contact-email,.portfolio-shell .contact-content-panel .contact-phone { font-size:clamp(24px,2.6vw,34px); }
+.portfolio-shell .works-page .project-related > a.project-product-demo { color:#eeeeee; border-color:#eeeeee; font-weight:700; transition:background-color .24s,color .24s,border-color .24s; }
+.portfolio-shell .works-page .project-related > a.project-product-demo:hover,.portfolio-shell .works-page .project-related > a.project-product-demo:focus-visible { background:#eeeeee; color:#111; border-color:#eeeeee; font-weight:700; }
+@media(max-width:767px) {
+ .portfolio-shell .contact-page .contact-content-panel { --contact-row-gutter:16px; }
+ .portfolio-shell .contact-content-panel .contact-email,.portfolio-shell .contact-content-panel .contact-phone { font-size:clamp(16px,4.6vw,20px); }
+}
+
+/* The middle row owns the breathing room before the decorative row. */
+.portfolio-shell .contact-page .contact-content-panel { gap:0; }
+.contact-content-panel .contact-social-group { padding-bottom:60px; }
+.contact-content-panel .contact-decorations { margin-top:0; }
+.portfolio-shell .works-page .project-related > a.project-product-demo:hover,
+.portfolio-shell .works-page .project-related > a.project-product-demo:focus-visible { background:var(--accent); border-color:var(--accent); color:var(--button-text); }
+@media(max-width:767px) {
+ .contact-content-panel .contact-social-group { padding-bottom:40px; }
+ .contact-content-panel .contact-decorations { margin-top:0; }
+}
+
+.contact-content-panel .contact-group::before,.contact-content-panel .contact-decorations::before { pointer-events:auto; z-index:0; }
+.contact-content-panel .contact-group > *,.contact-content-panel .contact-decorations > * { position:relative; z-index:1; }
