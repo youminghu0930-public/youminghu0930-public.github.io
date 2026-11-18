@@ -53,6 +53,9 @@ export function installProjectPreviews(main, projects) {
   function updateWriteup(item,animate=false){
     const panel=item.writeup;
     const from=panel.getBoundingClientRect().height;
+    // Keep the current geometry while measuring the new state. A temporary
+    // zero-height layout can clamp scrolling at the end of the last project.
+    if(animate)panel.style.height=`${from}px`;
     item.writeupAnimation?.cancel();item.writeupAnimation=null;
     panel.classList.toggle('is-open',item.writeupExpanded);
     panel.inert=!item.writeupExpanded;
@@ -60,10 +63,10 @@ export function installProjectPreviews(main, projects) {
     item.readToggle.setAttribute('aria-expanded',String(item.writeupExpanded));
     item.readLabel.classList.toggle('is-expanded',item.writeupExpanded);
     item.readToggle.setAttribute('aria-label',item.writeupExpanded?'Close':'Explore the thinking');
-    if(!animate||matchMedia('(prefers-reduced-motion:reduce)').matches)return;
+    if(!animate||matchMedia('(prefers-reduced-motion:reduce)').matches){panel.style.removeProperty('height');return;}
     const natural=item.writeupInner.getBoundingClientRect().height;
     const to=item.writeupExpanded?natural:0;
-    if(Math.abs(to-from)<.5)return;
+    if(Math.abs(to-from)<.5){panel.style.removeProperty('height');return;}
     const style=getComputedStyle(panel);
     const value=style.getPropertyValue(item.writeupExpanded?'--project-writeup-duration':'--project-writeup-collapse-duration').trim();
     const base=(parseFloat(value)||(item.writeupExpanded?820:950))*(value.endsWith('s')&&!value.endsWith('ms')?1000:1);
@@ -84,6 +87,7 @@ export function installProjectPreviews(main, projects) {
       Array.from({length:241},(_,index)=>({height:`${Math.round(from+(to-from)*index/240)}px`,opacity:1,offset:index/240,easing:'steps(1,end)'}));
     const animation=panel.animate(pixelFrames,{duration,easing:style.getPropertyValue('--project-writeup-ease').trim()||'ease-in-out',fill:'both'});
     item.writeupAnimation=animation;
+    panel.style.removeProperty('height');
     animation.onfinish=()=>{
       if(item.writeupAnimation!==animation)return;
       item.writeupAnimation=null;animation.cancel();
