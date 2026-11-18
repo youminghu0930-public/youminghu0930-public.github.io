@@ -1903,3 +1903,5 @@ html:has(.contact-page),body:has(.contact-page) { height:100%; overflow:hidden; 
  .portfolio-shell .works-page .project-writeup .project-preview-qa { margin-top:12px; }
  .portfolio-shell .works-page .project-writeup .project-qa-item:first-child { border-top:0; padding-top:16px; }
 }
+
+@media(max-width:1000px) { .portfolio-shell .works-page .project-copy > a.project-product-demo { pointer-events:auto; cursor:pointer; } }
