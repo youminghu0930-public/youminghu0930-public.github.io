@@ -293,7 +293,7 @@
     "MenuElasticReturn": "translate 450ms cubic-bezier(.2,.8,.2,1), scale 450ms cubic-bezier(.2,.8,.2,1)",
     "ContactActionBackdropBlur": "6px",
     "ContactBackgroundOpacity": "0.2",
-    "ContactBackgroundBlur": "2px",
+    "ContactBackgroundBlur": "0px",
     "ContactActionBackground": "rgb(12 12 12 / 25%)",
     "MenuLetterRevealStagger": "22.5ms",
     "TitleFontFamily": "\"Geist Sans\", \"Noto Sans TC\", system-ui, sans-serif",

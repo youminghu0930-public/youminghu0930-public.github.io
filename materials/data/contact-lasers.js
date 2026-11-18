@@ -57,7 +57,7 @@ float microParticles(vec2 p){
  float size=mix(.32,.85,pow(hash(vec3(cell,62.)),3.));
  float radius=max(.075,390./resolution.y*size);
  float d=length(local-center)/radius;
- return exp(-d*d*3.)*step(.92,hash(vec3(cell,83.)));
+ return (1.-smoothstep(.3,.85,d))*step(.88,hash(vec3(cell,83.)));
 }
 // A few larger, gently tumbling dust flecks float independently of the smoke.
 float floatingDust(vec2 p){
@@ -79,53 +79,65 @@ float sheet(vec2 p,vec2 source,vec2 target,float width){
  float beam=exp(-distance*distance/max(.000001,spread*spread));
  return beam*smoothstep(0.,.08,along)*exp(-max(along,0.)*.65);
 }
-// Steep near-beam falloff with a broad, faint power-law tail.
+// A soft sigmoid shoulder supplies width around a hairline core; a faint tail reaches farther.
 float diffusion(vec2 p,vec2 source,vec2 target){
  vec2 direction=normalize(target-source+vec2(.0001)),delta=p-source;
  float along=dot(delta,direction);
  float distance=abs(delta.x*direction.y-delta.y*direction.x);
  float widening=.7+max(along,0.)*.25;
- float normalized=distance/max(.0001,.008*widening);
- float body=pow(1.+normalized,-2.5);
- float tail=.07*pow(1.+distance/(.024*widening),-1.7);
+ float normalized=distance/max(.0001,.0045*widening);
+ float body=(1.+exp(-1.76))/(1.+exp(clamp(2.2*(normalized-.8),-20.,20.)));
+ float tail=.06*pow(1.+distance/(.018*widening),-1.45);
  float outerFade=1.-smoothstep(.13*widening,.22*widening,distance);
- return (body+tail)/1.07*outerFade*smoothstep(0.,.08,along)*exp(-max(along,0.)*.65);
+ return .65*(body+tail)/1.06*outerFade*smoothstep(0.,.08,along)*exp(-max(along,0.)*.65);
 }
 void main(){
  vec2 uv=gl_FragCoord.xy/resolution;vec2 screen=vec2((uv.x-.5)*aspect,uv.y);
  vec3 light=vec3(0.);
- vec2 sourceA=vec2(-aspect*.43,sourceY),sourceB=vec2(aspect*.43,sourceY);
+ vec2 sourceA=vec2(-aspect*.5,sourceY),sourceB=vec2(aspect*.5,sourceY);
  vec2 liveA=sourceA+vec2(cos(trail[0].x),sin(trail[0].x));
  vec2 liveB=sourceB+vec2(cos(trail[0].y),sin(trail[0].y));
- vec2 sourceC=vec2(-aspect*.143333,sourceY),sourceD=vec2(aspect*.143333,sourceY);
+ vec2 sourceC=vec2(-aspect/6.,sourceY),sourceD=vec2(aspect/6.,sourceY);
  vec2 liveC=sourceC+vec2(cos(innerTrail[0].x),sin(innerTrail[0].x));
  vec2 liveD=sourceD+vec2(cos(innerTrail[0].y),sin(innerTrail[0].y));
  // Narrow live cores and restrained halos keep the air clear between particles.
- float coreA=sheet(screen,sourceA,liveA,.0016);
- float coreB=sheet(screen,sourceB,liveB,.0016);
- float a=coreA*1.9,b=coreB*1.9;
+ float coreA=sheet(screen,sourceA,liveA,.00055);
+ float coreB=sheet(screen,sourceB,liveB,.00055);
+ float a=coreA*2.6,b=coreB*2.6;
  float illuminationA=diffusion(screen,sourceA,liveA);
  float illuminationB=diffusion(screen,sourceB,liveB);
- a+=sheet(screen,sourceC,liveC,.0016)*1.9;b+=sheet(screen,sourceD,liveD,.0016)*1.9;
- illuminationA+=diffusion(screen,sourceC,liveC);illuminationB+=diffusion(screen,sourceD,liveD);
+ a=max(a,sheet(screen,sourceC,liveC,.00055)*2.6);b=max(b,sheet(screen,sourceD,liveD,.00055)*2.6);
+ illuminationA=max(illuminationA,diffusion(screen,sourceC,liveC));illuminationB=max(illuminationB,diffusion(screen,sourceD,liveD));
+ float beamCore=max(max(sheet(screen,sourceA,liveA,.00045),sheet(screen,sourceB,liveB,.00045)),
+                    max(sheet(screen,sourceC,liveC,.00045),sheet(screen,sourceD,liveD,.00045)));
+ float coreHalo=max(max(sheet(screen,sourceA,liveA,.0032),sheet(screen,sourceB,liveB,.0032)),
+                    max(sheet(screen,sourceC,liveC,.0032),sheet(screen,sourceD,liveD,.0032)));
  for(int j=1;j<HISTORY_COUNT;j++){
-  if(trail[j].z>=.5&&trail[j].w>=.5&&innerTrail[j].z>=.5&&innerTrail[j].w>=.5)continue;
+  if(trail[j].z>=.4&&trail[j].w>=.4&&innerTrail[j].z>=.4&&innerTrail[j].w>=.4)continue;
   vec2 previousA=sourceA+vec2(cos(trail[j].x),sin(trail[j].x));
   vec2 previousB=sourceB+vec2(cos(trail[j].y),sin(trail[j].y));
-  float lifeA=1.-smoothstep(.2,.5,trail[j].z);
-  float lifeB=1.-smoothstep(.2,.5,trail[j].w);
-  a+=sheet(screen,sourceA,previousA,.0016)*.23*lifeA;
-  b+=sheet(screen,sourceB,previousB,.0016)*.23*lifeB;
-  illuminationA+=diffusion(screen,sourceA,previousA)*lifeA*.18;
-  illuminationB+=diffusion(screen,sourceB,previousB)*lifeB*.18;
+  float lifeA=1.-smoothstep(.2,.4,trail[j].z);
+  float lifeB=1.-smoothstep(.2,.4,trail[j].w);
+  a=max(a,sheet(screen,sourceA,previousA,.00055)*2.6*lifeA);
+  b=max(b,sheet(screen,sourceB,previousB,.00055)*2.6*lifeB);
+  illuminationA=max(illuminationA,diffusion(screen,sourceA,previousA)*lifeA);
+  illuminationB=max(illuminationB,diffusion(screen,sourceB,previousB)*lifeB);
   vec2 previousC=sourceC+vec2(cos(innerTrail[j].x),sin(innerTrail[j].x));
   vec2 previousD=sourceD+vec2(cos(innerTrail[j].y),sin(innerTrail[j].y));
-  float lifeC=1.-smoothstep(.2,.5,innerTrail[j].z),lifeD=1.-smoothstep(.2,.5,innerTrail[j].w);
-  a+=sheet(screen,sourceC,previousC,.0016)*.23*lifeC;b+=sheet(screen,sourceD,previousD,.0016)*.23*lifeD;
-  illuminationA+=diffusion(screen,sourceC,previousC)*lifeC*.18;illuminationB+=diffusion(screen,sourceD,previousD)*lifeD*.18;
+  float lifeC=1.-smoothstep(.2,.4,innerTrail[j].z),lifeD=1.-smoothstep(.2,.4,innerTrail[j].w);
+  a=max(a,sheet(screen,sourceC,previousC,.00055)*2.6*lifeC);b=max(b,sheet(screen,sourceD,previousD,.00055)*2.6*lifeD);
+  illuminationA=max(illuminationA,diffusion(screen,sourceC,previousC)*lifeC);illuminationB=max(illuminationB,diffusion(screen,sourceD,previousD)*lifeD);
+  beamCore=max(beamCore,sheet(screen,sourceA,previousA,.00045)*lifeA);
+  coreHalo=max(coreHalo,sheet(screen,sourceA,previousA,.0032)*lifeA);
+  beamCore=max(beamCore,sheet(screen,sourceB,previousB,.00045)*lifeB);
+  coreHalo=max(coreHalo,sheet(screen,sourceB,previousB,.0032)*lifeB);
+  beamCore=max(beamCore,sheet(screen,sourceC,previousC,.00045)*lifeC);
+  coreHalo=max(coreHalo,sheet(screen,sourceC,previousC,.0032)*lifeC);
+  beamCore=max(beamCore,sheet(screen,sourceD,previousD,.00045)*lifeD);
+  coreHalo=max(coreHalo,sheet(screen,sourceD,previousD,.0032)*lifeD);
  }
  float dust=particles(screen,210.,1.)*.7+particles(screen,310.,3.)*.5+particles(screen,150.,5.)*.65;
- light=beamColor*(a+b+(illuminationA+illuminationB)*.018);
+ light=beamColor*(max(a,b)+max(illuminationA,illuminationB)*.018);
  // Near smoke has crisp torn edges; distant smoke forms a softer overlapping veil.
  float fine=fineMist(screen);
  float nearLayer=mist(screen,0.,vec2(.015,-.00875))*.7;
@@ -145,13 +157,13 @@ void main(){
  // Several gently warped scales break up broad cut-out patches into organic gaps.
  vec2 bankFlow=screen+vec2(time*.006,0.);
  bankFlow+=(vec2(field(screen*4.7+8.),field(screen*5.3+21.))-.5)*.18;
- float banks=field(bankFlow*3.8+8.)*.45+field(bankFlow*8.3+19.)*.35+field(bankFlow*17.1+31.)*.2;
- float bankMask=smoothstep(.27,.71,banks);
- density*=mix(.055,2.05,bankMask);
- density*=mix(.12,1.45,smoothstep(.05,.52,density));
+ float banks=field(bankFlow*7.6+8.)*.3+field(bankFlow*14.3+19.)*.4+field(bankFlow*27.1+31.)*.3;
+ float bankMask=smoothstep(.27,.72,banks);
+ density*=mix(.24,1.7,bankMask);
+ density*=mix(.3,1.4,smoothstep(.05,.52,density));
  // Shader y grows upward: smoke collects below and gradually thins overhead.
  float heightDensity=.003+.517*(exp(-3.*uv.y)-exp(-3.))/(1.-exp(-3.));
- density*=heightDensity;
+ density*=heightDensity*.65;
  // A very thin uniform haze keeps a faint laser trace in otherwise clear air.
  density+=.018;
  // Side-view laser visibility comes from local scattering, not a solid luminous line.
@@ -159,16 +171,26 @@ void main(){
  light*=mix(.002,1.,scatteringVisibility);
  // A shared physical density field is revealed by the existing beam masks.
  // Cyan chroma survives bright intersections instead of clipping toward white.
- vec3 scattered=beamColor*(min(illuminationA,2.4)+min(illuminationB,2.4));
+ vec3 scattered=beamColor*min(max(illuminationA,illuminationB),2.4);
  light+=density*scattered*2.2;
- float veil=(farLayer*.75+middleLayer*.28+backLayer*.22+deepLayer*.15)*mix(.09,1.25,bankMask)*heightDensity;
+ float veil=(farLayer*.75+middleLayer*.28+backLayer*.22+deepLayer*.15)*mix(.09,1.25,bankMask)*heightDensity*.65;
  light+=veil*vec3(.027,.03,.04)+nearDensity*heightDensity*vec3(.004,.007,.009);
  light+=dust*scattered*.1;
  float microDust=microParticles(screen);
- light+=microDust*(scattered*.45+beamColor*.006);
+ light+=microDust*(scattered*.65+beamColor*.006);
  light+=floatingDust(screen)*(scattered*.6+vec3(.012,.017,.014));
+ // A small high-luminance core and local bloom give the light a polished sparkle.
+ float glintPattern=smoothstep(.42,.72,field(screen*41.+vec2(time*.025,-time*.018)));
+ float glintVisibility=smoothstep(.025,.18,density+dust*.1);
+ float glintStrength=glintVisibility*(.35+glintPattern*2.4+dust);
+ light+=mix(beamColor,vec3(1.),.72)*beamCore*glintStrength*3.0;
+ light+=beamColor*coreHalo*glintPattern*glintVisibility*.45;
+
  // Compress brightness equally across channels to retain the light colour.
  light=light*1.65/(1.+max(light.r,max(light.g,light.b))*1.15);
+ // Preserve small white-hot highlights after compressing the diffuse green light.
+ float specular=clamp(beamCore*glintStrength,0.,1.);
+ light=mix(light,vec3(.85,1.,.91),specular*.88);
  gl_FragColor=vec4(light,1.);
 }`;
 
@@ -197,9 +219,9 @@ export function installContactLasers(main){
  const stripeObserver=new ResizeObserver(syncStripe);if(stripe)stripeObserver.observe(stripe);
  let target={x:.5,y:.36},aim={a:0,b:Math.PI,c:0,d:Math.PI};const history={a:[],b:[],c:[],d:[]},values=new Float32Array(historyCapacity*4),innerValues=new Float32Array(historyCapacity*4);let initialized=false;
  const anchors={a:0,b:0,c:0,d:0};
- const maxAngularSpeed=1.2;
+ const maxAngularSpeed=3.2;
  // Fit a full lifetime at maximum speed; sampling density is independent of FPS.
- const angularSpacing=4*maxAngularSpeed*.5/126;
+ const angularSpacing=9*1.2*.5/126;
  const angleDelta=(to,from)=>Math.atan2(Math.sin(to-from),Math.cos(to-from));
  function resize(){syncStripe();const limit=(mobile.matches?720:1280)*scale;const ratio=Math.min(1,limit/Math.max(innerWidth,innerHeight));canvas.width=Math.max(1,Math.round(innerWidth*ratio));canvas.height=Math.max(1,Math.round(innerHeight*ratio));gl.viewport(0,0,canvas.width,canvas.height);}
  function move(e){target={x:Math.max(0,Math.min(1,e.clientX/innerWidth)),y:Math.max(0,Math.min(1,e.clientY/innerHeight))};if(reduced.matches)start();}
@@ -210,12 +232,12 @@ export function installContactLasers(main){
   slowFrames=elapsed>2&&raw>70?slowFrames+1:0;
   if(slowFrames>=8&&scale>.55){scale*=.9;slowFrames=0;resize();}
   const aspect=innerWidth/innerHeight,px=(target.x-.5)*aspect,py=1-target.y;
-  const wanted={a:Math.atan2(py-sourceHeight,px+aspect*.43),b:Math.atan2(py-sourceHeight,px-aspect*.43),c:Math.atan2(py-sourceHeight,px+aspect*.143333),d:Math.atan2(py-sourceHeight,px-aspect*.143333)};
+  const wanted={a:Math.atan2(py-sourceHeight,px+aspect*.5),b:Math.atan2(py-sourceHeight,px-aspect*.5),c:Math.atan2(py-sourceHeight,px+aspect*(1/6)),d:Math.atan2(py-sourceHeight,px-aspect*(1/6))};
   if(!initialized||reduced.matches){aim={...wanted};initialized=true;for(const key of Object.keys(history)){history[key].length=0;anchors[key]=aim[key];}}
   if(!reduced.matches){
    for(const key of ['a','b','c','d']){
     const points=history[key];for(const point of points)point.age+=dt;
-    while(points.length&&points.at(-1).age>.5)points.pop();
+    while(points.length&&points.at(-1).age>.4)points.pop();
     const before=aim[key],delta=angleDelta(wanted[key],before);
     const travel=Math.sign(delta)*Math.min(Math.abs(delta),maxAngularSpeed*dt);
     aim[key]+=travel;
