@@ -25,16 +25,21 @@ export function installProjectPreviews(main, projects) {
     if(frame){frame.tabIndex=mobile.matches?-1:0;frame.style.pointerEvents=mobile.matches||frame.dataset.ready!=='true'?'none':'';}
     const heading=item.action.querySelector('.project-heading'),company=heading.querySelector('.project-company'),headingTitle=heading.querySelector('h2');
     company.hidden=true;
-    item.editorial.hidden=mobile.matches;item.writeup.hidden=mobile.matches;item.editorialActions.hidden=mobile.matches;
+    item.editorial.hidden=mobile.matches;item.writeup.hidden=false;item.editorialActions.hidden=false;
     if(mobile.matches){
       item.action.insertBefore(heading,item.wrapper);
       item.action.insertBefore(copy,item.editorial);
       heading.insertBefore(headingTitle,company);
       item.action.insertBefore(item.wrapper,copy);
-      if(item.qa)item.action.append(item.qa);
+      if(item.qa)item.writeupInner.append(item.qa);
+      item.editorialActions.append(item.readToggle);
+      item.action.append(item.editorialActions,item.writeup);
+      const demo=item.related.querySelector('.project-product-demo')||copy.querySelector('.project-product-demo');
+      if(demo)copy.insertBefore(demo,item.related);
 
       copy.append(item.open);
     }else{
+      const demo=copy.querySelector('.project-product-demo');if(demo)item.related.append(demo);
       heading.insertBefore(company,headingTitle);
       item.editorial.prepend(heading,copy);
       item.action.insertBefore(item.wrapper,item.editorial);
@@ -55,7 +60,7 @@ export function installProjectPreviews(main, projects) {
     item.readToggle.setAttribute('aria-expanded',String(item.writeupExpanded));
     item.readLabel.classList.toggle('is-expanded',item.writeupExpanded);
     item.readToggle.setAttribute('aria-label',item.writeupExpanded?'Close':'Explore the thinking');
-    if(!animate||mobile.matches||matchMedia('(prefers-reduced-motion:reduce)').matches)return;
+    if(!animate||matchMedia('(prefers-reduced-motion:reduce)').matches)return;
     const natural=item.writeupInner.getBoundingClientRect().height;
     const to=item.writeupExpanded?natural:0;
     if(Math.abs(to-from)<.5)return;

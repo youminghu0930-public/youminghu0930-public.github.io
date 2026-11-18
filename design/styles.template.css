@@ -1883,3 +1883,22 @@ html:has(.contact-page),body:has(.contact-page) { height:100%; overflow:hidden; 
  .portfolio-shell .works-page .project-preview-qa { margin-top:26px; }
  .portfolio-shell .works-page .project-preview-qa .project-qa-item:first-child { border-top:1px solid var(--border); padding-top:26px; }
 }
+
+/* Mobile uses the same reversible write-up animation with a stationary header. */
+@media(max-width:{{mobileBreakpoint}}) {
+ .portfolio-shell .works-page .project-row-link,.portfolio-shell .works-page .project-row-link.is-preview-expanded { grid-template-areas:"heading" "preview" "copy" "actions" "writeup"; grid-template-rows:auto auto auto auto auto; overflow-anchor:none; }
+ .portfolio-shell .works-page .project-copy > a.project-product-demo { align-self:flex-start; display:inline-block; width:fit-content; margin:12px 0 0; padding:{{ProjectTechnologyPadding}}; border:1px solid {{HeadingColor}}; border-radius:{{ProjectTechnologyRadius}}; background:transparent; color:{{HeadingColor}}; font-family:var(--font-mono,monospace); font-size:{{ProjectTechnologySize}}; font-weight:700; line-height:1.5; text-decoration:none; transition:background-color .24s,color .24s,border-color .24s; }
+ .portfolio-shell .works-page .project-copy > a.project-product-demo:hover,.portfolio-shell .works-page .project-copy > a.project-product-demo:focus-visible { background:var(--accent); color:var(--button-text); border-color:var(--accent); }
+ .portfolio-shell .works-page .project-editorial-actions { grid-area:actions; display:flex; align-items:center; justify-content:center; gap:12px; margin-top:16px; padding:0; min-height:44px; }
+ .portfolio-shell .works-page .project-editorial-actions::before,.portfolio-shell .works-page .project-editorial-actions::after { content:""; flex:1; height:2px; pointer-events:none; }
+ .portfolio-shell .works-page .project-editorial-actions::before { background:linear-gradient(to right,transparent,rgb(255 255 255 / 48%)); }
+ .portfolio-shell .works-page .project-editorial-actions::after { background:linear-gradient(to left,transparent,rgb(255 255 255 / 48%)); }
+ .portfolio-shell .works-page .project-writeup-toggle { display:inline-flex; align-items:center; justify-content:center; gap:10px; margin:0; padding:8px; min-height:44px; border:0; border-radius:0; box-shadow:none; background:transparent; color:{{HeadingColor}}; font-family:inherit; font-size:14px; font-weight:600; line-height:1.5; }
+ .portfolio-shell .works-page .project-writeup-chevron { display:block; width:14px; height:14px; flex:none; color:var(--accent); rotate:0deg; transition:rotate 300ms ease; }
+ .portfolio-shell .works-page .project-writeup-toggle[aria-expanded="true"] .project-writeup-chevron { rotate:180deg; }
+ .portfolio-shell .works-page .project-writeup { --project-writeup-duration:{{ProjectWriteupDuration}}; --project-writeup-collapse-duration:{{ProjectWriteupCollapseDuration}}; --project-writeup-ease:{{ProjectWriteupEase}}; grid-area:writeup; display:block; height:0; min-width:0; overflow:hidden; opacity:0; overflow-anchor:none; }
+ .portfolio-shell .works-page .project-writeup.is-open { height:auto; opacity:1; }
+ .portfolio-shell .works-page .project-writeup-inner { min-height:0; overflow:hidden; }
+ .portfolio-shell .works-page .project-writeup .project-preview-qa { margin-top:12px; }
+ .portfolio-shell .works-page .project-writeup .project-qa-item:first-child { border-top:0; padding-top:16px; }
+}
