@@ -10,6 +10,7 @@ export function installPointerEffects(hero) {
   const ctx = canvas?.getContext('2d');
   const stripe = hero?.parentElement?.querySelector('.landing-stripe');
   const binaryBackground=Boolean(hero?.closest('.works-page'));
+  const mobileBinary=matchMedia('(max-width: 767px)');
   const binaryCells=new Map();
   let binaryFrame=0,binaryLastTime=0;
   const cursor = document.createElement('div');
@@ -137,7 +138,8 @@ export function installPointerEffects(hero) {
           const key=`${x}:${y}`,previous=binaryCells.get(key)||{visibility:0,conversion:0,magnification:0};
           const strength=pointer?.touch?touchStrength:1;
           // A broad readable core, with smooth fading confined to the outer rim.
-          const visibilityT=inside?Math.max(0,Math.min(1,(1-distance/influenceRadius)/(1-options.binaryVisibilityCore))):0;
+          const visibilityCore=mobileBinary.matches?.15:options.binaryVisibilityCore;
+          const visibilityT=inside?Math.max(0,Math.min(1,(1-distance/influenceRadius)/(1-visibilityCore))):0;
           visibility=visibilityT*visibilityT*(3-2*visibilityT)*strength;
           const magnificationRadius=pointer?.touch?Math.min(options.touchDotInfluenceRadius,options.binaryMagnificationRadius):options.binaryMagnificationRadius;
           const magnificationT=inside?Math.max(0,1-distance/magnificationRadius):0;
@@ -166,12 +168,13 @@ export function installPointerEffects(hero) {
           ctx.globalAlpha=influence*influence;ctx.fillStyle=glow;ctx.fillRect(px-8,py-8,16,16);
         }
         if(binaryBackground){
-          ctx.font=`${(matchMedia('(max-width: 767px)').matches?9:11)*(1+magnification*options.dotEnlargement)}px monospace`;
+          ctx.font=`${(mobileBinary.matches?9:11)*(1+magnification*options.dotEnlargement)}px monospace`;
           ctx.textAlign='center';ctx.textBaseline='middle';
-          ctx.shadowColor=accent;ctx.shadowBlur=5*Math.max(visibility,influence);
-          ctx.globalAlpha=(options.binaryBaseOpacity+(options.binaryHoverZeroOpacity-options.binaryBaseOpacity)*visibility)*(1-influence);ctx.fillStyle=muted;
+          ctx.shadowColor=mobileBinary.matches?'transparent':accent;
+          ctx.shadowBlur=mobileBinary.matches?0:5*Math.max(visibility,influence);
+          ctx.globalAlpha=(options.binaryBaseOpacity+(options.binaryHoverZeroOpacity-options.binaryBaseOpacity)*visibility)*Math.pow(1-influence,mobileBinary.matches?2:1);ctx.fillStyle=muted;
           ctx.fillText('0',px,py);
-          if(influence>0){ctx.globalAlpha=options.dotHighlightOpacity*influence;ctx.fillStyle=accent;ctx.fillText('1',px,py);}
+          if(influence>0){ctx.globalAlpha=options.dotHighlightOpacity*influence*(mobileBinary.matches?.65:1);ctx.fillStyle=accent;ctx.fillText('1',px,py);}
           ctx.shadowBlur=0;
           continue;
         }
