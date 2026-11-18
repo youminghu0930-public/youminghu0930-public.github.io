@@ -34,7 +34,7 @@ float mist(vec2 p,float seed,vec2 velocity){
  float body=field(q*12.8)*.32+field(r*25.7+8.)*.36+field(q*51.6+13.)*.22+field(r*103.5+29.)*.1;
  float erosion=field(q*91.+5.)*.6+field(r*177.+31.)*.4;
  // Fine detail erodes the boundary while dense interiors remain connected.
- float mass=smoothstep(.42,.59,body+(erosion-.5)*.2);
+ float mass=smoothstep(.35,.67,body+(erosion-.5)*.12);
  float pockets=smoothstep(.24,.75,field(r*4.3+23.));
  float filaments=smoothstep(.49,.66,body)*fineMist(q+seed)*.12;
  return (mass+filaments)*mix(.07,1.65,pockets);
@@ -68,28 +68,29 @@ float floatingDust(vec2 p){
  center+=vec2(sin(time*.35+seed*41.),cos(time*.27+seed*29.))*.1;
  float angle=time*.18+seed*6.283;
  vec2 delta=mat2(cos(angle),-sin(angle),sin(angle),cos(angle))*(local-center);
- float radius=max(.012,34./resolution.y*.7);
+ float radius=max(.022,34./resolution.y*1.8)*mix(.8,1.35,pow(hash(vec3(cell,151.)),3.));
  float shape=length(delta/vec2(radius*2.2,radius*.65));
- return exp(-shape*shape*2.)*step(.994,seed);
+ return exp(-shape*shape*2.)*step(.978,seed);
 }
 float sheet(vec2 p,vec2 source,vec2 target,float width){
  vec2 direction=normalize(target-source+vec2(.0001));vec2 delta=p-source;
  float along=dot(delta,direction),distance=abs(delta.x*direction.y-delta.y*direction.x);
  float spread=width*(.7+max(along,0.)*.25);
  float beam=exp(-distance*distance/max(.000001,spread*spread));
- return beam*smoothstep(0.,.08,along)*exp(-max(along,0.)*.65);
+ return beam*smoothstep(0.,.08,along)*exp(-max(along,0.)*1.25);
 }
-// A soft sigmoid shoulder supplies width around a hairline core; a faint tail reaches farther.
+// Very soft continuous scattering around the hairline core, without a visible halo boundary.
 float diffusion(vec2 p,vec2 source,vec2 target){
  vec2 direction=normalize(target-source+vec2(.0001)),delta=p-source;
  float along=dot(delta,direction);
  float distance=abs(delta.x*direction.y-delta.y*direction.x);
  float widening=.7+max(along,0.)*.25;
- float normalized=distance/max(.0001,.0045*widening);
- float body=(1.+exp(-1.76))/(1.+exp(clamp(2.2*(normalized-.8),-20.,20.)));
- float tail=.06*pow(1.+distance/(.018*widening),-1.45);
- float outerFade=1.-smoothstep(.13*widening,.22*widening,distance);
- return .65*(body+tail)/1.06*outerFade*smoothstep(0.,.08,along)*exp(-max(along,0.)*.65);
+ float normalized=distance/max(.0001,.007*widening);
+ // No shoulder or finite-radius cut: scattered light tapers continuously into the air.
+ float body=exp(-pow(normalized,1.1));
+ float tail=.045*pow(1.+distance/(.023*widening),-1.65);
+ float outerFade=exp(-pow(distance/(.32*widening),2.));
+ return .46*(body+tail)/1.045*outerFade*smoothstep(0.,.08,along)*exp(-max(along,0.)*1.25);
 }
 void main(){
  vec2 uv=gl_FragCoord.xy/resolution;vec2 screen=vec2((uv.x-.5)*aspect,uv.y);
@@ -148,17 +149,20 @@ void main(){
  float deepLayer=mist(screen*.48,51.2,vec2(.001,-.000583))*.7;
  vec2 distant=screen*.57+vec2(time*.0006,-time*.00035);
  float farLayer=smoothstep(.22,.78,field(distant*3.4+11.)*.65+field(distant*7.1+4.)*.35)*.7;
- float openAir=smoothstep(.2,.73,field(screen*2.1+vec2(time*.004,17.)));
+ // Clear pockets move in the same flow as the smoke instead of masking fixed screen locations.
+ vec2 airFlow=screen+vec2(time*.012,-time*.007);
+ vec2 airWarp=(vec2(field(airFlow*3.7+vec2(time*.017,8.)),field(airFlow*4.1+vec2(21.,-time*.013)))-.5)*.12;
+ float openAir=smoothstep(.2,.73,field((airFlow+airWarp)*2.1+17.));
  float nearDensity=nearLayer*(1.2+fine*.45)*mix(.25,1.,openAir)+frontLayer*.46+closeLayer*.3;
  float middleDensity=middleLayer*.65+backLayer*.42+deepLayer*.28;
  float farDensity=farLayer*.2;
  float transmission=exp(-nearDensity*.32);
  float density=nearDensity+transmission*(middleDensity+farDensity);
  // Several gently warped scales break up broad cut-out patches into organic gaps.
- vec2 bankFlow=screen+vec2(time*.006,0.);
- bankFlow+=(vec2(field(screen*4.7+8.),field(screen*5.3+21.))-.5)*.18;
+ vec2 bankFlow=airFlow;
+ bankFlow+=(vec2(field(airFlow*4.7+vec2(time*.019,8.)),field(airFlow*5.3+vec2(21.,-time*.016)))-.5)*.18;
  float banks=field(bankFlow*7.6+8.)*.3+field(bankFlow*14.3+19.)*.4+field(bankFlow*27.1+31.)*.3;
- float bankMask=smoothstep(.27,.72,banks);
+ float bankMask=smoothstep(.2,.79,banks);
  density*=mix(.24,1.7,bankMask);
  density*=mix(.3,1.4,smoothstep(.05,.52,density));
  // Shader y grows upward: smoke collects below and gradually thins overhead.
@@ -167,30 +171,36 @@ void main(){
  // A very thin uniform haze keeps a faint laser trace in otherwise clear air.
  density+=.018;
  // Side-view laser visibility comes from local scattering, not a solid luminous line.
- float scatteringVisibility=pow(smoothstep(.06,.55,density+dust*.15),1.5);
+ float scatteringVisibility=pow(smoothstep(.07,.4,density+dust*.15),1.7);
  light*=mix(.002,1.,scatteringVisibility);
  // A shared physical density field is revealed by the existing beam masks.
  // Cyan chroma survives bright intersections instead of clipping toward white.
  vec3 scattered=beamColor*min(max(illuminationA,illuminationB),2.4);
- light+=density*scattered*2.2;
+ float scatteringResponse=density*mix(.5,1.65,smoothstep(.02,.42,density));
+ light+=scatteringResponse*scattered*2.6;
  float veil=(farLayer*.75+middleLayer*.28+backLayer*.22+deepLayer*.15)*mix(.09,1.25,bankMask)*heightDensity*.65;
  light+=veil*vec3(.027,.03,.04)+nearDensity*heightDensity*vec3(.004,.007,.009);
  light+=dust*scattered*.1;
  float microDust=microParticles(screen);
  light+=microDust*(scattered*.65+beamColor*.006);
- light+=floatingDust(screen)*(scattered*.6+vec3(.012,.017,.014));
+ float flecks=floatingDust(screen);
+ float sparkLight=min(max(illuminationA,illuminationB),2.);
+ light+=flecks*(scattered*.9+mix(beamColor,vec3(1.),.8)*sparkLight*1.8+vec3(.012,.017,.014));
  // A small high-luminance core and local bloom give the light a polished sparkle.
  float glintPattern=smoothstep(.42,.72,field(screen*41.+vec2(time*.025,-time*.018)));
- float glintVisibility=smoothstep(.025,.18,density+dust*.1);
+ float glintVisibility=smoothstep(.04,.22,density+dust*.1);
  float glintStrength=glintVisibility*(.35+glintPattern*2.4+dust);
  light+=mix(beamColor,vec3(1.),.72)*beamCore*glintStrength*3.0;
- light+=beamColor*coreHalo*glintPattern*glintVisibility*.45;
+ light+=beamColor*coreHalo*glintPattern*glintVisibility*.08;
 
  // Compress brightness equally across channels to retain the light colour.
  light=light*1.65/(1.+max(light.r,max(light.g,light.b))*1.15);
  // Preserve small white-hot highlights after compressing the diffuse green light.
  float specular=clamp(beamCore*glintStrength,0.,1.);
  light=mix(light,vec3(.85,1.,.91),specular*.88);
+ // Keep rare particle flashes crisp rather than flattening them in the tone curve.
+ float spark=clamp(flecks*sparkLight*3.,0.,1.);
+ light=mix(light,vec3(.94,1.,.96),spark*.95);
  gl_FragColor=vec4(light,1.);
 }`;
 

@@ -3,6 +3,7 @@ import { design } from './design-settings.js';
 import { createLanding, installLandingEntrance } from './landing.js';
 import { installPointerEffects } from './pointer-effects.js';
 import { installContactLasers } from './materials/data/contact-lasers.js';
+import { installContactClock } from './materials/data/contact-clock.js';
 import { installSkillsAccordion } from './materials/data/skills-accordion.js';
 import { installNavigation } from './navigation.js';
 import { installProjectPreviews } from './materials/data/project-previews.js';
@@ -317,6 +318,43 @@ async function startApp() {
   main.className = `portfolio-page ${route}-page ${route === 'home' ? '' : 'inner-page'}`;
   const landing = createLanding(landings[route], {page, navigation});
   main.append(landing.root);
+  if(route==='contact'){
+    const content=landing.hero.querySelector('.landing-content');
+    const panel=element('div',undefined,'contact-content-panel');
+    for(const node of [...content.children])if(!node.classList.contains('landing-title-composition'))panel.append(node);
+    const profiles=element('div',undefined,'contact-profiles');profiles.setAttribute('aria-label','Social profiles');
+    for(const profile of page.contact?.profiles || []){
+      const control=profile.url?link('',profile.url,'contact-profile-link'):element('span',undefined,'contact-profile-link');
+      if(profile.url){control.target='_blank';control.rel='noopener noreferrer';control.setAttribute('aria-label',`${profile.label} (opens in a new tab)`);}
+      const tile=element('span',undefined,'skill-icon-tile');
+      const icon=element('img',undefined,'skill-icon');icon.src=profile.icon;icon.alt='';icon.width=20;icon.height=20;tile.append(icon);
+      control.append(tile,element('span',profile.label));profiles.append(control);
+    }
+    panel.querySelector('.hero-details')?.remove();
+    const makeSection=(label,className)=>{const group=element('div',undefined,`contact-group ${className}`);group.append(element('h2',label,'contact-group-label'));panel.append(group);return group;};
+    makeSection('Related links','contact-social-group').append(profiles);
+    const reach=makeSection('Get in touch','contact-reach-group');
+    const email=page.contact?.email;
+    if(email){const field=element('div',undefined,'contact-field');field.append(link(email,`mailto:${email}`,'contact-email'));reach.append(field);}
+    const phone=page.contact?.phone;
+    if(phone){const field=element('div',undefined,'contact-field');field.append(link(phone,`tel:${phone.replace(/[^+0-9]/g,'')}`,'contact-phone'));reach.append(field);}
+    const work=page.currentWork;
+    const clockGroup=makeSection('My local time','contact-clock-group');
+    const liveClock=element('time',undefined,'contact-live-clock');liveClock.dataset.zone=work?.timeZone||'Asia/Taipei';liveClock.setAttribute('aria-label','Current time in Taipei, UTC+8');
+    liveClock.append(element('span','00:00:00','contact-clock-seconds'),element('span','.00','contact-clock-fraction'));
+    clockGroup.append(liveClock,element('span','Taipei · UTC+8','contact-clock-zone'));
+
+    landing.hero.querySelector('.hero-status')?.remove();
+    const locationIntro=element('p',undefined,'contact-location-intro');
+    locationIntro.append(element('span','I’m currently based in','contact-location-caption'),element('strong',(work?.location||'Taiwan, Taipei, Zhongshan').toUpperCase()));
+    const clockCaption=element('div',undefined,'contact-clock-caption');
+    clockCaption.append(clockGroup.querySelector('.contact-group-label'),clockGroup.querySelector('.contact-clock-zone'));
+    clockGroup.prepend(clockCaption);
+    panel.prepend(locationIntro,clockGroup,reach);
+
+    content.append(panel);
+  }
+
   if (route === 'home' && experience?.items?.length) {
     const section = element('section', undefined, 'experience-section');
     section.id = 'experience';
@@ -615,6 +653,7 @@ async function startApp() {
     const stopEntrance = installLandingEntrance(landing, header, {animateHeader:initial});
     const stopPointer = installPointerEffects(landing.hero);
     const stopContactLasers=route==='contact'?installContactLasers(main):()=>{};
+    const stopContactClock=route==='contact'?installContactClock(main):()=>{};
     const stopSkills = installSkillsAccordion(main, {setScrollPosition:position => {
       if (smoothScroll) {
         smoothScroll.resize();
@@ -623,7 +662,7 @@ async function startApp() {
     }});
     const stopProjectPreviews = route === 'works' ? installProjectPreviews(main, projects) : () => {};
     const stopScrollMotion = installScrollMotion(main);
-    cleanup = () => { stopContactLasers(); stopProjectPreviews(); stopSkills(); stopScrollMotion(); stopEntrance?.(); stopPointer?.(); landing.destroy(); };
+    cleanup = () => { stopContactClock(); stopContactLasers(); stopProjectPreviews(); stopSkills(); stopScrollMotion(); stopEntrance?.(); stopPointer?.(); landing.destroy(); };
     currentRoute = route;
     updateScrollbar();
     menu.close();

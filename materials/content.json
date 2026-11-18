@@ -27,10 +27,19 @@
       "company": "Ideas Lab Formosa",
       "companyUrl": "https://ideaslab.com/",
       "connector": "at",
-      "location": "Neihu, Taipei, Taiwan",
+      "location": "Taiwan, Taipei, Zhongshan",
       "timeZone": "Asia/Taipei",
       "timeZoneLabel": "UTC+8",
       "clockLabel": "Current time in Taipei"
+    },
+    "contact": {
+      "profiles": [
+        {"label": "Personal GitHub", "url": "https://github.com/youminghu0930", "icon": "/materials/data/skill-icons/github.svg"},
+        {"label": "Public GitHub", "url": "https://github.com/youminghu0930-public", "icon": "/materials/data/skill-icons/github.svg"},
+        {"label": "LinkedIn", "url": "https://www.linkedin.com/in/youming-hu-6506b5446", "icon": "/materials/data/skill-icons/linkedin.svg"}
+      ],
+      "phone": "+886 981 224 068",
+      "email": "youminghu0930@gmail.com"
     },
     "breadcrumbLabel": "Breadcrumb",
     "mobileMenuLabel": "Menu",
@@ -371,7 +380,7 @@
     },
     "contact": {
       "label": "Contact",
-      "title": "Contact",
+      "title": "Find me here",
       "role": "",
       "description": "Contact information will be added here.",
       "stripeItems": [

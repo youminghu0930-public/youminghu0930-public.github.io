@@ -13,3 +13,5 @@ Unused legacy assets remain in this folder: the Meta and Hugging Face marks from
 OptiTrack and Motive use the official site icon from https://docs.optitrack.com/. Bertec uses the official site icon from https://www.bertec.com/. These company-owned assets identify the linked products and companies; they are not covered by the icon-library licenses above.
 
 The OpenAI mark used for Codex is from Simple Icons v15.0.0: https://github.com/simple-icons/simple-icons/blob/15.0.0/icons/openai.svg (CC0).
+
+LinkedIn SVG: locally drawn vector mark for the Contact profile row.
